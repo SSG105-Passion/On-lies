@@ -1,4 +1,4 @@
-import { GameMode, ScenarioItem, UserAnswer } from './types';
+import type { GameMode, ScenarioItem, UserAnswer } from './types';
 import { GAME_DATA } from './gameData';
 
 declare const Tone: any;

@@ -1,4 +1,4 @@
-import { GameMode, ScenarioItem } from './types';
+import type { GameMode, ScenarioItem } from './types';
 
 export const GAME_DATA: Record<GameMode, ScenarioItem[]> = {
   mail: [
