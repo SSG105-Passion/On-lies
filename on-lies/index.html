@@ -1,907 +1,208 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>On-lies - Fake OS Simulation Game</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tone.js for low-latency sound effects -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter & Press Start 2P for retro accents -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        pastelBg: '#C2D1D9',
-                        windowBg: '#E9EEF0',
-                        headerBg: '#D8E2E8',
-                        accentBlue: '#5B82A6',
-                        pastelRed: '#E86F6F',
-                        pastelGreen: '#61B183',
-                        pastelYellow: '#E5A93C',
-                        pastelPurple: '#937CB2'
-                    },
-                    fontFamily: {
-                        sans: ['Fredoka', 'Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #A2B5C1;
-            background-image: 
-                radial-gradient(#BDC3C7 1px, transparent 1px),
-                radial-gradient(#BDC3C7 1px, #A2B5C1 1px);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-            user-select: none;
-            font-family: 'Fredoka', 'Inter', sans-serif;
-        }
-
-        .os-window {
-            box-shadow: 0 16px 32px rgba(45, 60, 75, 0.25), 
-                        inset 0 2px 0 rgba(255, 255, 255, 0.8),
-                        0 0 0 3px #536471;
-            border-radius: 20px;
-        }
-
-        .retro-button {
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .retro-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .retro-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .glitch-flash {
-            animation: glitch 0.3s ease-in-out 2;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
-            20% { transform: translate(-4px, 4px) scale(1.002); filter: hue-rotate(90deg) contrast(1.5); }
-            40% { transform: translate(4px, -2px); filter: hue-rotate(180deg); }
-            60% { transform: translate(-2px, -4px); filter: hue-rotate(270deg); }
-            80% { transform: translate(2px, 2px); }
-            100% { transform: translate(0) scale(1); filter: hue-rotate(0deg); }
-        }
-
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #D8E2E8;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #9CB0BD;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7B93A4;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>On-lies Security Inspector</title>
+  <link rel="stylesheet" href="/src/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-x-hidden text-slate-800">
-
-    <!-- MAIN CONTAINER WINDOW -->
-    <div id="appWindow" class="os-window bg-windowBg w-full max-w-5xl h-[92vh] max-h-[820px] flex flex-col relative overflow-hidden transition-all duration-300">
-        
-        <!-- TOP DECK HEADER BAR -->
-        <div class="bg-headerBg px-4 py-3 border-b-2 border-slate-400 flex items-center justify-between shadow-sm">
-            
-            <!-- LOGO & BRANDING -->
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-gradient-to-tr from-sky-300 via-indigo-200 to-pink-300 rounded-xl border-2 border-slate-600 flex items-center justify-center font-bold text-xl text-slate-700 shadow-md transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
-                    <span class="text-indigo-600 font-extrabold tracking-tighter">OL</span>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-xl text-slate-700 leading-none tracking-wide">On-lies</h1>
-                    <p class="text-xs text-slate-500 font-medium">Cyber Security Simulator v1.0</p>
-                </div>
-            </div>
-
-            <!-- TOP RIGHT STATS & SURRENDER -->
-            <div class="flex items-center space-x-4">
-                
-                <!-- LIVES COUNTER -->
-                <div class="bg-slate-200/90 border-2 border-slate-400 px-4 py-1.5 rounded-full flex items-center space-x-2 shadow-inner">
-                    <div id="livesContainer" class="flex space-x-1 text-red-500 text-lg">
-                        <i class="fa-solid fa-heart animate-bounce"></i>
-                        <i class="fa-solid fa-heart animate-bounce" style="animation-delay: 0.1s"></i>
-                        <i class="fa-solid fa-heart text-slate-300"></i>
-                    </div>
-                    <span id="livesText" class="font-bold text-slate-700 text-sm ml-1">2/3 Lives</span>
-                </div>
-
-                <!-- SURRENDER BUTTON -->
-                <button onclick="triggerSurrender()" class="retro-button bg-slate-200 hover:bg-red-100 text-slate-700 hover:text-red-600 border-2 border-slate-400 hover:border-red-400 px-4 py-1.5 rounded-xl text-sm font-bold flex items-center space-x-1.5">
-                    <i class="fa-solid fa-flag"></i>
-                    <span>Bỏ cuộc</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- MAIN CONTENT WORKSPACE -->
-        <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-
-            <!-- SIDEBAR: GAME TYPE / APPS -->
-            <div class="w-full md:w-64 bg-slate-200/70 p-4 border-r-0 md:border-r-2 border-b-2 md:border-b-0 border-slate-300 flex flex-col space-y-4 shrink-0">
-                
-                <!-- NAVIGATION CARD BOX -->
-                <div class="bg-white/90 border-2 border-slate-400 rounded-2xl p-3 shadow-sm">
-                    <div class="text-center font-extrabold text-xs text-slate-500 tracking-wider uppercase mb-3 bg-slate-100 py-1 rounded-lg border border-slate-200">
-                        GAME TYPE
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2">
-                        <!-- POSTS TAB -->
-                        <button id="tab-posts" onclick="switchTab('posts')" class="tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-slate-300 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 transition-all">
-                            <i class="fa-solid fa-newspaper text-xl mb-1"></i>
-                            <span class="text-xs font-bold">Posts</span>
-                        </button>
-
-                        <!-- MESSAGES TAB -->
-                        <button id="tab-messages" onclick="switchTab('messages')" class="tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-slate-300 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 transition-all">
-                            <i class="fa-solid fa-comments text-xl mb-1"></i>
-                            <span class="text-xs font-bold">Messages</span>
-                        </button>
-
-                        <!-- MAIL TAB (ACTIVE DEFAULT) -->
-                        <button id="tab-mail" onclick="switchTab('mail')" class="tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-amber-400 bg-amber-200 text-amber-900 shadow-sm font-bold transition-all">
-                            <i class="fa-solid fa-envelope text-xl mb-1 text-amber-700"></i>
-                            <span class="text-xs font-bold">Mail</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- SCORE & PROGRESS CARD -->
-                <div class="bg-white/90 border-2 border-slate-400 rounded-2xl p-3 flex-1 flex flex-col justify-between shadow-sm">
-                    <div>
-                        <h3 class="font-bold text-slate-700 text-sm mb-2 flex items-center justify-between">
-                            <span><i class="fa-solid fa-shield-halved text-emerald-500 mr-1.5"></i>Nhiệm vụ:</span>
-                            <span id="resolvedCount" class="text-xs bg-slate-200 px-2 py-0.5 rounded-full text-slate-700 font-extrabold">0/4</span>
-                        </h3>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Phát hiện và xử lý đúng các email độc hại, tin nhắn lừa đảo hoặc mã độc đính kèm!
-                        </p>
-                    </div>
-
-                    <!-- TIPS / ALERT BOX -->
-                    <div class="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-800">
-                        <div class="font-bold mb-1 flex items-center">
-                            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>
-                            <span>Mẹo an toàn:</span>
-                        </div>
-                        <p class="text-[11px] leading-tight text-amber-900/80">Không tải file lạ (.exe, .zip), không nhấp vào link rút gọn đòi mật khẩu!</p>
-                    </div>
-                </div>
-
-                <!-- SURRENDER QUICK BOX -->
-                <button onclick="triggerSurrender()" class="retro-button w-full bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border-2 border-slate-400 py-2 rounded-xl text-xs font-bold text-center">
-                    Bỏ cuộc
-                </button>
-            </div>
-
-            <!-- TAB PANELS CONTENT AREA -->
-            <div class="flex-1 bg-slate-100/80 p-3 sm:p-5 overflow-y-auto relative">
-
-                <!-- 1. MAIL TAB CONTENT -->
-                <div id="view-mail" class="tab-view space-y-3">
-                    
-                    <!-- INBOX TOOLBAR -->
-                    <div class="bg-white p-2.5 rounded-xl border-2 border-slate-300 flex items-center justify-between shadow-sm">
-                        <div class="flex items-center space-x-2">
-                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-400">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Hộp thư đến</span>
-                        </div>
-                        <div class="text-xs text-slate-400 font-medium">
-                            Tự động lọc Spam & Security Sandbox
-                        </div>
-                    </div>
-
-                    <!-- MAIL LIST CONTAINER -->
-                    <div id="emailList" class="space-y-2">
-                        <!-- Emails dynamically injected here via JS -->
-                    </div>
-                </div>
-
-                <!-- 2. MESSAGES TAB CONTENT -->
-                <div id="view-messages" class="tab-view hidden space-y-3">
-                    <div class="bg-white p-3 rounded-xl border-2 border-slate-300 shadow-sm flex items-center justify-between">
-                        <h2 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-comments text-sky-500 mr-2"></i>Tin nhắn On-Messenger</h2>
-                        <span class="text-xs text-slate-400">Đang trực tuyến</span>
-                    </div>
-
-                    <div id="messageList" class="space-y-2">
-                        <!-- Message threads dynamically rendered -->
-                    </div>
-                </div>
-
-                <!-- 3. POSTS TAB CONTENT -->
-                <div id="view-posts" class="tab-view hidden space-y-3">
-                    <div class="bg-white p-3 rounded-xl border-2 border-slate-300 shadow-sm flex items-center justify-between">
-                        <h2 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-globe text-indigo-500 mr-2"></i>Bản tin On-Social</h2>
-                        <span class="text-xs text-slate-400">Tin mới cập nhật</span>
-                    </div>
-
-                    <div id="postsList" class="space-y-3">
-                        <!-- Social feed items dynamically rendered -->
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- FOOTER TASKBAR -->
-        <div class="bg-slate-300 border-t-2 border-slate-400 px-4 py-2 flex items-center justify-between text-xs text-slate-600">
-            <div class="flex items-center space-x-3">
-                <button onclick="switchTab('mail')" class="hover:text-slate-900 transition-colors" title="Trang chủ"><i class="fa-solid fa-house text-base"></i></button>
-                <button onclick="showToast('Hệ thống đang hoạt động ổn định', 'info')" class="hover:text-slate-900 transition-colors" title="Cài đặt"><i class="fa-solid fa-gear text-base"></i></button>
-                <button onclick="triggerSurrender()" class="hover:text-red-600 transition-colors" title="Thoát"><i class="fa-solid fa-right-from-bracket text-base"></i></button>
-            </div>
-            <div class="flex items-center space-x-2 font-mono text-[11px] text-slate-500">
-                <i class="fa-regular fa-clock"></i>
-                <span id="currentTime">10:42 AM</span>
-            </div>
-        </div>
-
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 font-mono select-none">
+  <!-- OS WINDOW CONTAINER -->
+  <div class="os-window w-full max-w-5xl h-[92vh] flex flex-col relative overflow-hidden">
+    
+    <!-- TOP OS BAR -->
+    <div class="os-titlebar px-4 py-2 flex justify-between items-center text-xs tracking-wider">
+      <div class="flex items-center space-x-2">
+        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+        <span class="font-bold ml-2 text-slate-700">OS_SEC_V3.0.4 // ON-LIES</span>
+      </div>
+      <div id="statsBar" class="hidden flex items-center space-x-4">
+        <span id="roundBadge" class="stat-pill text-indigo-700 font-bold">VÒNG 1 / 3</span>
+        <span id="scoreBadge" class="stat-pill text-emerald-700 font-bold">ĐIỂM: 0 / 9</span>
+        <span id="livesDisplay" class="stat-pill text-rose-700 font-bold">3 / 3 💔</span>
+      </div>
     </div>
 
-    <!-- EMAIL DETAIL MODAL -->
-    <div id="emailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-windowBg border-2 border-slate-500 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            
-            <!-- MODAL HEADER -->
-            <div class="bg-headerBg px-4 py-3 border-b-2 border-slate-400 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 rounded-full bg-rose-400 border border-slate-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-amber-400 border border-slate-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-emerald-400 border border-slate-500"></span>
-                    <h3 id="modalSubject" class="font-bold text-slate-700 text-sm ml-2 truncate">Chi tiết Email</h3>
-                </div>
-                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800 p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- MODAL BODY -->
-            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 bg-white flex-1">
-                <!-- SENDER METADATA -->
-                <div class="flex items-start justify-between border-b pb-3 border-slate-200">
-                    <div class="flex items-center space-x-3">
-                        <div id="modalAvatar" class="w-10 h-10 rounded-full bg-indigo-500 text-white font-bold flex items-center justify-center text-base shadow">
-                            N
-                        </div>
-                        <div>
-                            <div id="modalSender" class="font-bold text-slate-800 text-sm">Sender Name</div>
-                            <div id="modalEmailAddr" class="text-xs text-slate-400">sender@domain.com</div>
-                        </div>
-                    </div>
-                    <span id="modalTime" class="text-xs font-mono text-slate-400">Hôm nay, 09:15</span>
-                </div>
-
-                <!-- CONTENT BODY TEXT -->
-                <div id="modalBody" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line font-sans pt-2">
-                    Nội dung chi tiết email...
-                </div>
-
-                <!-- ATTACHMENT BOX IF APPLICABLE -->
-                <div id="modalAttachment" class="hidden bg-slate-50 border-2 border-dashed border-slate-300 p-3 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i id="modalAttachIcon" class="fa-solid fa-file-code text-2xl text-indigo-500"></i>
-                        <div>
-                            <div id="modalAttachName" class="text-xs font-bold text-slate-700">file_attachment.exe</div>
-                            <div id="modalAttachSize" class="text-[10px] text-slate-400">2.4 MB - File ứng dụng</div>
-                        </div>
-                    </div>
-                    <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">Chưa quét mã độc</span>
-                </div>
-            </div>
-
-            <!-- ACTION BUTTONS FOOTER -->
-            <div class="bg-slate-200 px-4 py-3 border-t-2 border-slate-300 flex flex-wrap gap-2 justify-end">
-                <button id="btnActionDelete" class="retro-button bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>XÓA NGAY (Báo Phishing)</span>
-                </button>
-                
-                <button id="btnActionDownload" class="retro-button bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1.5 shadow">
-                    <i class="fa-solid fa-download"></i>
-                    <span>TẢI VỀ / THỰC THI</span>
-                </button>
-
-                <button onclick="closeModal()" class="retro-button bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">
-                    Đóng / Bỏ qua
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION BOX -->
-    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl border-2 border-slate-600 flex items-center space-x-3 max-w-sm">
-        <i id="toastIcon" class="fa-solid fa-circle-info text-sky-400 text-lg"></i>
-        <div id="toastMessage" class="text-xs font-medium">Thông báo hệ thống</div>
-    </div>
-
-    <!-- GAME OVER / VICTORY MODAL -->
-    <div id="endGameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border-4 border-slate-700 rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl transform animate-in zoom-in-95 duration-200">
-            <div id="endGameIcon" class="w-16 h-16 rounded-full bg-rose-100 text-rose-500 text-3xl flex items-center justify-center mx-auto border-2 border-rose-300">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h2 id="endGameTitle" class="text-2xl font-extrabold text-slate-800">Thất bại!</h2>
-            <p id="endGameDesc" class="text-xs text-slate-600 leading-relaxed">
-                Máy tính của bạn đã bị nhiễm mã độc độc hại do tải nhầm tệp lừa đảo.
-            </p>
-
-            <div class="bg-slate-100 p-3 rounded-xl text-left text-xs space-y-1 font-mono text-slate-700">
-                <div>Điểm đạt được: <span id="finalScore" class="font-bold text-indigo-600">0</span></div>
-                <div>Lỗi vi phạm: <span id="finalErrors" class="font-bold text-rose-600">3 Lần</span></div>
-            </div>
-
-            <button onclick="restartGame()" class="retro-button w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg">
-                Chơi lại từ đầu
+    <!-- MAIN BODY CONTENT -->
+    <div class="flex-1 flex overflow-hidden relative">
+      
+      <!-- MODE SELECTION (INTRO SCREEN) -->
+      <div id="modeSelectOverlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-md z-30 flex items-center justify-center p-6">
+        <div class="bg-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl text-center">
+          <div class="inline-block p-3 bg-indigo-500/10 rounded-2xl mb-3">
+            <span class="text-4xl">🛡️</span>
+          </div>
+          <h1 class="text-3xl font-black text-indigo-400 mb-1">ON-LIES INSPECTOR</h1>
+          <p class="text-xs text-slate-400 mb-6">MÔ PHỎNG AN NINH MẠNG • XÁC MINH TIN NHẮN & THƯ ĐIỆN TỬ</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <button onclick="selectGameMode('mail')" id="card-mail" class="mode-card border-indigo-500 bg-indigo-500/10 p-4 rounded-xl text-left border-2">
+              <div class="text-2xl mb-1">📬</div>
+              <div class="font-bold text-sm text-indigo-300">Mail Inspector</div>
+              <div class="text-[10px] text-slate-400 mt-1">Kiểm tra Email, domain giả mạo, file đính kèm độc hại.</div>
             </button>
+            <button onclick="selectGameMode('messages')" id="card-messages" class="mode-card border-slate-700 p-4 rounded-xl text-left border-2 hover:border-slate-500">
+              <div class="text-2xl mb-1">💬</div>
+              <div class="font-bold text-sm text-indigo-300">Messages Guard</div>
+              <div class="text-[10px] text-slate-400 mt-1">Phát hiện link lừa đảo SMS, fake tin nhắn ngân hàng.</div>
+            </button>
+            <button onclick="selectGameMode('posts')" id="card-posts" class="mode-card border-slate-700 p-4 rounded-xl text-left border-2 hover:border-slate-500">
+              <div class="text-2xl mb-1">🌐</div>
+              <div class="font-bold text-sm text-indigo-300">Posts Verifier</div>
+              <div class="text-[10px] text-slate-400 mt-1">Soát lỗi bài đăng mạng xã hội, tin giả & quà tặng ảo.</div>
+            </button>
+          </div>
+
+          <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800 text-left text-xs mb-6 text-slate-300 space-y-1">
+            <p>🎯 <strong>Quy tắc trò chơi:</strong></p>
+            <p>• Trải qua <strong>3 Vòng chơi</strong> (Mỗi vòng 3 tình huống = Tổng 9 tình huống).</p>
+            <p>• Bạn có <strong>3 Lượt sống</strong>. Nhận diện sai sẽ bị trừ 1 sống.</p>
+            <p>• Hoàn thành để xem <strong>Báo cáo phân tích kỹ thuật chi tiết</strong>.</p>
+          </div>
+
+          <button id="startGameBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition">
+            KHÓA CHẾ ĐỘ & BẮT ĐẦU VÒNG 1 🚀
+          </button>
         </div>
+      </div>
+
+      <!-- MAIN APP CONTAINER -->
+      <div id="gameApp" class="flex-1 flex flex-col md:flex-row overflow-hidden opacity-30 pointer-events-none transition-all duration-300">
+        
+        <!-- SIDEBAR -->
+        <div class="w-full md:w-56 bg-slate-950/50 border-r border-slate-800/80 p-3 flex flex-col justify-between">
+          <div>
+            <div class="px-2 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Hộp thư / Tải lên</div>
+            <nav class="space-y-1">
+              <div id="nav-mail" class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-indigo-600/20 text-indigo-300 font-bold text-xs border border-indigo-500/30">
+                <span>📬</span><span>Mail Inbox</span>
+              </div>
+              <div id="nav-messages" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-slate-400 text-xs opacity-50">
+                <span>💬</span><span>Messages</span>
+              </div>
+              <div id="nav-posts" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-slate-400 text-xs opacity-50">
+                <span>🌐</span><span>Social Posts</span>
+              </div>
+            </nav>
+          </div>
+          
+          <button id="resetGameBtn" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 flex items-center justify-center space-x-1">
+            <span>🔄</span><span>Thoát / Đổi Chế Độ</span>
+          </button>
+        </div>
+
+        <!-- CONTENT WORKSPACE -->
+        <div class="flex-1 flex flex-col overflow-hidden bg-slate-900/50">
+          <div class="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+            <div>
+              <h2 id="currentModeTitle" class="text-sm font-bold text-indigo-300">MAIL INSPECTOR</h2>
+              <p class="text-[10px] text-slate-400">Danh sách tình huống trong <span id="roundLabelTitle" class="text-indigo-400">Vòng 1</span></p>
+            </div>
+            <button id="nextRoundBtn" class="hidden px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow-md animate-pulse">
+              TIẾP TỤC SANG VÒNG KẾ ➔
+            </button>
+          </div>
+
+          <!-- LIST ITEM VIEW -->
+          <div id="itemList" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- ITEM INSPECTION MODAL -->
+      <div id="inspectModal" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+          <div class="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+            <span class="text-xs font-bold text-slate-300">CHI TIẾT MẪU KIỂM TRA (#<span id="modalItemId"></span>)</span>
+            <button id="closeModalBtn" class="text-slate-400 hover:text-white font-bold text-sm px-2">✕</button>
+          </div>
+          
+          <div class="p-4 overflow-y-auto space-y-3 text-xs flex-1">
+            <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-1">
+              <div><span class="text-slate-500">Người gửi:</span> <span id="modalSender" class="font-bold text-slate-200"></span></div>
+              <div><span class="text-slate-500">Địa chỉ thực:</span> <span id="modalAddress" class="text-amber-300 font-mono"></span></div>
+              <div><span class="text-slate-500">Tiêu đề / Mục:</span> <span id="modalSubject" class="text-slate-300 font-semibold"></span></div>
+              <div><span class="text-slate-500">Xác thực SPF/DKIM:</span> <span id="modalSpf" class="font-mono"></span></div>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded border border-slate-800">
+              <div class="text-[10px] text-slate-500 mb-1 uppercase tracking-wider">Nội dung văn bản:</div>
+              <p id="modalBody" class="text-slate-300 whitespace-pre-wrap leading-relaxed font-sans"></p>
+            </div>
+
+            <div id="modalAttachmentBox" class="bg-indigo-950/30 p-2.5 rounded border border-indigo-900/50 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span>📎</span>
+                <span id="modalAttachment" class="text-indigo-300 font-mono"></span>
+              </div>
+              <span class="text-[10px] bg-indigo-900/80 px-2 py-0.5 rounded text-indigo-200 font-bold">TỆP ĐÍNH KÈM</span>
+            </div>
+          </div>
+
+          <div class="p-3 border-t border-slate-800 bg-slate-950 flex space-x-2">
+            <button id="btnActionScam" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded text-xs transition">
+              🚨 BÁO CÁO SCAM
+            </button>
+            <button id="btnActionSafe" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-xs transition">
+              ✅ XÁC NHẬN AN TOÀN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL SUMMARY REPORT SCREEN -->
+      <div id="resultScreen" class="hidden absolute inset-0 bg-slate-950 z-50 flex flex-col p-6 overflow-y-auto">
+        <div class="max-w-3xl mx-auto w-full space-y-6">
+          <div class="text-center space-y-2">
+            <div id="resultStatusIcon" class="text-5xl">🏆</div>
+            <h2 id="resultTitle" class="text-2xl font-black text-indigo-400">BÁO CÁO TỔNG CẾT AN NINH MẠNG</h2>
+            <p class="text-xs text-slate-400">Phân tích kết quả kiểm tra qua 3 vòng đánh giá</p>
+          </div>
+
+          <!-- NUMERICAL METRICS -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+              <div class="text-[10px] text-slate-400">TỔNG ĐIỂM DỰ ĐOÁN</div>
+              <div id="finalScore" class="text-xl font-bold text-indigo-400 mt-1">0 / 9</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+              <div class="text-[10px] text-slate-400">TỶ LỆ CHÍNH XÁC</div>
+              <div id="finalAccuracy" class="text-xl font-bold text-emerald-400 mt-1">0%</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+              <div class="text-[10px] text-slate-400">MẠNG SỐNG CÒN LẠI</div>
+              <div id="finalLives" class="text-xl font-bold text-rose-400 mt-1">3 / 3</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-center">
+              <div class="text-[10px] text-slate-400">VÒNG HOÀN THÀNH</div>
+              <div id="finalRounds" class="text-xl font-bold text-amber-400 mt-1">3 / 3</div>
+            </div>
+          </div>
+
+          <!-- EXPLANATION / ANALYSIS FEED -->
+          <div class="bg-slate-900 rounded-xl border border-slate-800 p-4 space-y-3">
+            <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">
+              📋 CHI TIẾT BẢN CÁO LỖI & GIẢI THÍCH AN TOÀN
+            </h3>
+            <div id="breakdownContainer" class="space-y-3"></div>
+          </div>
+
+          <div class="flex space-x-3 pt-2">
+            <button id="restartGameBtn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition shadow-lg">
+              🔄 CHƠI LẠI CHẾ ĐỘ NÀY
+            </button>
+            <button id="changeModeBtn" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
+              🔀 ĐỔI CHẾ ĐỘ KHÁC
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <script>
-        // --- GAME DATA STRUCTURES ---
-        const emailsData = [
-            {
-                id: 'mail-1',
-                sender: 'Nguyễn Duy Nhật Anh',
-                emailAddr: 'nhatanh.dev@fasttech-security.vn',
-                avatarBg: 'bg-purple-600',
-                avatarChar: 'N',
-                subject: 'Project Proposal & Low-level C Architecture',
-                time: '09:30 AM',
-                isPhishing: true,
-                body: `Chào bạn,
-
-Tôi đã hoàn thiện bản thảo thiết kế kiến trúc hệ thống C cấp thấp cho dự án mới. 
-
-Vui lòng tải về file đính kèm "project_proposal_v2.exe" bên dưới để xem báo cáo tổng quan và chạy thử nghiệm module benchmark.
-
-Thân ái,
-Nguyễn Duy Nhật Anh`,
-                attachment: {
-                    name: 'project_proposal_v2.exe',
-                    size: '4.8 MB',
-                    icon: 'fa-file-code text-rose-500'
-                },
-                explanation: 'File đính kèm có đuôi .exe từ nguồn không xác minh là Trojan lừa đảo!'
-            },
-            {
-                id: 'mail-2',
-                sender: 'Đại học XYZ',
-                emailAddr: 'pdaotao@xyz.edu.vn',
-                avatarBg: 'bg-emerald-600',
-                avatarChar: 'U',
-                subject: 'THÔNG BÁO THU HỌC PHÍ HỌC KỲ MOOC',
-                time: '08:15 AM',
-                isPhishing: false,
-                body: `Kính gửi Sinh viên,
-
-Nhà trường xin thông báo lịch thu học phí học kỳ MOOC mới. Vui lòng đăng nhập cổng thông tin chính thức đào tạo tại đại học XYZ để kiểm tra mức phí chi tiết.
-
-Thời hạn thanh toán: Trước ngày 20 tháng này.
-
-Ban Giám Hiệu Đại Học XYZ.`,
-                attachment: {
-                    name: 'HoaDon_HocPhi.pdf',
-                    size: '520 KB',
-                    icon: 'fa-file-pdf text-emerald-500'
-                },
-                explanation: 'Đây là thông báo chính thức hợp lệ từ cổng trường đại học (.edu.vn).'
-            },
-            {
-                id: 'mail-3',
-                sender: 'Tuyển dụng FastTech',
-                emailAddr: 'hr@fasttech-corp.com',
-                avatarBg: 'bg-blue-600',
-                avatarChar: 'F',
-                subject: 'Thư Mời Phỏng Vấn Intern C/Systems Engineer',
-                time: 'Hôm qua',
-                isPhishing: false,
-                body: `Chào ứng viên,
-
-Chúng tôi rất ấn tượng với hồ sơ của bạn cho vị trí Intern C / Systems Engineer tại FastTech.
-
-Chúng tôi trân trọng mời bạn tham gia buổi phỏng vấn kỹ thuật trực tuyến diễn ra vào lúc 14:00 chiều mai.
-
-Trân trọng,
-Bộ phận Tuyển dụng FastTech.`,
-                attachment: null,
-                explanation: 'Thư mời tuyển dụng hợp lệ không yêu cầu mật khẩu hay file thực thi.'
-            },
-            {
-                id: 'mail-4',
-                sender: 'Tuyển dụng FastTech',
-                emailAddr: 'no-reply@fasttech-login-auth2983.xyz',
-                avatarBg: 'bg-amber-600',
-                avatarChar: 'T',
-                subject: 'Link phỏng vấn trực tuyến & Xác minh tài khoản',
-                time: 'Hôm qua',
-                isPhishing: true,
-                body: `Kính gửi Ứng viên,
-
-Để hoàn tất thủ tục đăng ký phòng phỏng vấn trực tuyến, vui lòng nhấp vào đường link bên dưới và đăng nhập bằng MẬT KHẨU EMAIL của bạn để hệ thống cấp mã Token xác nhận:
-
-http://fasttech-login-auth2983.xyz/verify-login
-
-* Lưu ý: Nếu không đăng nhập xác minh trước 15 phút, lịch phỏng vấn sẽ tự động hủy.`,
-                attachment: null,
-                explanation: 'Tên miền giả mạo (.xyz) và yêu cầu nhập mật khẩu email là chiêu thức lấy cắp tài khoản (Credential Harvesting)!'
-            }
-        ];
-
-        const messagesData = [
-            {
-                id: 'msg-1',
-                sender: 'Ngân hàng SafeBank CSKH',
-                time: '10:05 AM',
-                avatarBg: 'bg-rose-500',
-                preview: 'Cảnh báo: Tài khoản của bạn bị khóa! Nhấp link để mở...',
-                isPhishing: true,
-                body: 'Tài khoản SafeBank của quý khách tạm khóa do đăng nhập bất thường. Nhấp link www.safebank-verify-security.cc và nhập mã OTP gửi tới máy bạn để mở khóa khẩn cấp!'
-            },
-            {
-                id: 'msg-2',
-                sender: 'Thầy Cố Vấn Học Tập',
-                time: '09:00 AM',
-                avatarBg: 'bg-indigo-500',
-                preview: 'Nhắc nhở nộp báo cáo thực tập tuần này',
-                isPhishing: false,
-                body: 'Chào em, nhớ nộp báo cáo tiến độ tuần này qua hệ thống portal của trường trước 17h thứ 6 nhé.'
-            }
-        ];
-
-        const postsData = [
-            {
-                id: 'post-1',
-                author: 'Quà Tặng Công Nghệ 247',
-                time: '2 giờ trước',
-                avatarBg: 'bg-pink-500',
-                content: '🎉 TRI ÂN KHÁCH HÀNG: Tặng miễn phí 100 chiếc iPhone 15 Pro Max cho người dùng nhanh tay nhất! Nhấp link bit.ly/nhan-iphone-mien-phi và nhập số thẻ ngân hàng để thanh toán phí ship 20k!',
-                isPhishing: true
-            },
-            {
-                id: 'post-2',
-                author: 'Cổng Thông Tin An Ninh Mạng',
-                time: '5 giờ trước',
-                avatarBg: 'bg-sky-600',
-                content: 'Cảnh báo: Xuất hiện nhiều chiến dịch lừa đảo giả danh thư mời tuyển dụng và hóa đơn học phí để phát tán mã độc mã hóa dữ liệu (Ransomware). Người dân cần chú ý kiểm tra kỹ địa chỉ email người gửi.',
-                isPhishing: false
-            }
-        ];
-
-        // --- GAME STATE ---
-        let lives = 2;
-        const maxLives = 3;
-        let resolvedItems = new Set();
-        let selectedMailId = null;
-
-        // Sound FX with Tone.js
-        let synth = null;
-
-        function initAudio() {
-            if (!synth && typeof Tone !== 'undefined') {
-                synth = new Tone.Synth().toDestination();
-            }
-        }
-
-        function playSound(type) {
-            try {
-                initAudio();
-                if (!synth) return;
-                
-                if (type === 'click') {
-                    synth.triggerAttackRelease('C5', '8n');
-                } else if (type === 'success') {
-                    const now = Tone.now();
-                    synth.triggerAttackRelease('E5', '8n', now);
-                    synth.triggerAttackRelease('G5', '8n', now + 0.1);
-                } else if (type === 'error') {
-                    const now = Tone.now();
-                    synth.triggerAttackRelease('A2', '8n', now);
-                    synth.triggerAttackRelease('F2', '8n', now + 0.12);
-                }
-            } catch (e) {
-                // Audio fallback
-            }
-        }
-
-        // --- RENDER LOGIC ---
-        function renderMailList() {
-            const container = document.getElementById('emailList');
-            container.innerHTML = '';
-
-            emailsData.forEach(mail => {
-                const isResolved = resolvedItems.has(mail.id);
-                const itemEl = document.createElement('div');
-                itemEl.className = `bg-white border-2 ${isResolved ? 'border-slate-200 opacity-60' : 'border-slate-300 hover:border-indigo-400'} rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all shadow-sm`;
-
-                itemEl.innerHTML = `
-                    <div class="flex items-center space-x-3 flex-1 min-w-0 cursor-pointer" onclick="openEmailModal('${mail.id}')">
-                        <button onclick="event.stopPropagation(); toggleStar(this)" class="text-slate-300 hover:text-amber-400 text-sm">
-                            <i class="fa-solid fa-star"></i>
-                        </button>
-                        <input type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 rounded border-slate-300 text-indigo-600">
-                        <div class="w-9 h-9 rounded-full ${mail.avatarBg} text-white font-bold flex items-center justify-center text-sm shrink-0">
-                            ${mail.avatarChar}
-                        </div>
-                        <div class="truncate flex-1">
-                            <div class="flex items-center space-x-2">
-                                <span class="font-bold text-slate-800 text-xs sm:text-sm truncate">${mail.sender}</span>
-                                ${isResolved ? '<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">Đã xử lý</span>' : ''}
-                            </div>
-                            <div class="text-xs text-slate-500 truncate">${mail.subject}</div>
-                        </div>
-                    </div>
-
-                    <!-- ACTION BUTTONS matching screenshot specifications -->
-                    <div class="flex items-center space-x-1.5 shrink-0 self-end sm:self-auto">
-                        <button onclick="handleQuickAction('${mail.id}', 'delete')" class="retro-button bg-pastelRed hover:bg-rose-600 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg">
-                            XÓA NGAY
-                        </button>
-                        <button onclick="handleQuickAction('${mail.id}', 'download')" class="retro-button bg-pastelGreen hover:bg-emerald-600 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg">
-                            TẢI VỀ
-                        </button>
-                        <button onclick="openEmailModal('${mail.id}')" class="retro-button bg-accentBlue hover:bg-sky-600 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg">
-                            XEM THÊM
-                        </button>
-                    </div>
-                `;
-                container.appendChild(itemEl);
-            });
-        }
-
-        function renderMessages() {
-            const container = document.getElementById('messageList');
-            container.innerHTML = '';
-
-            messagesData.forEach(msg => {
-                const isResolved = resolvedItems.has(msg.id);
-                const el = document.createElement('div');
-                el.className = `bg-white border-2 border-slate-300 rounded-xl p-3 flex items-start justify-between space-x-3 ${isResolved ? 'opacity-50' : ''}`;
-                el.innerHTML = `
-                    <div class="flex items-start space-x-3 flex-1">
-                        <div class="w-9 h-9 rounded-full ${msg.avatarBg} text-white font-bold flex items-center justify-center text-xs shrink-0">
-                            <i class="fa-solid fa-user"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-800 text-xs">${msg.sender} <span class="text-[10px] text-slate-400 font-normal ml-2">${msg.time}</span></div>
-                            <p class="text-xs text-slate-600 mt-1">${msg.body}</p>
-                        </div>
-                    </div>
-                    <div class="flex flex-col space-y-1">
-                        <button onclick="handleMessageAction('${msg.id}', 'report')" class="retro-button bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded">Báo Phishing</button>
-                        <button onclick="handleMessageAction('${msg.id}', 'trust')" class="retro-button bg-sky-500 text-white text-[10px] font-bold px-2 py-1 rounded">Tin tưởng</button>
-                    </div>
-                `;
-                container.appendChild(el);
-            });
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('postsList');
-            container.innerHTML = '';
-
-            postsData.forEach(post => {
-                const isResolved = resolvedItems.has(post.id);
-                const el = document.createElement('div');
-                el.className = `bg-white border-2 border-slate-300 rounded-xl p-4 space-y-2 ${isResolved ? 'opacity-50' : ''}`;
-                el.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 rounded-full ${post.avatarBg} text-white flex items-center justify-center text-xs font-bold">
-                            <i class="fa-solid fa-rss"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-xs text-slate-800">${post.author}</div>
-                            <div class="text-[10px] text-slate-400">${post.time}</div>
-                        </div>
-                    </div>
-                    <p class="text-xs text-slate-700 leading-relaxed">${post.content}</p>
-                    <div class="pt-2 border-t flex justify-end space-x-2">
-                        <button onclick="handlePostAction('${post.id}', 'report')" class="retro-button bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-lg">Báo cáo lừa đảo</button>
-                        <button onclick="handlePostAction('${post.id}', 'like')" class="retro-button bg-slate-200 text-slate-700 text-[10px] font-bold px-3 py-1 rounded-lg">Tương tác</button>
-                    </div>
-                `;
-                container.appendChild(el);
-            });
-        }
-
-        // --- GAME ACTIONS LOGIC ---
-        function handleQuickAction(mailId, action) {
-            playSound('click');
-            const mail = emailsData.find(m => m.id === mailId);
-            if (!mail) return;
-
-            if (action === 'delete') {
-                // Deleting email
-                if (mail.isPhishing) {
-                    // Correct! Deleting a phishing email
-                    showToast('Chính xác! Bạn đã xóa email độc hại.', 'success');
-                    playSound('success');
-                    resolvedItems.add(mailId);
-                } else {
-                    // Wrong! Deleting a legitimate email
-                    takeDamage(`Bạn đã xóa nhầm email quan trọng từ ${mail.sender}!`);
-                }
-            } else if (action === 'download') {
-                // Downloading attachment or opening link
-                if (mail.isPhishing) {
-                    // Fatal error! Downloading malware/phishing
-                    takeDamage(`Nhiễm mã độc! File từ ${mail.sender} là trojan nguy hiểm!`);
-                } else {
-                    // Safe action
-                    showToast('Đã tải tệp an toàn thành công.', 'success');
-                    playSound('success');
-                    resolvedItems.add(mailId);
-                }
-            }
-            updateProgress();
-            renderMailList();
-        }
-
-        function openEmailModal(mailId) {
-            playSound('click');
-            selectedMailId = mailId;
-            const mail = emailsData.find(m => m.id === mailId);
-            if (!mail) return;
-
-            document.getElementById('modalSubject').innerText = mail.subject;
-            document.getElementById('modalSender').innerText = mail.sender;
-            document.getElementById('modalEmailAddr').innerText = mail.emailAddr;
-            document.getElementById('modalTime').innerText = mail.time;
-            document.getElementById('modalBody').innerText = mail.body;
-
-            const avatarEl = document.getElementById('modalAvatar');
-            avatarEl.className = `w-10 h-10 rounded-full ${mail.avatarBg} text-white font-bold flex items-center justify-center text-base shadow`;
-            avatarEl.innerText = mail.avatarChar;
-
-            const attachEl = document.getElementById('modalAttachment');
-            if (mail.attachment) {
-                attachEl.classList.remove('hidden');
-                document.getElementById('modalAttachName').innerText = mail.attachment.name;
-                document.getElementById('modalAttachSize').innerText = mail.attachment.size;
-                document.getElementById('modalAttachIcon').className = `fa-solid ${mail.attachment.icon} text-2xl`;
-            } else {
-                attachEl.classList.add('hidden');
-            }
-
-            // Configure modal buttons
-            document.getElementById('btnActionDelete').onclick = () => {
-                closeModal();
-                handleQuickAction(mailId, 'delete');
-            };
-
-            document.getElementById('btnActionDownload').onclick = () => {
-                closeModal();
-                handleQuickAction(mailId, 'download');
-            };
-
-            document.getElementById('emailModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('emailModal').classList.add('hidden');
-        }
-
-        function handleMessageAction(msgId, action) {
-            playSound('click');
-            const msg = messagesData.find(m => m.id === msgId);
-            if (!msg) return;
-
-            if (action === 'report' && msg.isPhishing) {
-                showToast('Chính xác! Đã chặn tin nhắn giả mạo.', 'success');
-                playSound('success');
-                resolvedItems.add(msgId);
-            } else if (action === 'trust' && msg.isPhishing) {
-                takeDamage('Sập bẫy lừa đảo! Bạn đã cung cấp OTP cho kẻ gian!');
-            } else {
-                showToast('Hành động được ghi nhận.', 'info');
-                resolvedItems.add(msgId);
-            }
-            updateProgress();
-            renderMessages();
-        }
-
-        function handlePostAction(postId, action) {
-            playSound('click');
-            const post = postsData.find(p => p.id === postId);
-            if (!post) return;
-
-            if (action === 'report' && post.isPhishing) {
-                showToast('Đã báo cáo bài viết lừa đảo thành công!', 'success');
-                playSound('success');
-                resolvedItems.add(postId);
-            } else if (action === 'like' && post.isPhishing) {
-                takeDamage('Cảnh báo: Bạn đã bấm vào link bài viết lừa đảo nhận quà!');
-            } else {
-                showToast('Ghi nhận bài viết.', 'info');
-                resolvedItems.add(postId);
-            }
-            updateProgress();
-            renderPosts();
-        }
-
-        function takeDamage(reason) {
-            playSound('error');
-            lives--;
-            updateLivesUI();
-
-            // Glitch visual FX
-            const windowEl = document.getElementById('appWindow');
-            windowEl.classList.add('glitch-flash');
-            setTimeout(() => windowEl.classList.remove('glitch-flash'), 600);
-
-            showToast(reason, 'error');
-
-            if (lives <= 0) {
-                triggerGameOver(false, reason);
-            }
-        }
-
-        function updateLivesUI() {
-            const container = document.getElementById('livesContainer');
-            container.innerHTML = '';
-            for (let i = 0; i < maxLives; i++) {
-                if (i < lives) {
-                    container.innerHTML += `<i class="fa-solid fa-heart animate-bounce" style="animation-delay: ${i * 0.1}s"></i>`;
-                } else {
-                    container.innerHTML += `<i class="fa-solid fa-heart text-slate-300"></i>`;
-                }
-            }
-            document.getElementById('livesText').innerText = `${lives}/${maxLives} Lives`;
-        }
-
-        function updateProgress() {
-            const count = resolvedItems.size;
-            document.getElementById('resolvedCount').innerText = `${count}/4`;
-
-            if (count >= 4 && lives > 0) {
-                setTimeout(() => {
-                    triggerGameOver(true, 'Bạn đã xuất sắc hoàn thành việc nhận biết và bảo vệ an toàn thông tin!');
-                }, 500);
-            }
-        }
-
-        function switchTab(tabName) {
-            playSound('click');
-            // Hide all views
-            document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
-            
-            // Reset button active styles
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-slate-300 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 transition-all';
-            });
-
-            // Show selected view & highlight button
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-${tabName}`);
-            
-            if (tabName === 'mail') {
-                activeBtn.className = 'tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-amber-400 bg-amber-200 text-amber-900 shadow-sm font-bold transition-all';
-            } else {
-                activeBtn.className = 'tab-btn flex flex-col items-center justify-center p-2 rounded-xl border-2 border-indigo-400 bg-indigo-200 text-indigo-900 shadow-sm font-bold transition-all';
-            }
-        }
-
-        function toggleStar(btn) {
-            playSound('click');
-            btn.classList.toggle('text-amber-400');
-            btn.classList.toggle('text-slate-300');
-        }
-
-        function toggleSelectAll(masterCb) {
-            playSound('click');
-            document.querySelectorAll('#emailList input[type="checkbox"]').forEach(cb => {
-                cb.checked = masterCb.checked;
-            });
-        }
-
-        function showToast(msg, type = 'info') {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toastIcon');
-            document.getElementById('toastMessage').innerText = msg;
-
-            if (type === 'error') {
-                icon.className = 'fa-solid fa-triangle-exclamation text-rose-400 text-lg';
-            } else if (type === 'success') {
-                icon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
-            } else {
-                icon.className = 'fa-solid fa-circle-info text-sky-400 text-lg';
-            }
-
-            toast.classList.remove('translate-x-full');
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-            }, 3000);
-        }
-
-        function triggerSurrender() {
-            playSound('click');
-            takeDamage('Bạn đã chọn Bỏ cuộc!');
-        }
-
-        function triggerGameOver(isWin, desc) {
-            const modal = document.getElementById('endGameModal');
-            const title = document.getElementById('endGameTitle');
-            const icon = document.getElementById('endGameIcon');
-
-            if (isWin) {
-                title.innerText = 'CHIẾN THẮNG!';
-                title.className = 'text-2xl font-extrabold text-emerald-600';
-                icon.className = 'w-16 h-16 rounded-full bg-emerald-100 text-emerald-500 text-3xl flex items-center justify-center mx-auto border-2 border-emerald-300';
-                icon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
-            } else {
-                title.innerText = 'THẤT BẠI!';
-                title.className = 'text-2xl font-extrabold text-rose-600';
-                icon.className = 'w-16 h-16 rounded-full bg-rose-100 text-rose-500 text-3xl flex items-center justify-center mx-auto border-2 border-rose-300';
-                icon.innerHTML = '<i class="fa-solid fa-skull"></i>';
-            }
-
-            document.getElementById('endGameDesc').innerText = desc;
-            document.getElementById('finalScore').innerText = `${resolvedItems.size * 25} điểm`;
-            document.getElementById('finalErrors').innerText = `${maxLives - lives} Lần`;
-
-            modal.classList.remove('hidden');
-        }
-
-        function restartGame() {
-            lives = 2;
-            resolvedItems.clear();
-            updateLivesUI();
-            updateProgress();
-            renderMailList();
-            renderMessages();
-            renderPosts();
-            document.getElementById('endGameModal').classList.add('hidden');
-            showToast('Game đã được khởi động lại!', 'info');
-        }
-
-        // --- CLOCK TICKER ---
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12 || 12;
-            document.getElementById('currentTime').innerText = `${hours}:${minutes} ${ampm}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // INITIAL LOAD
-        window.onload = function() {
-            updateLivesUI();
-            renderMailList();
-            renderMessages();
-            renderPosts();
-        };
-    </script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
