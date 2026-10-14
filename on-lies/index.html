@@ -16,7 +16,7 @@
     <main class="device-shell" aria-label="Không gian học tập On-Lies">
       <header class="system-bar">
         <div class="brand-mark" aria-label="On-Lies"><span class="brand-shield">OL</span><span class="brand-copy"><strong>On-lies</strong><small>Cyber Security Simulator v1.0</small></span></div>
-        <div class="system-status"><span class="top-lives">♥♥♡ <b>2/3 Lives</b></span><span id="systemClock">09:41</span><span class="battery" aria-label="Pin 86%"><span></span></span></div>
+        <div class="system-status"><span id="systemClock">09:41</span><span class="battery" aria-label="Pin 86%"><span></span></span></div>
       </header>
 
       <section id="desktop" class="desktop-screen">
@@ -29,7 +29,7 @@
             <div class="progress-card">
               <div class="progress-icon">🛡️</div>
               <div class="progress-info">
-                <div class="progress-heading"><strong>Hành trình của bạn</strong><span>1/6 kỹ năng</span></div>
+                <div class="progress-heading"><strong>Hành trình của bạn</strong><span>0/5 kỹ năng</span></div>
                 <div class="progress-track"><span></span></div>
                 <small>Hoàn thành Mail để mở khóa huy hiệu đầu tiên</small>
               </div>
@@ -39,15 +39,14 @@
           <section class="apps-panel" aria-labelledby="appsTitle">
             <div class="section-heading">
               <div><p class="eyebrow">MÔ PHỎNG THỰC TẾ</p><h2 id="appsTitle">Chọn một ứng dụng</h2></div>
-              <span class="mission-count">1 nhiệm vụ mới</span>
+              <span class="mission-count">5 mini game</span>
             </div>
             <div class="app-grid">
               <button class="app-tile active-app" data-app="mail"><span class="notification-badge">9</span><span class="app-icon mail-icon">✉</span><span class="app-name">Mail</span><span class="app-description">Phân biệt thư thật và thư giả</span><span class="play-label">Chơi ngay <b>→</b></span></button>
-              <button class="app-tile locked-app" data-app="phone"><span class="app-icon phone-icon">☎</span><span class="app-name">Điện thoại</span><span class="app-description">Đối phó cuộc gọi mạo danh</span><span class="coming-label">Sắp ra mắt</span></button>
-              <button class="app-tile locked-app" data-app="sms"><span class="app-icon sms-icon">●●●</span><span class="app-name">Tin nhắn</span><span class="app-description">Phát hiện liên kết nguy hiểm</span><span class="coming-label">Sắp ra mắt</span></button>
-              <button class="app-tile locked-app" data-app="social"><span class="app-icon social-icon">♥</span><span class="app-name">Mạng xã hội</span><span class="app-description">Kiểm chứng tin giả và quà ảo</span><span class="coming-label">Sắp ra mắt</span></button>
-              <button class="app-tile locked-app" data-app="browser"><span class="app-icon browser-icon">◎</span><span class="app-name">Trình duyệt</span><span class="app-description">Nhận biết website giả mạo</span><span class="coming-label">Sắp ra mắt</span></button>
-              <button class="app-tile locked-app" data-app="market"><span class="app-icon market-icon">▣</span><span class="app-name">Mua sắm</span><span class="app-description">Tránh bẫy giao dịch trực tuyến</span><span class="coming-label">Sắp ra mắt</span></button>
+              <button class="app-tile" data-app="phone"><span class="app-icon phone-icon">☎</span><span class="app-name">Điện thoại</span><span class="app-description">Đối phó cuộc gọi mạo danh</span><span class="play-label">Chơi ngay <b>→</b></span></button>
+              <button class="app-tile" data-app="sms"><span class="app-icon sms-icon">●●●</span><span class="app-name">Tin nhắn</span><span class="app-description">Phát hiện liên kết nguy hiểm</span><span class="play-label">Chơi ngay <b>→</b></span></button>
+              <button class="app-tile" data-app="social"><span class="app-icon social-icon">ϟ</span><span class="app-name">Messenger</span><span class="app-description">Nhận diện lừa đảo qua đoạn chat</span><span class="play-label">Chơi ngay <b>→</b></span></button>
+              <button class="app-tile" data-app="market"><span class="app-icon market-icon">🛍</span><span class="app-name">Shopee</span><span class="app-description">Săn deal, tránh bẫy giao dịch</span><span class="play-label">Chơi ngay <b>→</b></span></button>
             </div>
           </section>
         </div>
@@ -57,15 +56,15 @@
           <button class="dock-item dock-active" data-app="mail" aria-label="Mail">✉<span>Mail</span></button>
           <button class="dock-item" data-app="phone" aria-label="Điện thoại">☎<span>Điện thoại</span></button>
           <button class="dock-item" data-app="sms" aria-label="Tin nhắn">●●●<span>Tin nhắn</span></button>
-          <button class="dock-item" data-app="social" aria-label="Mạng xã hội">♥<span>Mạng xã hội</span></button>
-          <button class="dock-item" data-app="browser" aria-label="Trình duyệt">◎<span>Trình duyệt</span></button>
+          <button class="dock-item" data-app="social" aria-label="Messenger">ϟ<span>Messenger</span></button>
+          <button class="dock-item" data-app="market" aria-label="Shopee">🛍<span>Shopee</span></button>
         </nav>
       </section>
 
       <section id="mailApp" class="app-window hidden" aria-label="Mini game kiểm tra email">
         <header class="app-window-bar">
           <div class="window-controls"><button id="exitMailBtn" class="window-dot close-dot" aria-label="Đóng Mail"></button><span class="window-dot minimize-dot"></span><span class="window-dot expand-dot"></span></div>
-          <div class="window-title"><span class="mini-mail-icon">✉</span> Mail Inspector</div>
+          <div class="window-title"><span class="mini-mail-icon">✉</span> <span id="windowTitle">Mail Inspector</span></div>
           <div id="statsBar" class="game-stats hidden"><span id="roundBadge">Vòng 1/3</span><span id="scoreBadge">0 điểm</span><span id="livesDisplay">♥♥♥</span></div>
         </header>
 
@@ -82,12 +81,12 @@
         <div id="gameApp" class="mail-workspace hidden">
           <aside class="mail-sidebar">
             <div class="agent-card"><span>ĐV</span><div><strong>Đặc vụ Tân binh</strong><small>Cấp độ 1</small></div></div>
-            <nav><button class="sidebar-link active"><span>▣</span>Hộp thư đến <b>9</b></button><button class="sidebar-link"><span>⚑</span>Đã báo cáo</button><button class="sidebar-link"><span>✓</span>Đã xác minh</button></nav>
+            <nav><button class="sidebar-link active"><span>▣</span>Hộp thư đến <b>9</b></button></nav>
             <div class="sidebar-lesson"><span>🎓</span><strong>Gợi ý</strong><p>Địa chỉ người gửi có thể tiết lộ nhiều hơn tên hiển thị.</p></div>
             <button id="resetGameBtn" class="sidebar-exit">← Thoát nhiệm vụ</button>
           </aside>
           <div class="mail-content">
-            <header class="mail-heading"><div><p class="eyebrow">NHIỆM VỤ ĐANG DIỄN RA</p><h2>Hộp thư đến</h2><p>Kiểm tra các email trong <span id="roundLabelTitle">Vòng 1</span></p></div><button id="nextRoundBtn" class="next-button hidden">Sang vòng kế <span>→</span></button></header>
+            <header class="mail-heading"><div><p class="eyebrow">NHIỆM VỤ ĐANG DIỄN RA</p><h2 id="currentModeTitle">Hộp thư đến</h2><p>Kiểm tra các <span id="channelLabel">email</span> trong <span id="roundLabelTitle">Vòng 1</span></p></div><button id="nextRoundBtn" class="next-button hidden">Sang vòng kế <span>→</span></button></header>
             <div class="round-progress"><span id="roundProgressBar"></span></div><div id="itemList" class="mail-list"></div>
           </div>
         </div>
@@ -98,7 +97,7 @@
             <div class="email-meta"><div class="sender-avatar" id="senderAvatar">?</div><div><strong id="modalSender"></strong><p id="modalAddress"></p></div><span id="modalItemId" class="case-id"></span></div>
             <div class="signal-grid"><div><small>XÁC THỰC SPF/DKIM</small><strong id="modalSpf"></strong></div><div><small>TỆP ĐÍNH KÈM</small><strong id="modalAttachment"></strong></div></div>
             <div class="email-body"><small>NỘI DUNG EMAIL</small><p id="modalBody"></p></div>
-            <footer><p>Email này có phải là lừa đảo không?</p><div><button id="btnActionSafe" class="safe-button">✓ An toàn</button><button id="btnActionScam" class="scam-button">⚑ Báo cáo lừa đảo</button></div></footer>
+            <footer><p>Email này có phải là lừa đảo không?</p><div id="answerButtons"><button id="btnActionSafe" class="safe-button">✓ An toàn</button><button id="btnActionScam" class="scam-button">⚑ Báo cáo lừa đảo</button></div><div id="answerFeedback" class="answer-feedback hidden" role="status"></div></footer>
           </article>
         </div>
 
@@ -109,6 +108,7 @@
           </div>
         </div>
       </section>
+      <section id="phoneApp" class="app-window hidden" aria-label="Mini game cuộc gọi"><header class="app-window-bar"><button id="phoneExit" class="secondary-button">← Màn hình chính</button><div class="window-title">☎ Cuộc gọi đáng ngờ</div><div id="phoneStats" class="game-stats hidden"></div></header><div id="phoneContent" class="phone-content"></div></section>
       <div id="toast" class="toast hidden" role="status"><span>🔒</span><div><strong>Tính năng đang được phát triển</strong><p>Mini game này sẽ sớm có mặt trong On-Lies.</p></div></div>
     </main>
     <script type="module" src="/src/main.ts"></script>

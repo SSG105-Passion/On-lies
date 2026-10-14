@@ -1,4 +1,4 @@
-export type GameMode = 'mail' | 'messages' | 'posts';
+export type GameMode = 'mail' | 'messages' | 'posts' | 'browser' | 'market';
 
 export interface ScenarioItem {
   id: number;
