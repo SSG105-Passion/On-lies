@@ -1,0 +1,52 @@
+import type { Rule } from './types';
+
+export const RULES: Rule[] = [
+  {
+    id: 1,
+    day: 1,
+    cat: 'sender',
+    text: 'Email chính thức của trường dùng tên miền chuẩn (@fpt.edu.vn), không dùng đuôi lạ (.top, .site, .vip).'
+  },
+  {
+    id: 2,
+    day: 1,
+    cat: 'ask',
+    text: 'Học phí và các khoản thu đều qua cổng chính thức (FAP/Portal), KHÔNG chuyển vào số tài khoản cá nhân.'
+  },
+  {
+    id: 3,
+    day: 1,
+    cat: 'bait',
+    text: 'Việc làm thêm chân chính KHÔNG thu tiền cọc giữ chỗ, tiền hồ sơ hay tiền đồng phục trước.'
+  },
+  {
+    id: 4,
+    day: 2,
+    cat: 'ask',
+    text: 'Tuyệt đối KHÔNG một tổ chức hay cá nhân chính đáng nào ĐÒI mật khẩu hoặc mã OTP của bạn.'
+  },
+  {
+    id: 5,
+    day: 2,
+    cat: 'fake',
+    text: 'Người quen nhắn tin vay tiền gấp: phải GỌI ĐIỆN THOẠI TRỰC TIẾP đến số đã biết để xác minh.'
+  },
+  {
+    id: 6,
+    day: 3,
+    cat: 'link',
+    text: 'Link rút gọn (bit.ly, tinyurl) hoặc tên miền lạ: tự mở ứng dụng/trang chính thức, không bấm link.'
+  },
+  {
+    id: 7,
+    day: 3,
+    cat: 'fake',
+    text: 'Cơ quan công an, tòa án KHÔNG làm việc qua điện thoại và KHÔNG yêu cầu chuyển tiền vào "tài khoản an toàn".'
+  },
+  {
+    id: 8,
+    day: 4,
+    cat: 'ask',
+    text: 'Mua sắm trực tuyến: thanh toán theo quy trình có bảo vệ, KHÔNG giao dịch hay chuyển tiền riêng ngoài sàn.'
+  }
+];
