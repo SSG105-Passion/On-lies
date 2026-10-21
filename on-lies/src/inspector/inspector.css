@@ -353,6 +353,13 @@
   color: var(--insp-red);
 }
 
+.feedback-logs {
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 6px;
+  padding-right: 4px;
+}
+
 .feedback-log-item {
   margin-top: 6px;
   padding: 8px 10px;

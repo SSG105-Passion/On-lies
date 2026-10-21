@@ -122,6 +122,7 @@ export class InspectorUI {
           this.engine.nextCase();
           this.renderDesk();
           this.updateTopBar();
+          desk.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
     });
@@ -139,6 +140,11 @@ export class InspectorUI {
 
     this.renderDesk();
     this.updateTopBar();
+
+    const desk = this.container.querySelector('#inspDesk');
+    if (desk) {
+      desk.scrollTo({ top: desk.scrollHeight, behavior: 'smooth' });
+    }
 
     if (this.engine.isFired()) {
       this.engine.isRunning = false;
