@@ -39,10 +39,24 @@
           <section class="apps-panel" aria-labelledby="appsTitle">
             <div class="section-heading">
               <div><p class="eyebrow">MÔ PHỎNG THỰC TẾ</p><h2 id="appsTitle">Chọn một ứng dụng</h2></div>
-              <span class="mission-count">5 mini game</span>
+              <span class="mission-count">Ca trực + 5 mini game</span>
             </div>
             <div class="app-grid">
-              <button class="app-tile active-app" data-app="mail"><span class="notification-badge">9</span><span class="app-icon mail-icon">✉</span><span class="app-name">Mail</span><span class="app-description">Phân biệt thư thật và thư giả</span><span class="play-label">Chơi ngay <b>→</b></span></button>
+              <button class="app-tile inspector-tile active-app" data-app="inspector" style="grid-column: 1 / -1; min-height: auto; padding: 18px 20px; background: linear-gradient(135deg, #252820 0%, #171914 100%); border: 2px solid #eab308; box-shadow: 0 6px 18px rgba(0,0,0,0.35);">
+                <span class="notification-badge" style="background:#eab308; color:#181914; font-weight:900; font-size:10px;">HOT</span>
+                <div style="display:flex; align-items:center; gap:16px; width:100%; text-align:left;">
+                  <span class="app-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04); font-size: 24px; color: #181914; flex-shrink:0;">⚖</span>
+                  <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="app-name" style="color:#fef08a; font-size:15px; margin:0; font-weight:800;">Ca trực Thanh tra (Papers, Please Mode)</span>
+                      <span style="background:#374151; color:#93c5fd; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px;">Chế độ mới</span>
+                    </div>
+                    <span class="app-description" style="color:#d4d4d8; font-size:12px; margin-top:4px; display:block; line-height:1.4;">Đóng vai nhân viên kiểm duyệt: soi hồ sơ, tìm chi tiết bất thường, tra cứu sổ tay nghiệp vụ và đóng dấu <b>ĐÃ DUYỆT</b> hoặc <b>TỪ CHỐI</b>.</span>
+                  </div>
+                  <span class="play-label" style="color:#fde047; font-weight:800; font-size:12px; margin-top:0; white-space:nowrap;">Vào ca trực <b>→</b></span>
+                </div>
+              </button>
+              <button class="app-tile" data-app="mail"><span class="notification-badge">9</span><span class="app-icon mail-icon">✉</span><span class="app-name">Mail</span><span class="app-description">Phân biệt thư thật và thư giả</span><span class="play-label">Chơi ngay <b>→</b></span></button>
               <button class="app-tile" data-app="phone"><span class="app-icon phone-icon">☎</span><span class="app-name">Điện thoại</span><span class="app-description">Đối phó cuộc gọi mạo danh</span><span class="play-label">Chơi ngay <b>→</b></span></button>
               <button class="app-tile" data-app="sms"><span class="app-icon sms-icon">●●●</span><span class="app-name">Tin nhắn</span><span class="app-description">Phát hiện liên kết nguy hiểm</span><span class="play-label">Chơi ngay <b>→</b></span></button>
               <button class="app-tile" data-app="social"><span class="app-icon social-icon">ϟ</span><span class="app-name">Messenger</span><span class="app-description">Nhận diện lừa đảo qua đoạn chat</span><span class="play-label">Chơi ngay <b>→</b></span></button>
@@ -53,6 +67,7 @@
 
         <aside class="daily-tip"><span class="tip-bulb">💡</span><div><strong>Mẹo an toàn hôm nay</strong><p>Đừng vội tin vào cảm giác khẩn cấp. Kẻ lừa đảo thường muốn bạn hành động trước khi kịp suy nghĩ.</p></div><button id="closeTipBtn" aria-label="Đóng mẹo">×</button></aside>
         <nav class="dock" aria-label="Ứng dụng nhanh">
+          <button class="dock-item" data-app="inspector" aria-label="Ca trực">⚖<span>Ca trực</span></button>
           <button class="dock-item dock-active" data-app="mail" aria-label="Mail">✉<span>Mail</span></button>
           <button class="dock-item" data-app="phone" aria-label="Điện thoại">☎<span>Điện thoại</span></button>
           <button class="dock-item" data-app="sms" aria-label="Tin nhắn">●●●<span>Tin nhắn</span></button>
@@ -109,6 +124,7 @@
         </div>
       </section>
       <section id="phoneApp" class="app-window hidden" aria-label="Mini game cuộc gọi"><header class="app-window-bar"><button id="phoneExit" class="secondary-button">← Màn hình chính</button><div class="window-title">☎ Cuộc gọi đáng ngờ</div><div id="phoneStats" class="game-stats hidden"></div></header><div id="phoneContent" class="phone-content"></div></section>
+      <section id="inspectorApp" class="app-window hidden" aria-label="Ca trực thanh tra an toàn số"></section>
       <div id="toast" class="toast hidden" role="status"><span>🔒</span><div><strong>Tính năng đang được phát triển</strong><p>Mini game này sẽ sớm có mặt trong On-Lies.</p></div></div>
     </main>
     <script type="module" src="/src/main.ts"></script>

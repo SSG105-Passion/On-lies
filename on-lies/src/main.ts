@@ -1,9 +1,11 @@
 import { GameEngine } from './gameEngine';
 import { openPhoneGame } from './phoneGame';
 import { renderChannelList, renderChannelDetail } from './channelViews';
+import { InspectorUI } from './inspector/ui';
 import type { ScenarioItem, GameMode } from './types';
 
 const engine = new GameEngine();
+let inspectorUI: InspectorUI | null = null;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const desktop = $('desktop');
 const mailApp = $('mailApp');
@@ -46,6 +48,8 @@ function updateClock() {
 function showDesktop() {
   $('phoneApp').classList.add('hidden');
   $('phoneStats').classList.add('hidden');
+  $('inspectorApp')?.classList.add('hidden');
+  inspectorUI?.stop();
   statsBar.classList.add('hidden');
   mailApp.classList.add('hidden');
   desktop.classList.remove('hidden');
@@ -81,7 +85,15 @@ document.addEventListener('click', event => {
   if (button.dataset.itemId) { openInspectModal(Number(button.dataset.itemId)); return; }
 
   if (button.dataset.app) {
-    if (button.dataset.app === 'phone') {
+    if (button.dataset.app === 'inspector') {
+      showDesktop();
+      desktop.classList.add('hidden');
+      $('inspectorApp').classList.remove('hidden');
+      if (!inspectorUI) {
+        inspectorUI = new InspectorUI($('inspectorApp'), showDesktop);
+      }
+      inspectorUI.start();
+    } else if (button.dataset.app === 'phone') {
       showDesktop();
       desktop.classList.add('hidden');
       $('phoneApp').classList.remove('hidden');

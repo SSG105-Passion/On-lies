@@ -130,7 +130,7 @@ export class InspectorUI {
   private handleStamp(isReject: boolean) {
     if (this.engine.isCaseEvaluated) return;
 
-    const { result, needReason } = this.engine.stamp(isReject);
+    const { needReason } = this.engine.stamp(isReject);
 
     if (needReason) {
       this.showToast('Từ chối cần có lý do: hãy bấm đánh dấu chi tiết đáng ngờ trên giấy!');
@@ -195,7 +195,7 @@ export class InspectorUI {
       return;
     }
 
-    const { allItems, isScam } = currentCase;
+    const { allItems } = currentCase;
     const evaluated = this.engine.isCaseEvaluated;
     const res = this.engine.currentResult;
 
