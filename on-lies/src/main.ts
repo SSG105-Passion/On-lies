@@ -11,6 +11,7 @@ import {
   signUp,
   signOut,
   subscribeToLeaderboard,
+  onAuthStateChange,
   isSupabaseConfigured,
   type LeaderboardEntry,
   type UserProfile
@@ -351,22 +352,22 @@ function openMode(mode: GameMode) {
   gameApp.classList.add('hidden');
   $('windowTitle').textContent = config.title;
   $('exitMailBtn').setAttribute('aria-label', `Đóng ${config.title}`);
-  
+
   const miniMailIcon = document.querySelector<HTMLElement>('.mini-mail-icon');
   if (miniMailIcon) miniMailIcon.textContent = config.icon;
-  
+
   const introEnvelope = document.querySelector<HTMLElement>('.intro-envelope');
   if (introEnvelope) introEnvelope.innerHTML = `${config.icon}<span>!</span>`;
-  
+
   const introH2 = document.querySelector<HTMLElement>('.intro-content h2');
   if (introH2) introH2.textContent = config.title;
-  
+
   const introP = document.querySelector<HTMLElement>('.intro-content > p:not(.eyebrow)');
   if (introP) introP.textContent = config.intro;
-  
+
   const introEyebrow = document.querySelector<HTMLElement>('.intro-content .eyebrow');
   if (introEyebrow) introEyebrow.textContent = 'NHIỆM VỤ HUẤN LUYỆN';
-  
+
   const rulesList = document.querySelector<HTMLElement>('.rules-list');
   if (rulesList) rulesList.innerHTML = `<li><span>01</span> Đọc nội dung và đối chiếu các dấu hiệu</li><li><span>02</span> 3 vòng • 9 tình huống thực tế</li><li><span>03</span> 3 mạng • Mỗi lựa chọn sai mất 1 mạng</li>`;
 
@@ -504,19 +505,19 @@ function openInspectModal(itemId: number) {
   $('modalBody').textContent = item.body;
   const mail = engine.currentMode === 'mail';
   $('modalAttachment').textContent = mail ? (item.attachment === 'none' ? 'Không có' : item.attachment) : 'Chỉ mô phỏng trong game';
-  
+
   const firstSignal = document.querySelector<HTMLElement>('.signal-grid small');
   if (firstSignal) firstSignal.textContent = mail ? 'XÁC THỰC NGƯỜI GỬI' : 'BỐI CẢNH';
-  
+
   const signals = document.querySelectorAll<HTMLElement>('.signal-grid small');
   if (signals.length > 1) signals[1].textContent = mail ? 'TỆP ĐÍNH KÈM' : 'TƯƠNG TÁC';
-  
+
   const bodySmall = document.querySelector<HTMLElement>('.email-body small');
   if (bodySmall) bodySmall.textContent = `NỘI DUNG ${modes[engine.currentMode].noun.toUpperCase()}`;
-  
+
   const promptP = document.querySelector<HTMLElement>('.inspect-card footer > p');
   if (promptP) promptP.textContent = `Tình huống này có dấu hiệu lừa đảo không?`;
-  
+
   $('btnActionSafe').textContent = '✓ Hợp lệ trong tình huống này';
   $('btnActionScam').textContent = '⚑ Có dấu hiệu lừa đảo';
   $('answerFeedback').classList.add('hidden');
@@ -589,7 +590,7 @@ async function finishGame() {
   if (saveScorePrompt) {
     saveScorePrompt.classList.toggle('hidden', !scoreResult.requiresLogin);
   }
-  
+
   const subTitle = document.querySelector<HTMLElement>('.result-subtitle');
   if (subTitle) {
     subTitle.textContent = `Bạn đã xử lý ${engine.userAnswers.length}/9 tình huống. Ôn lại các dấu hiệu và cách tự bảo vệ bên dưới.`;
@@ -605,4 +606,5 @@ updateClock();
 updateProgress();
 renderLeaderboard();
 subscribeToLeaderboard(() => renderLeaderboard());
+onAuthStateChange(() => renderLeaderboard());
 window.setInterval(updateClock, 30_000);

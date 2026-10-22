@@ -325,6 +325,7 @@ export async function signUp(email: string, password: string, username: string):
             username: username || email.split('@')[0],
             avatar_url: '👤',
           },
+          emailRedirectTo: window.location.origin,
         },
       });
 
@@ -370,7 +371,7 @@ export async function signOut(): Promise<void> {
  * Subscribe to realtime updates on profiles / game records
  */
 export function subscribeToLeaderboard(onUpdate: () => void): () => void {
-  if (!supabase) return () => {};
+  if (!supabase) return () => { };
 
   const channel = supabase
     .channel('public:leaderboard')
@@ -384,5 +385,24 @@ export function subscribeToLeaderboard(onUpdate: () => void): () => void {
 
   return () => {
     supabase.removeChannel(channel);
+  };
+}
+
+/**
+ * Listen for auth state changes (e.g., email confirmation redirect)
+ */
+export function onAuthStateChange(callback: (profile: UserProfile) => void): () => void {
+  if (!supabase) return () => { };
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    if (session?.user) {
+      const profile = await getCurrentProfile();
+      saveLocalProfile(profile);
+      callback(profile);
+    }
+  });
+
+  return () => {
+    subscription.unsubscribe();
   };
 }
