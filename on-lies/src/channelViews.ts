@@ -1,37 +1,69 @@
 import type { GameMode, ScenarioItem, UserAnswer } from './types';
 
-const products: Record<number, { icon: string; name: string; price: string; tag: string }> = {
-  501: { icon: '🎧', name: 'Tai nghe không dây', price: '149.000', tag: 'Giá sốc hôm nay' },
-  502: { icon: '📚', name: 'Bộ sách khám phá', price: '189.000', tag: 'Đơn hàng trong ứng dụng' },
-  503: { icon: '📦', name: 'Kiện hàng chưa xác nhận', price: '12.000', tag: 'Yêu cầu phí giao hàng' },
-  504: { icon: '💻', name: 'Laptop đã qua sử dụng', price: '6.500.000', tag: 'Bạn là người bán' },
-  505: { icon: '👟', name: 'Giày thể thao', price: '329.000', tag: 'Đơn hàng đang giao' },
-  506: { icon: '💳', name: 'Yêu cầu hoàn tiền', price: '249.000', tag: 'Tin nhắn hỗ trợ' },
-  507: { icon: '👕', name: 'Áo khoác nhẹ', price: '179.000', tag: 'Yêu cầu đặt cọc' },
-  508: { icon: '👜', name: 'Túi đeo chéo', price: '219.000', tag: 'Hồ sơ đổi trả' },
-  509: { icon: '🎮', name: 'Máy chơi game', price: '899.000', tag: 'Ưu đãi từ người bán' },
-};
-const state = (answer?: UserAnswer) => answer ? answer.isCorrect ? '✓ Đã xử lý' : '✕ Cần lưu ý' : 'Mới';
+const state = (answer?: UserAnswer) => answer ? (answer.isCorrect ? '✓ Đã xử lý' : '✕ Cần lưu ý') : 'Chưa đọc';
 
-export function renderChannelList(mode: GameMode, items: ScenarioItem[], answers: UserAnswer[]): string {
-  if (mode === 'market') return `<div class="shop-banner"><div><span>ON-LIES • SÀN MUA SẮM MÔ PHỎNG</span><h2>Deal hời hay bẫy lừa?</h2><p>Kiểm tra người bán và cách thanh toán trước khi quyết định.</p></div><div class="shop-banner-bag">🛍</div></div><div class="shop-categories"><span>Tất cả</span><span>Đơn hàng</span><span>Tin từ shop</span></div><div class="product-grid">${items.map(item=>{
-    const product=products[item.id], answer=answers.find(a=>a.item.id===item.id);
-    return `<button class="product-card" data-item-id="${item.id}"><div class="product-art art-${item.id%3}"><span class="product-tag">${product.tag}</span><span class="product-object">${product.icon}</span></div><div class="product-info"><small>${item.sender}</small><h3>${product.name}</h3><div class="product-price">₫${product.price}</div><p>${item.subject}</p><div class="product-bottom"><span>${state(answer)}</span><b>Xem giao dịch →</b></div></div></button>`;
-  }).join('')}</div>`;
-  const sms=mode==='messages';
-  return `<div class="conversation-home ${sms?'sms-home':'messenger-home'}"><header class="conversation-heading"><div><h2>${sms?'Tin nhắn':'Messenger'}</h2><p>${sms?'SMS / Tin nhắn văn bản':'Đoạn chat • On-Lies mô phỏng'}</p></div><span>${sms?'●●●':'ϟ'}</span></header><div class="chat-search">⌕ ${sms?'Tìm trong tin nhắn':'Tìm kiếm trên Messenger'}</div>${!sms?`<div class="chat-stories">${items.map(item=>`<div><span>${item.sender.slice(0,1)}</span><small>${item.sender.split(' ')[0]}</small></div>`).join('')}</div>`:''}<div class="conversation-list">${items.map(item=>{
-    const answer=answers.find(a=>a.item.id===item.id);
-    return `<button class="conversation-row" data-item-id="${item.id}"><span class="chat-avatar avatar-${item.id%3}">${item.sender.slice(0,1)}</span><div><strong>${item.sender}</strong><p>${item.body.slice(0,70)}…</p></div><span class="conversation-time">${answer?state(answer):'Bây giờ'}<i class="unread-dot ${answer?'hidden':''}"></i></span></button>`;
-  }).join('')}</div><div class="conversation-bottom">${sms?'Tin nhắn cá nhân · Chạm để đọc':'💬 Đoạn chat · Chạm vào một người để mở hội thoại'}</div></div>${!sms?'<div class="messenger-empty"><span>ϟ</span><h2>Chọn một cuộc trò chuyện</h2><p>Bạn bè, người lạ, tài khoản mạo danh…<br>Hãy đọc kỹ trước khi trả lời.</p></div>':''}`;
+export function renderChannelList(_mode: GameMode, items: ScenarioItem[], answers: UserAnswer[]): string {
+  return `<div class="conversation-home sms-home">
+    <header class="conversation-heading">
+      <div class="conversation-heading-text">
+        <h2>Tin nhắn SMS</h2>
+        <p>Phát hiện liên kết nguy hiểm & tin nhắn giả mạo</p>
+      </div>
+      <div class="sms-app-badge">💬</div>
+    </header>
+    <div class="chat-search">🔍 Tìm kiếm trong tin nhắn...</div>
+    <div class="conversation-list">
+      ${items.map(item => {
+        const answer = answers.find(a => a.item.id === item.id);
+        const initial = item.sender.trim().slice(0, 1).toUpperCase();
+        return `<button class="conversation-row ${answer ? 'evaluated' : ''}" data-item-id="${item.id}">
+          <span class="chat-avatar avatar-${item.id % 4}">${initial}</span>
+          <div class="conversation-body">
+            <div class="conversation-topline">
+              <strong>${item.sender}</strong>
+              <span class="conversation-time">${answer ? state(answer) : 'Hôm nay'}</span>
+            </div>
+            <p>${item.body.slice(0, 72)}…</p>
+          </div>
+          <i class="unread-dot ${answer ? 'hidden' : ''}"></i>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="conversation-bottom">💬 Chạm vào tin nhắn để mở chi tiết và phân tích độ an toàn</div>
+  </div>`;
 }
 
 const dialogue = (item: ScenarioItem) => item.body.split(/(?<=[.!?])\s+(?!\d)/).filter(Boolean);
-export function renderChannelDetail(mode: GameMode, item: ScenarioItem): string {
-  const buttons=`<div id="answerButtons"><button id="btnActionSafe" class="safe-button">✓ Tiếp tục, không có dấu hiệu bất thường</button><button id="btnActionScam" class="scam-button">⚑ Dừng lại, có dấu hiệu lừa đảo</button></div><div id="answerFeedback" class="hidden" role="status"></div>`;
-  if (mode==='market') {
-    const product=products[item.id];
-    return `<article class="shop-detail"><header><strong>🛍 Shopee · Mô phỏng On-Lies</strong><button id="closeModalBtn" aria-label="Đóng giao dịch">×</button></header><div class="shop-detail-grid"><div class="product-art art-${item.id%3}"><span class="product-object">${product.icon}</span></div><div class="shop-detail-info"><small>${product.tag}</small><h2>${product.name}</h2><p class="product-price">₫${product.price}</p><div class="shop-seller">🏪 <strong>${item.sender}</strong><p>${item.address}</p></div><h3>${item.subject}</h3><div class="seller-message">💬 Nội dung giao dịch<p>${item.body}</p></div></div></div><footer><p>Bạn có tiếp tục giao dịch này không?</p>${buttons}</footer></article>`;
-  }
-  const sms=mode==='messages';
-  return `<article class="chat-detail ${sms?'sms-detail':'messenger-detail'}"><header><button id="closeModalBtn" aria-label="Quay lại hội thoại">‹</button><span class="chat-avatar avatar-${item.id%3}">${item.sender.slice(0,1)}</span><div><strong>${item.sender}</strong><small>${item.address}</small></div><span class="chat-header-icon">${sms?'ⓘ':'☎ · ⓘ'}</span></header><div class="chat-timeline"><small class="chat-day">Hôm nay · ${sms?'Tin nhắn văn bản':'Cuộc trò chuyện mô phỏng'}</small>${!sms?'<p class="chat-outgoing">Chào bạn, có chuyện gì vậy?</p>':''}${dialogue(item).map(line=>`<div class="chat-incoming">${line}</div>`).join('')}<small class="chat-delivered">${sms?'Đã nhận':'Đã xem'} · Nội dung giả lập, các link không mở được</small></div><footer><div class="chat-compose"><span>${sms?'+':'⊕'}</span><span>${sms?'Tin nhắn văn bản':'Aa'}</span><span>${sms?'↑':'👍'}</span></div><p>Bạn sẽ phản ứng thế nào?</p>${buttons}</footer></article>`;
+
+export function renderChannelDetail(_mode: GameMode, item: ScenarioItem): string {
+  const buttons = `<div id="answerButtons" class="sms-answer-buttons">
+    <button id="btnActionSafe" class="safe-button">✓ Hợp lệ trong tình huống này</button>
+    <button id="btnActionScam" class="scam-button">⚑ Báo cáo tin nhắn lừa đảo</button>
+  </div>
+  <div id="answerFeedback" class="hidden" role="status"></div>`;
+
+  const initial = item.sender.trim().slice(0, 1).toUpperCase();
+
+  return `<article class="chat-detail sms-detail">
+    <header>
+      <button id="closeModalBtn" class="chat-back-btn" aria-label="Quay lại danh sách">‹ Quay lại</button>
+      <div class="chat-header-center">
+        <span class="chat-avatar avatar-${item.id % 4}">${initial}</span>
+        <div>
+          <strong>${item.sender}</strong>
+          <small>${item.address}</small>
+        </div>
+      </div>
+      <span class="chat-header-info">ℹ️</span>
+    </header>
+    <div class="chat-timeline">
+      <div class="chat-day">Hôm nay • Tin nhắn văn bản (SMS)</div>
+      ${dialogue(item).map(line => `<div class="chat-incoming">${line}</div>`).join('')}
+      <div class="chat-delivered">Mô phỏng an toàn • Cảnh giác với link rút gọn và yêu cầu OTP</div>
+    </div>
+    <footer>
+      <p class="chat-prompt">Tin nhắn này có dấu hiệu lừa đảo không?</p>
+      ${buttons}
+    </footer>
+  </article>`;
 }
