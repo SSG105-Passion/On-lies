@@ -29,13 +29,17 @@
         </div>
         <nav class="mac-menu-bar" aria-label="Menu hệ thống">
           <span class="menu-item active">Tổng quan</span>
-          <span class="menu-item">Ca trực</span>
           <span class="menu-item">Học tập</span>
           <span class="menu-item">Trợ giúp</span>
         </nav>
       </div>
 
       <div class="system-status">
+        <button id="themeToggleBtn" class="system-bar-btn" title="Chuyển chế độ Sáng / Tối"
+          aria-label="Chế độ giao diện">
+          <span class="btn-icon" id="themeIcon">🌙</span>
+          <span class="btn-text" id="themeText">Giao diện</span>
+        </button>
         <button id="toggleLeaderboardBtn" class="system-bar-btn active" title="Bật/Tắt Bảng xếp hạng"
           aria-label="Mở bảng xếp hạng">
           <span class="btn-icon">🏆</span>
@@ -167,32 +171,15 @@
             </div>
 
             <div class="app-grid">
-              <!-- Featured App: Ca trực Thanh tra -->
-              <button class="app-tile inspector-tile active-app" data-app="inspector" aria-label="Mở Ca trực Thanh tra">
+              <!-- Mail Inspector App (Papers, Please Desk Gameplay) -->
+              <button class="app-tile active-app mail-tile" data-app="mail" aria-label="Mở Ca trực Thanh tra Hộp thư">
                 <span class="notification-badge hot-badge">HOT</span>
-                <div class="inspector-tile-body">
-                  <span class="app-icon inspector-icon">⚖</span>
-                  <div class="inspector-tile-text">
-                    <div class="inspector-tile-heading">
-                      <span class="app-name">Ca trực Thanh tra (Papers, Please Mode)</span>
-                      <span class="new-pill">Chế độ mới</span>
-                    </div>
-                    <span class="app-description">Đóng vai nhân viên kiểm duyệt: soi hồ sơ, tìm chi tiết bất thường, tra
-                      cứu sổ tay nghiệp vụ và đóng dấu <b>ĐÃ DUYỆT</b> hoặc <b>TỪ CHỐI</b>.</span>
-                  </div>
-                  <span class="play-label">Vào ca trực <b>→</b></span>
-                </div>
-              </button>
-
-              <!-- Mail App -->
-              <button class="app-tile" data-app="mail" aria-label="Mở ứng dụng Mail">
-                <span class="notification-badge">9</span>
                 <div class="app-icon-wrap">
                   <span class="app-icon mail-icon">✉</span>
                 </div>
-                <span class="app-name">Mail Inspector</span>
-                <span class="app-description">Phân biệt thư công việc thật và bẫy phishing mạo danh.</span>
-                <span class="play-label">Vào kiểm tra <b>→</b></span>
+                <span class="app-name">Thanh tra Hộp thư (Mail Inspector)</span>
+                <span class="app-description">Ca trực giám định email khẩn cấp: Soi chi tiết đáng ngờ trên lá thư, đối chiếu Sổ tay nghiệp vụ và đóng dấu <b>ĐÃ DUYỆT</b> hoặc <b>TỪ CHỐI</b>.</span>
+                <span class="play-label">Vào ca trực <b>→</b></span>
               </button>
 
               <!-- Phone App -->
@@ -223,13 +210,9 @@
 
       <!-- macOS Floating Dock -->
       <nav class="dock" aria-label="Thanh Dock macOS">
-        <button class="dock-item" data-app="inspector" aria-label="Ca trực">
-          <span class="dock-glyph">⚖</span>
-          <span class="dock-tooltip">Ca trực Thanh tra</span>
-        </button>
-        <button class="dock-item dock-active" data-app="mail" aria-label="Mail">
+        <button class="dock-item dock-active" data-app="mail" aria-label="Thanh tra Hộp thư">
           <span class="dock-glyph">✉</span>
-          <span class="dock-tooltip">Mail Inspector</span>
+          <span class="dock-tooltip">Thanh tra Hộp thư</span>
         </button>
         <button class="dock-item" data-app="phone" aria-label="Điện thoại">
           <span class="dock-glyph">☎</span>
@@ -330,17 +313,17 @@
           <div class="intro-envelope">✉<span>!</span></div>
         </div>
         <div class="intro-content">
-          <p class="eyebrow">MINI GAME 01</p>
-          <h2>Thám tử hộp thư</h2>
-          <p>Bạn đang phụ trách hộp thư của một công ty. Hãy kiểm tra từng email và quyết định đâu là thư an toàn, đâu
-            là bẫy lừa đảo.</p>
+          <p class="eyebrow">LỆNH ĐIỀU ĐỘNG · TRUNG TÂM AN TOÀN SỐ</p>
+          <h2>Ca trực Thanh tra: Thẩm định Hộp thư Lừa đảo</h2>
+          <p>Chào mừng Thanh tra viên đến với ca trực thẩm định khẩn cấp! Đội Phản ứng nhanh liên tục tiếp nhận các email nghi vấn do sinh viên và người dân gửi về cầu cứu: từ bẫy thu học phí gấp, mạo danh tuyển dụng IT, đến dọa khóa tài khoản ngân hàng và tệp đính kèm mã độc.</p>
+          <p style="margin-top: 8px; color: #94a3b8;">Nhiệm vụ trong ca trực của bạn: Mở từng hồ sơ email, đối chiếu nghiêm ngặt theo <b>Sổ tay nghiệp vụ</b>, phát hiện dấu hiệu lừa đảo và ra quyết định: <b>Phê duyệt An toàn</b> hoặc <b>Lập biên bản Lừa đảo</b>.</p>
           <ul class="rules-list">
-            <li><span>01</span> Kiểm tra người gửi, tên miền và nội dung</li>
-            <li><span>02</span> Phân loại đủ 9 email trong 3 vòng</li>
-            <li><span>03</span> Bạn có 3 trái tim — hãy suy nghĩ thật kỹ</li>
+            <li><span>01</span> <b>Hồ sơ thẩm định:</b> Tiếp nhận 9 email khẩn cấp qua 3 ca phân loại.</li>
+            <li><span>02</span> <b>Sổ tay nghiệp vụ:</b> Soi kỹ tên miền nguồn (@fpt.edu.vn,...), SPF/DKIM, link lạ và đuôi file kép (.pdf.exe).</li>
+            <li><span>03</span> <b>Kỷ luật ca trực:</b> Tối đa 3 lần cảnh cáo vi phạm (3 trái tim). Bỏ lọt email lừa đảo hoặc chặn nhầm thư công vụ sẽ bị trừ điểm nghiệp vụ!</li>
           </ul>
           <div class="intro-actions">
-            <button id="startGameBtn" class="primary-button">Bắt đầu nhiệm vụ <span>→</span></button>
+            <button id="startGameBtn" class="primary-button">Nhận ca trực & Bắt đầu thẩm định <span>→</span></button>
             <button id="introBackBtn" class="text-button">Quay lại màn hình chính</button>
           </div>
         </div>
@@ -349,23 +332,23 @@
       <div id="gameApp" class="mail-workspace hidden">
         <aside class="mail-sidebar">
           <div class="agent-card">
-            <span>ĐV</span>
+            <span>TT</span>
             <div>
-              <strong>Đặc vụ Tân binh</strong>
-              <small>Cấp độ 1</small>
+              <strong>Thanh tra viên Giám định</strong>
+              <small>Ca trực số 01</small>
             </div>
           </div>
           <nav>
             <button class="sidebar-link active">
-              <span>▣</span>Hộp thư đến <b>9</b>
+              <span>▣</span>Hồ sơ chờ duyệt <b>9</b>
             </button>
           </nav>
           <div class="sidebar-lesson">
-            <span>🎓</span>
-            <strong>Gợi ý nghiệp vụ</strong>
-            <p>Địa chỉ người gửi có thể tiết lộ nhiều hơn tên hiển thị.</p>
+            <span>📒</span>
+            <strong>Sổ tay nghiệp vụ Email</strong>
+            <p>Domain trường/cơ quan phải chuẩn xác (@fpt.edu.vn,...). Tuyệt đối không chuyển học phí vào STK cá nhân hoặc nộp cọc nhận việc.</p>
           </div>
-          <button id="resetGameBtn" class="sidebar-exit">← Thoát nhiệm vụ</button>
+          <button id="resetGameBtn" class="sidebar-exit">← Thoát ca trực</button>
         </aside>
         <div class="mail-content">
           <header class="mail-heading">
@@ -385,7 +368,7 @@
         <article class="inspect-card">
           <header>
             <div>
-              <span class="inspection-badge">ĐANG KIỂM TRA</span>
+              <span class="inspection-badge">HỒ SƠ THẨM ĐỊNH KHẨN CẤP</span>
               <h3 id="modalSubject"></h3>
             </div>
             <button id="closeModalBtn" aria-label="Đóng">✕</button>
@@ -413,10 +396,10 @@
             <p id="modalBody"></p>
           </div>
           <footer>
-            <p>Email này có phải là lừa đảo không?</p>
+            <p>Email này là thông báo công vụ hợp lệ hay bẫy lừa đảo trực tuyến?</p>
             <div id="answerButtons">
-              <button id="btnActionSafe" class="safe-button">✓ An toàn</button>
-              <button id="btnActionScam" class="scam-button">⚑ Báo cáo lừa đảo</button>
+              <button id="btnActionSafe" class="safe-button">✓ Phê duyệt An toàn</button>
+              <button id="btnActionScam" class="scam-button">⚑ Lập biên bản: Bẫy lừa đảo</button>
             </div>
             <div id="answerFeedback" class="answer-feedback hidden" role="status"></div>
           </footer>
@@ -426,9 +409,9 @@
       <div id="resultScreen" class="result-screen hidden">
         <div class="result-card">
           <div id="resultStatusIcon" class="result-icon">🏆</div>
-          <p class="eyebrow">NHIỆM VỤ HOÀN TẤT</p>
-          <h2 id="resultTitle">Báo cáo an toàn hộp thư</h2>
-          <p class="result-subtitle">Bạn đã hoàn thành bài huấn luyện nhận diện email lừa đảo.</p>
+          <p class="eyebrow">BÁO CÁO KẾT THÚC CA TRỰC</p>
+          <h2 id="resultTitle">Biên bản thanh tra hộp thư</h2>
+          <p class="result-subtitle">Bạn đã hoàn thành ca trực thẩm định email lừa đảo tại Trung tâm An toàn số.</p>
           <div class="result-metrics">
             <div><small>ĐIỂM SỐ</small><strong id="finalScore">0 / 9</strong></div>
             <div><small>CHÍNH XÁC</small><strong id="finalAccuracy">0%</strong></div>

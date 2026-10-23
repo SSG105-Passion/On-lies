@@ -33,6 +33,166 @@
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+[data-theme="light"] {
+  --mac-bg-dark: #eef2f7;
+  --mac-surface-1: rgba(255, 255, 255, 0.88);
+  --mac-surface-2: rgba(243, 246, 251, 0.82);
+  --mac-surface-hover: rgba(0, 0, 0, 0.05);
+  --mac-surface-active: rgba(0, 0, 0, 0.08);
+  --mac-border: rgba(0, 0, 0, 0.1);
+  --mac-border-subtle: rgba(0, 0, 0, 0.06);
+  --mac-border-glow: rgba(10, 132, 255, 0.25);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+}
+
+[data-theme="light"] body {
+  background-color: #eef2f7;
+  color: #0f172a;
+}
+
+[data-theme="light"] .wallpaper-ambient.ambient-one {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 65%);
+}
+
+[data-theme="light"] .wallpaper-ambient.ambient-two {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 60%);
+}
+
+[data-theme="light"] .wallpaper-ambient.ambient-three {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
+}
+
+[data-theme="light"] .system-bar {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+[data-theme="light"] .system-bar-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+[data-theme="light"] .system-bar-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .welcome-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .welcome-content h1 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .progress-card {
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .app-tile {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .app-tile:hover {
+  border-color: rgba(10, 132, 255, 0.4);
+  box-shadow: 0 12px 28px rgba(10, 132, 255, 0.1);
+  background: #ffffff;
+}
+
+[data-theme="light"] .app-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .app-description {
+  color: #475569;
+}
+
+[data-theme="light"] .dock {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .dock-item {
+  color: #1e293b;
+}
+
+[data-theme="light"] .dock-item:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .leaderboard-sidebar {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .sidebar-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .user-rank-card {
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .user-rank-meta strong {
+  color: #0f172a;
+}
+
+[data-theme="light"] .tab-item {
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+}
+
+[data-theme="light"] .tab-item.active {
+  color: var(--mac-blue);
+  border-color: var(--mac-blue);
+}
+
+[data-theme="light"] .leaderboard-item {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .leaderboard-item strong {
+  color: #0f172a;
+}
+
+[data-theme="light"] .sidebar-badges-card {
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .badge-pill.locked {
+  background: rgba(0, 0, 0, 0.05);
+  color: #94a3b8;
+}
+
+[data-theme="light"] .daily-tip-banner {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+[data-theme="light"] .tip-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .tip-desc {
+  color: #475569;
+}
+
 /* Base Reset */
 *,
 *::before,
@@ -1441,15 +1601,17 @@ button.window-dot {
 
 .rules-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  font-size: 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
   color: #cbd5e1;
 }
 
 .rules-list span {
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   background: rgba(10, 132, 255, 0.15);
@@ -1457,6 +1619,7 @@ button.window-dot {
   border-radius: 6px;
   font-size: 10px;
   font-weight: 800;
+  margin-top: 1px;
 }
 
 .intro-actions {

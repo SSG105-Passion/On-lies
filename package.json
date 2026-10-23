@@ -1,0 +1,10 @@
+{
+  "name": "on-lies-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd on-lies && npm install && npm run build",
+    "start": "cd on-lies && node server/index.js",
+    "dev": "cd on-lies && npm run dev"
+  }
+}

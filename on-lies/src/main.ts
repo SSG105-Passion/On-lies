@@ -37,11 +37,11 @@ let isSignUpMode = false;
 
 const modes: Record<GameMode, { title: string; icon: string; intro: string; noun: string; hint: string }> = {
   mail: {
-    title: 'Thám tử hộp thư',
+    title: 'Ca trực Thanh tra: Thẩm định Hộp thư',
     icon: '✉',
-    noun: 'email',
-    intro: 'Kiểm tra người gửi, tên miền và tệp đính kèm để nhận diện bẫy lừa đảo trong hộp thư.',
-    hint: 'SPF hợp lệ hay tệp PDF không tự chứng minh email an toàn. Hãy đối chiếu nguồn và yêu cầu trong nội dung.'
+    noun: 'hồ sơ email',
+    intro: 'Chào mừng Thanh tra viên! Tiếp nhận 9 hồ sơ email khẩn cấp từ người dân và sinh viên gửi về cầu cứu. Đối chiếu Sổ tay nghiệp vụ an toàn thông tin để vạch trần bẫy lừa đảo tinh vi.',
+    hint: 'Domain trường/cơ quan phải chuẩn xác (@fpt.edu.vn,...). Bản ghi SPF PASS nhưng gửi từ Gmail công cộng hay đòi cọc tiền, STK cá nhân vẫn là lừa đảo.'
   },
   messages: {
     title: 'Lá chắn SMS',
@@ -120,6 +120,32 @@ document.addEventListener('phone-completed', () => {
 function updateClock() {
   $('systemClock').textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
+
+function initTheme() {
+  const saved = localStorage.getItem('on-lies-theme') || 'dark';
+  applyTheme(saved);
+}
+
+function applyTheme(theme: string) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = $('themeIcon');
+  const text = $('themeText');
+  if (icon) icon.textContent = theme === 'light' ? '☀️' : '🌙';
+  if (text) text.textContent = theme === 'light' ? 'Sáng' : 'Tối';
+  localStorage.setItem('on-lies-theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+$('themeToggleBtn')?.addEventListener('click', toggleTheme);
+
+document.addEventListener('mail-completed', () => {
+  recordCompletion('mail');
+  renderLeaderboard();
+});
 
 function showDesktop() {
   $('phoneApp').classList.add('hidden');
@@ -366,10 +392,22 @@ function openMode(mode: GameMode) {
   if (introP) introP.textContent = config.intro;
 
   const introEyebrow = document.querySelector<HTMLElement>('.intro-content .eyebrow');
-  if (introEyebrow) introEyebrow.textContent = 'NHIỆM VỤ HUẤN LUYỆN';
+  if (introEyebrow) {
+    introEyebrow.textContent = mode === 'mail' ? 'LỆNH ĐIỀU ĐỘNG · TRUNG TÂM AN TOÀN SỐ' : 'NHIỆM VỤ HUẤN LUYỆN';
+  }
 
   const rulesList = document.querySelector<HTMLElement>('.rules-list');
-  if (rulesList) rulesList.innerHTML = `<li><span>01</span> Đọc nội dung và đối chiếu các dấu hiệu</li><li><span>02</span> 3 vòng • 9 tình huống thực tế</li><li><span>03</span> 3 mạng • Mỗi lựa chọn sai mất 1 mạng</li>`;
+  if (rulesList) {
+    if (mode === 'mail') {
+      rulesList.innerHTML = `
+        <li><span>01</span> <b>Hồ sơ thẩm định:</b> Tiếp nhận 9 email khẩn cấp qua 3 ca phân loại.</li>
+        <li><span>02</span> <b>Sổ tay nghiệp vụ:</b> Soi kỹ tên miền nguồn (@fpt.edu.vn,...), SPF/DKIM, link lạ và đuôi file kép (.pdf.exe).</li>
+        <li><span>03</span> <b>Kỷ luật ca trực:</b> Tối đa 3 lần cảnh cáo vi phạm (3 trái tim). Bỏ lọt email lừa đảo hoặc chặn nhầm thư công vụ sẽ bị trừ điểm nghiệp vụ!</li>
+      `;
+    } else {
+      rulesList.innerHTML = `<li><span>01</span> Đọc nội dung và đối chiếu các dấu hiệu</li><li><span>02</span> 3 vòng • 9 tình huống thực tế</li><li><span>03</span> 3 mạng • Mỗi lựa chọn sai mất 1 mạng</li>`;
+    }
+  }
 
   updateDockActive(mode === 'messages' ? 'sms' : mode);
 }
@@ -384,7 +422,7 @@ document.addEventListener('click', event => {
 
   if (button.dataset.app) {
     const app = button.dataset.app;
-    if (app === 'inspector') {
+    if (app === 'mail' || app === 'inspector') {
       showDesktop();
       desktop.classList.add('hidden');
       $('inspectorApp').classList.remove('hidden');
@@ -392,19 +430,17 @@ document.addEventListener('click', event => {
         inspectorUI = new InspectorUI($('inspectorApp'), showDesktop);
       }
       inspectorUI.start();
-      updateDockActive('inspector');
+      updateDockActive('mail');
     } else if (app === 'phone') {
       showDesktop();
       desktop.classList.add('hidden');
       $('phoneApp').classList.remove('hidden');
       openPhoneGame();
       updateDockActive('phone');
+    } else if (app === 'sms') {
+      openMode('messages');
     } else if (app === 'leaderboard') {
       toggleLeaderboard();
-    } else {
-      const mapping: Record<string, GameMode> = { mail: 'mail', sms: 'messages' };
-      const mode = mapping[app];
-      if (mode) openMode(mode);
     }
     return;
   }
@@ -440,7 +476,8 @@ function startGame() {
   statsBar.classList.remove('hidden');
   const activeLink = document.querySelector<HTMLElement>('.sidebar-link.active');
   if (activeLink) {
-    activeLink.innerHTML = `<span>${modes[engine.currentMode].icon}</span>${modes[engine.currentMode].noun} <b>9</b>`;
+    const label = engine.currentMode === 'mail' ? 'Hồ sơ chờ duyệt' : modes[engine.currentMode].noun;
+    activeLink.innerHTML = `<span>${modes[engine.currentMode].icon}</span>${label} <b>9</b>`;
   }
   const lessonP = document.querySelector<HTMLElement>('.sidebar-lesson p');
   if (lessonP) {
@@ -602,6 +639,7 @@ async function finishGame() {
 }
 
 // Initializations
+initTheme();
 updateClock();
 updateProgress();
 renderLeaderboard();

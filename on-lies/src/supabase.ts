@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// On-Lies Backend API & Database Service (MongoDB & Local Storage)
 
 export interface LeaderboardEntry {
   user_id: string;
@@ -23,22 +23,9 @@ export interface UserProfile {
   is_authenticated: boolean;
 }
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+export const isSupabaseConfigured = true;
+export const supabase = null;
 
-// Detect if real Supabase keys are provided
-export const isSupabaseConfigured = Boolean(
-  supabaseUrl &&
-  supabaseAnonKey &&
-  supabaseUrl.startsWith('https://') &&
-  !supabaseUrl.includes('your-project-id')
-);
-
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
-
-// Initial starter roster for the leaderboard when database is empty or running local mock
 const INITIAL_MOCK_LEADERBOARD: LeaderboardEntry[] = [
   { user_id: 'agent-1', username: 'Hoàng Long', avatar_url: 'HL', role_title: 'Thanh tra cấp 5', level: 5, total_xp: 4890, streak_days: 14, rank: 1 },
   { user_id: 'agent-2', username: 'Mai Anh', avatar_url: 'MA', role_title: 'Cảnh sát mạng', level: 4, total_xp: 4120, streak_days: 12, rank: 2 },
@@ -77,7 +64,7 @@ export function getLocalProfile(): UserProfile {
   }
   return {
     id: 'local-guest-id',
-    username: 'Bạn (Đặc vụ Tân binh)',
+    username: 'Bạn (Thanh tra viên)',
     email: null,
     avatar_url: '👤',
     role_title: 'Tân binh',
@@ -97,53 +84,27 @@ export function saveLocalProfile(profile: UserProfile) {
 }
 
 /**
- * Fetch leaderboard rankings.
- * If Supabase is connected, queries `leaderboard_view` or `profiles`.
- * Otherwise, uses localized mock store.
+ * Fetch leaderboard from MongoDB backend API with graceful local fallback.
  */
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('leaderboard_view')
-        .select('*')
-        .order('total_xp', { ascending: false })
-        .limit(20);
-
-      if (!error && data && data.length > 0) {
-        return data as LeaderboardEntry[];
+  try {
+    const res = await fetch('/api/leaderboard', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        saveLocalLeaderboard(data);
+        return data;
       }
-
-      // If view doesn't exist yet, query profiles directly
-      const { data: profiles, error: pError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('total_xp', { ascending: false })
-        .limit(20);
-
-      if (!pError && profiles && profiles.length > 0) {
-        return profiles.map((p, idx) => ({
-          user_id: p.id,
-          username: p.username,
-          avatar_url: p.avatar_url || p.username.slice(0, 2).toUpperCase(),
-          role_title: p.role_title || 'Đặc vụ',
-          level: p.level || 1,
-          total_xp: p.total_xp || 0,
-          streak_days: p.streak_days || 1,
-          rank: idx + 1,
-        }));
-      }
-    } catch (e) {
-      console.warn('Supabase query failed, falling back to local leaderboard:', e);
     }
+  } catch {
+    // Backend unreachable, fallback smoothly
   }
 
-  // Local/Offline Fallback with current user integrated
+  // Local fallback
   const localList = getLocalLeaderboard();
   const currentProfile = getLocalProfile();
 
-  // If user has earned XP, blend them into local leaderboard ranking
-  const existingIdx = localList.findIndex(e => e.user_id === currentProfile.id);
+  const existingIdx = localList.findIndex(e => e.user_id === currentProfile.id || e.username === currentProfile.username);
   const userEntry: LeaderboardEntry = {
     user_id: currentProfile.id,
     username: currentProfile.username,
@@ -161,7 +122,6 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
     localList.push(userEntry);
   }
 
-  // Sort by XP
   localList.sort((a, b) => b.total_xp - a.total_xp);
   return localList.map((entry, index) => ({
     ...entry,
@@ -170,73 +130,70 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
 }
 
 /**
- * Get current authenticated user or local guest profile.
+ * Get current profile.
  */
 export async function getCurrentProfile(): Promise<UserProfile> {
-  if (supabase) {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (profile) {
-          return {
-            id: user.id,
-            username: profile.username,
-            email: user.email || null,
-            avatar_url: profile.avatar_url || '👤',
-            role_title: profile.role_title || 'Tân binh',
-            level: profile.level || 1,
-            total_xp: profile.total_xp || 0,
-            streak_days: profile.streak_days || 1,
-            is_authenticated: true,
-          };
-        }
-      }
-    } catch (e) {
-      console.warn('Error fetching Supabase user, using local profile:', e);
-    }
-  }
-
   return getLocalProfile();
 }
 
 /**
- * Record completed training session score.
- * Updates local XP and optionally persists to Supabase if signed in.
+ * Record completed game score to backend and update player XP.
  */
 export async function recordGameScore(
-  gameMode: 'mail' | 'phone' | 'sms' | 'inspector',
+  gameMode: string,
   score: number,
   maxScore: number,
   livesLeft: number
-): Promise<{ xpEarned: number; newTotalXp: number; newLevel: number; requiresLogin: boolean }> {
-  const xpEarned = score * 100 + livesLeft * 50;
-  const profile = getLocalProfile();
+): Promise<{
+  xpEarned: number;
+  newTotalXp: number;
+  newLevel: number;
+  requiresLogin: boolean;
+}> {
+  const baseXP = score * 50;
+  const accuracyBonus = score === maxScore ? 100 : score >= Math.ceil(maxScore * 0.7) ? 40 : 0;
+  const livesBonus = livesLeft * 30;
+  const xpEarned = baseXP + accuracyBonus + livesBonus;
+  const accuracy = Math.round((score / Math.max(1, maxScore)) * 100);
 
+  const profile = getLocalProfile();
   profile.total_xp += xpEarned;
-  if (profile.total_xp >= 4000) {
-    profile.level = 5;
+  profile.level = Math.floor(profile.total_xp / 1000) + 1;
+
+  if (profile.level >= 5) {
     profile.role_title = 'Thanh tra cấp 5';
-  } else if (profile.total_xp >= 3000) {
-    profile.level = 4;
+  } else if (profile.level >= 4) {
     profile.role_title = 'Cảnh sát mạng';
-  } else if (profile.total_xp >= 2000) {
-    profile.level = 3;
-    profile.role_title = 'Chuyên gia an ninh';
-  } else if (profile.total_xp >= 1000) {
-    profile.level = 2;
-    profile.role_title = 'Đặc vụ Thực tập';
+  } else if (profile.level >= 3) {
+    profile.role_title = 'Chuyên viên An toàn';
+  } else if (profile.level >= 2) {
+    profile.role_title = 'Đặc vụ';
   }
+
   saveLocalProfile(profile);
+
+  // Sync to backend API (MongoDB)
+  try {
+    await fetch('/api/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: profile.username,
+        mode: gameMode,
+        score,
+        maxScore,
+        accuracy,
+        xp: xpEarned,
+        lives: livesLeft,
+      }),
+    });
+  } catch {
+    // local fallback already handled
+  }
 
   // Update local leaderboard
   const list = getLocalLeaderboard();
-  const foundIdx = list.findIndex(e => e.user_id === profile.id);
+  const foundIdx = list.findIndex(e => e.username === profile.username);
   const entry: LeaderboardEntry = {
     user_id: profile.id,
     username: profile.username,
@@ -251,58 +208,38 @@ export async function recordGameScore(
   list.sort((a, b) => b.total_xp - a.total_xp);
   saveLocalLeaderboard(list);
 
-  let requiresLogin = !profile.is_authenticated;
-
-  // If user is authenticated in Supabase, push the game record
-  if (supabase) {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        requiresLogin = false;
-        const accuracy = Math.round((score / Math.max(1, maxScore)) * 100);
-        await supabase.from('game_records').insert({
-          user_id: user.id,
-          game_mode: gameMode,
-          score,
-          max_score: maxScore,
-          lives_left: livesLeft,
-          accuracy,
-          xp_earned: xpEarned,
-        });
-      }
-    } catch (e) {
-      console.warn('Could not save to Supabase:', e);
-    }
-  }
-
   return {
     xpEarned,
     newTotalXp: profile.total_xp,
     newLevel: profile.level,
-    requiresLogin,
+    requiresLogin: !profile.is_authenticated,
   };
 }
 
 /**
- * Sign in using Supabase Auth or mock local account
+ * Sign in using backend API or local profile.
  */
 export async function signIn(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { success: false, error: error.message };
-
+  try {
+    const res = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (res.ok) {
+      const data = await res.json();
       if (data.user) {
-        const profile = await getCurrentProfile();
-        saveLocalProfile(profile);
+        saveLocalProfile(data.user);
         return { success: true };
       }
-    } catch (e: any) {
-      return { success: false, error: e?.message || 'Lỗi đăng nhập' };
+    } else {
+      const err = await res.json().catch(() => ({ error: 'Lỗi đăng nhập' }));
+      return { success: false, error: err.error || 'Lỗi đăng nhập' };
     }
+  } catch {
+    // Offline / Mock fallback
   }
 
-  // Offline / Mock fallback
   const profile = getLocalProfile();
   profile.email = email;
   profile.username = email.split('@')[0];
@@ -312,97 +249,64 @@ export async function signIn(email: string, password: string): Promise<{ success
 }
 
 /**
- * Sign up using Supabase Auth or mock local account
+ * Sign up using backend API or local profile.
  */
-export async function signUp(email: string, password: string, username: string): Promise<{ success: boolean; error?: string }> {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username: username || email.split('@')[0],
-            avatar_url: '👤',
-          },
-          emailRedirectTo: window.location.origin,
-        },
-      });
-
-      if (error) return { success: false, error: error.message };
+export async function signUp(
+  email: string,
+  password: string,
+  username: string
+): Promise<{ success: boolean; error?: string }> {
+  const cleanUsername = username || email.split('@')[0];
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, username: cleanUsername }),
+    });
+    if (res.ok) {
+      const data = await res.json();
       if (data.user) {
-        const profile = await getCurrentProfile();
-        saveLocalProfile(profile);
+        saveLocalProfile(data.user);
         return { success: true };
       }
-    } catch (e: any) {
-      return { success: false, error: e?.message || 'Lỗi đăng ký' };
+    } else {
+      const err = await res.json().catch(() => ({ error: 'Lỗi đăng ký' }));
+      return { success: false, error: err.error || 'Lỗi đăng ký' };
     }
+  } catch {
+    // Offline / Mock fallback
   }
 
-  // Offline / Mock fallback
   const profile = getLocalProfile();
   profile.email = email;
-  profile.username = username || email.split('@')[0];
+  profile.username = cleanUsername;
   profile.is_authenticated = true;
   saveLocalProfile(profile);
   return { success: true };
 }
 
 /**
- * Sign out
+ * Sign out current profile.
  */
 export async function signOut(): Promise<void> {
-  if (supabase) {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore
-    }
-  }
-
   const profile = getLocalProfile();
   profile.is_authenticated = false;
-  profile.email = null;
   saveLocalProfile(profile);
 }
 
 /**
- * Subscribe to realtime updates on profiles / game records
+ * Leaderboard polling / subscription helper
  */
-export function subscribeToLeaderboard(onUpdate: () => void): () => void {
-  if (!supabase) return () => { };
-
-  const channel = supabase
-    .channel('public:leaderboard')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
-      onUpdate();
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'game_records' }, () => {
-      onUpdate();
-    })
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+export function subscribeToLeaderboard(callback: () => void): () => void {
+  const interval = window.setInterval(callback, 30000);
+  return () => window.clearInterval(interval);
 }
 
 /**
- * Listen for auth state changes (e.g., email confirmation redirect)
+ * Auth state listener
  */
-export function onAuthStateChange(callback: (profile: UserProfile) => void): () => void {
-  if (!supabase) return () => { };
-
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session?.user) {
-      const profile = await getCurrentProfile();
-      saveLocalProfile(profile);
-      callback(profile);
-    }
-  });
-
-  return () => {
-    subscription.unsubscribe();
-  };
+export function onAuthStateChange(callback: (profile: UserProfile | null) => void): () => void {
+  const handler = () => callback(getLocalProfile());
+  window.addEventListener('storage', handler);
+  return () => window.removeEventListener('storage', handler);
 }

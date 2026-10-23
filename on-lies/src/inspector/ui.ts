@@ -1,5 +1,6 @@
 import { InspectorEngine } from './engine';
 import { CLUE_CATEGORIES } from './types';
+import { recordGameScore } from '../supabase';
 import './inspector.css';
 
 export class InspectorUI {
@@ -53,6 +54,7 @@ export class InspectorUI {
       <div class="inspector-window">
         <header class="inspector-topbar">
           <div class="inspector-stat-group">
+            <span class="inspector-mode-tag">✉ THANH TRA HỘP THƯ</span>
             <span>NGÀY <b id="inspDay">1</b></span>
             <span>THỜI GIAN <b id="inspTimer">02:00</b></span>
             <span>HỒ SƠ <b id="inspProgress">0/0</b></span>
@@ -327,17 +329,18 @@ export class InspectorUI {
   private showDayIntroModal() {
     const newRules = this.engine.getNewRulesToday();
     const modalHtml = `
-      <h2>CA TRỰC NGÀY ${this.engine.day}${this.engine.day === 1 ? ' · NHẬN NHIỆM VỤ' : ''}</h2>
+      <h2>CA TRỰC THANH TRA HỘP THƯ · NGÀY ${this.engine.day}${this.engine.day === 1 ? ' · NHẬN NHIỆM VỤ' : ''}</h2>
       ${this.engine.day === 1 ? `
         <p>Chào mừng bạn đến với <b>Đội Phản ứng nhanh – Trung tâm An toàn số</b>!</p>
-        <p>Mỗi hồ sơ là một tình huống sinh viên gửi về cầu cứu. Nhiệm vụ của bạn là: đối chiếu <b>Sổ tay nghiệp vụ</b>, <b>bấm chọn các chi tiết đáng ngờ trên hồ sơ</b>, rồi dùng con dấu <b>ĐÃ DUYỆT</b> hoặc <b>TỪ CHỐI</b>.</p>
+        <p>Trước mặt bạn là các bức email và thông báo khẩn cấp do sinh viên, người dân gửi về cầu cứu trước các bẫy lừa đảo trực tuyến (học phí giả mạo, học bổng ảo, việc làm cọc tiền, khóa tài khoản...).</p>
+        <p>Nhiệm vụ: Đối chiếu <b>Sổ tay nghiệp vụ</b>, <b>bấm chọn các chi tiết đáng ngờ trên lá thư</b>, rồi dùng con dấu <b>ĐÃ DUYỆT (Hợp lệ)</b> hoặc <b>TỪ CHỐI (Lừa đảo)</b>.</p>
       ` : ''}
       <p><b>Quy định ${this.engine.day === 1 ? 'áp dụng' : 'mới bổ sung'} hôm nay:</b></p>
       <ol>
         ${newRules.map(r => `<li><b>Quy tắc ${r.id}:</b> ${this.escapeHtml(r.text)}</li>`).join('')}
       </ol>
-      <p>⚠️ <b>Quy định xử phạt:</b> Bạn sẽ bị cảnh cáo nếu cho lọt tin lừa đảo hoặc từ chối nhầm tin an toàn. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ bị sa thải ngay lập tức!</b></p>
-      <button class="inspector-next-btn" id="modalStartDayBtn">BẮT ĐẦU CA TRỰC →</button>
+      <p>⚠️ <b>Quy định xử phạt:</b> Bạn sẽ bị cảnh cáo nếu cho lọt email lừa đảo hoặc từ chối nhầm email an toàn. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ bị sa thải ngay lập tức!</b></p>
+      <button class="inspector-next-btn" id="modalStartDayBtn">BẮT ĐẦU CA TRỰC THẨM ĐỊNH →</button>
     `;
 
     this.showModal(modalHtml);
@@ -420,6 +423,10 @@ export class InspectorUI {
       : this.engine.correctCount >= 8
         ? 'Thanh tra viên Khá'
         : 'Thanh tra viên Tập sự';
+
+    // Record score to database / localStorage
+    recordGameScore('mail', this.engine.correctCount, Math.max(1, this.engine.totalProcessed), Math.max(0, 3 - this.engine.citations));
+    document.dispatchEvent(new CustomEvent('mail-completed'));
 
     const modalHtml = `
       <h2>ĐÁNH GIÁ KẾT QUẢ THỰC TẬP</h2>

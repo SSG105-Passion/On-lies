@@ -19,6 +19,99 @@
   --insp-bad: #f8b4ab;
 }
 
+[data-theme="light"] {
+  --insp-desk: #d5d9e0;
+  --insp-desk-dark: #c5cad2;
+  --insp-paper: #ffffff;
+  --insp-ink: #0f172a;
+  --insp-mute: #475569;
+  --insp-wood: #78716c;
+}
+
+[data-theme="light"] .inspector-topbar {
+  background: #f8fafc;
+  border-bottom: 2px solid #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .inspector-topbar b {
+  color: #d97706;
+}
+
+[data-theme="light"] .inspector-window {
+  color: #0f172a;
+}
+
+[data-theme="light"] .inspector-mode-tag {
+  background: rgba(10, 132, 255, 0.12);
+  color: #0284c7;
+  border-color: rgba(10, 132, 255, 0.25);
+}
+
+[data-theme="light"] .inspector-exit-btn {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .inspector-exit-btn:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .inspector-handbook {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #1e293b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .inspector-handbook h3 {
+  color: #0f172a;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+[data-theme="light"] .inspector-handbook li {
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .insp-paper {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .insp-paper-head {
+  border-bottom: 2px solid #e2e8f0;
+}
+
+[data-theme="light"] .insp-paper-body {
+  color: #1e293b;
+}
+
+[data-theme="light"] .inspector-modal-box {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .inspector-modal-box h2 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .inspector-modal-box p {
+  color: #334155;
+}
+
+[data-theme="light"] .inspector-summary-row {
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+
 .inspector-window {
   width: 100%;
   height: calc(100vh - 48px);

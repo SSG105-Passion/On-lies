@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: on-lies-cybersecurity
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: cd on-lies && npm install && npm run build
+    startCommand: cd on-lies && node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: DB_NAME
+        value: onlies_db
