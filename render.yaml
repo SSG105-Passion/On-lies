@@ -9,7 +9,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI
-        sync: false
-      - key: DB_NAME
-        value: Onlies
+      - key: VITE_SUPABASE_URL
+        value: https://tpluixrztjahwiuesgdd.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: sb_publishable_QJ7tOyZTCZs7CdXSZjzDvw_SyjG7jyz
