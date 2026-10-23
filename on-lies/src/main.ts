@@ -1,9 +1,10 @@
 import { GameEngine } from './gameEngine';
 import { openPhoneGame } from './phoneGame';
-import { renderChannelList, renderChannelDetail } from './channelViews';
+import { renderChannelList } from './channelViews';
 import { InspectorUI } from './inspector/ui';
 import { DeliveryUI } from './sms/deliveryUI';
 import { createDeliveryInvestigation, DELIVERY_ITEM_ID } from './sms/deliveryModel';
+import { getSmsContinuation } from './sms/navigation';
 import type { ScenarioItem, GameMode } from './types';
 import {
   fetchLeaderboard,
@@ -542,13 +543,14 @@ function openInspectModal(itemId: number) {
   clearDeliveryModal();
   engine.activeItemId = itemId;
   if (engine.currentMode === 'messages') {
-    if (item.id === DELIVERY_ITEM_ID) {
       inspectModal.classList.add('sms-investigation-active');
       inspectModal.classList.remove('hidden');
       inspectModal.setAttribute('role', 'dialog');
       inspectModal.setAttribute('aria-modal', 'true');
-      inspectModal.setAttribute('aria-label', 'Điều tra SMS: Đơn hàng đang bị giữ');
+      inspectModal.setAttribute('aria-label', `SMS: ${item.subject}`);
       new DeliveryUI(inspectModal, {
+        item,
+        round: engine.currentRound,
         investigation: deliveryInvestigation,
         items: () => engine.getCurrentRoundItems(),
         answers: () => engine.userAnswers,
@@ -558,14 +560,18 @@ function openInspectModal(itemId: number) {
           if (answer) updateUI();
           return answer;
         },
+        classify: isScam => {
+          if (item.id === DELIVERY_ITEM_ID || engine.lives <= 0 || engine.evaluatedItemIds.has(item.id)) return null;
+          engine.evaluateAnswer(item.id, isScam);
+          updateUI();
+          return engine.userAnswers.find(answer => answer.item.id === item.id) || null;
+        },
+        open: openInspectModal,
+        continuation: () => getSmsContinuation(engine.getCurrentRoundItems(), engine.userAnswers, item.id, engine.currentRound, engine.lives),
+        continue: continueSms,
         close: closeModal,
       }).start();
       return;
-    }
-    inspectModal.innerHTML = renderChannelDetail(engine.currentMode, item);
-    inspectModal.classList.remove('hidden');
-    if (engine.evaluatedItemIds.has(itemId)) showFeedback(item);
-    return;
   }
   $('modalItemId').textContent = `#${item.id}`;
   $('modalSender').textContent = item.sender;
@@ -600,6 +606,20 @@ function openInspectModal(itemId: number) {
   });
   inspectModal.classList.remove('hidden');
   if (evaluated) showFeedback(item);
+}
+
+function continueSms() {
+  const next = getSmsContinuation(engine.getCurrentRoundItems(), engine.userAnswers, engine.activeItemId!, engine.currentRound, engine.lives);
+  if (next.kind === 'item') { openInspectModal(next.itemId!); return; }
+  if (next.kind === 'round' && engine.isRoundComplete()) {
+    engine.currentRound++;
+    updateUI();
+    openInspectModal(engine.getCurrentRoundItems()[0].id);
+    return;
+  }
+  inspectModal.classList.add('hidden');
+  clearDeliveryModal();
+  finishGame();
 }
 
 function clearDeliveryModal() {

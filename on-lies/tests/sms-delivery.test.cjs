@@ -21,6 +21,7 @@ function load(filename) {
   return module.exports;
 }
 const { GameEngine } = load(path.join(__dirname, '../src/gameEngine.ts'));
+const { getSmsContinuation } = load(path.join(__dirname, '../src/sms/navigation.ts'));
 const {
   createDeliveryInvestigation, inspectDeliveryTool, confirmDeliveryContact, evaluateDeliveryAction,
 } = load(path.join(__dirname, '../src/sms/deliveryModel.ts'));
@@ -160,4 +161,35 @@ test('last-life delivery mistake ends play and does not charge twice', () => {
   assert.equal(engine.lives, 0);
   assert.equal(engine.evaluateSmsDeliveryAction('pay', investigation), null);
   assert.equal(engine.lives, 0);
+});
+
+test('continuation chooses the next unanswered SMS, wrapping back to skipped messages', () => {
+  const { engine } = setup();
+  const items = engine.getCurrentRoundItems();
+  engine.evaluateAnswer(202, true);
+  let next = getSmsContinuation(items, engine.userAnswers, 202, 1, 3);
+  assert.equal(next.kind, 'item');
+  assert.equal(next.itemId, 203);
+  engine.evaluateAnswer(203, true);
+  next = getSmsContinuation(items, engine.userAnswers, 203, 1, 3);
+  assert.equal(next.kind, 'item');
+  assert.equal(next.itemId, 201);
+});
+
+test('continuation moves directly to the next round only after all messages are processed', () => {
+  const { engine, investigation } = setup();
+  engine.evaluateSmsDeliveryAction('ignore', investigation);
+  engine.evaluateAnswer(201, false);
+  engine.evaluateAnswer(203, true);
+  const next = getSmsContinuation(engine.getCurrentRoundItems(), engine.userAnswers, 203, 1, 3);
+  assert.equal(next.kind, 'round');
+  assert.match(next.label, /2/);
+});
+
+test('last round and zero lives offer results rather than another SMS', () => {
+  const { engine } = setup();
+  assert.equal(getSmsContinuation(engine.getCurrentRoundItems(), [], 202, 1, 0).kind, 'results');
+  engine.currentRound = 3;
+  for (const item of engine.getCurrentRoundItems()) engine.evaluateAnswer(item.id, item.isScam);
+  assert.equal(getSmsContinuation(engine.getCurrentRoundItems(), engine.userAnswers, 209, 3, 3).kind, 'results');
 });
