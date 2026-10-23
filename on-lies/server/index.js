@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || '';
-const DB_NAME = process.env.DB_NAME || 'onlies_db';
+const DB_NAME = process.env.DB_NAME || 'Onlies';
 
 app.use(cors());
 app.use(express.json());
