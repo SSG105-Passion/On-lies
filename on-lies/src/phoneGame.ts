@@ -1,3 +1,15 @@
+export interface PhoneGameResult {
+  score: number;
+  maxScore: number;
+  livesLeft: number;
+}
+
+declare global {
+  interface DocumentEventMap {
+    'phone-completed': CustomEvent<PhoneGameResult>;
+  }
+}
+
 interface CallCase { name: string; number: string; story: string; dialogue: string[]; choices: string[]; correct: number; lesson: string }
 const calls: CallCase[] = [
   { name: 'Nhân viên ngân hàng?', number: 'Số lạ • 09xx 218 xxx', story: 'Bạn vừa nhận một cuộc gọi tự xưng là nhân viên ngân hàng.', dialogue: ['Tài khoản của bạn có giao dịch bất thường.', 'Tôi vừa gửi mã OTP. Bạn đọc mã đó để tôi hủy giao dịch ngay nhé.'], choices: ['Đọc OTP để hủy giao dịch', 'Kết thúc cuộc gọi, tự liên hệ ngân hàng qua kênh chính thức', 'Gửi ảnh thẻ ngân hàng cho họ'], correct: 1, lesson: 'OTP có thể cho phép người khác đăng nhập hoặc xác nhận giao dịch. Không đọc OTP cho người gọi; kiểm tra bằng ứng dụng ngân hàng hoặc số liên hệ chính thức.' },
@@ -34,7 +46,11 @@ function answer(choice: number) {
   document.getElementById('callFeedback')!.innerHTML = `<div class="call-feedback ${correct?'good':'bad'}"><strong>${correct?'✓ Xử lý đúng!':'✕ Bạn vừa mắc bẫy.'}</strong><p>${item.lesson}</p><button class="primary-button" data-phone="next">${lives === 0 || index === calls.length-1?'Xem kết quả':'Cuộc gọi tiếp theo →'}</button></div>`;
 }
 function finish() {
-  if (lives > 0 && history.length === calls.length) document.dispatchEvent(new Event('phone-completed'));
+  if (lives > 0 && history.length === calls.length) {
+    document.dispatchEvent(new CustomEvent<PhoneGameResult>('phone-completed', {
+      detail: { score, maxScore: calls.length, livesLeft: lives },
+    }));
+  }
   stats().classList.add('hidden');
 content().innerHTML = `<div class="phone-summary"><div class="call-avatar">🛡</div><p class="eyebrow">BÁO CÁO NHIỆM VỤ</p><h2>${lives===0?'Cùng ôn lại cách tự bảo vệ':'Bạn đã xử lý các cuộc gọi!'}</h2><p>${score}/${history.length} lựa chọn đúng • ${lives}/3 mạng còn lại</p>${history.map(entry=>`<div class="call-review"><strong>${entry.correct?'✓':'✕'} ${calls[entry.index].name}</strong><p>${calls[entry.index].lesson}</p></div>`).join('')}<button class="primary-button" data-phone="start">Chơi lại</button><button class="secondary-button" data-action="phoneExit">Về màn hình chính</button></div>`;
 }

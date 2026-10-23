@@ -112,9 +112,10 @@ function recordCompletion(mode: string) {
   updateProgress();
 }
 
-document.addEventListener('phone-completed', () => {
+document.addEventListener('phone-completed', event => {
+  const { score, maxScore, livesLeft } = event.detail;
   recordCompletion('phone');
-  recordGameScore('phone', 6, 6, 3).then(renderLeaderboard);
+  recordGameScore('phone', score, maxScore, livesLeft).then(renderLeaderboard);
 });
 
 function updateClock() {
