@@ -1,5 +1,7 @@
 import type { GameMode, ScenarioItem, UserAnswer } from './types';
 import { GAME_DATA } from './gameData';
+import { DELIVERY_ITEM_ID, evaluateDeliveryAction } from './sms/deliveryModel';
+import type { DeliveryInvestigation } from './sms/deliveryModel';
 
 declare const Tone: any;
 
@@ -61,6 +63,25 @@ export class GameEngine {
   public isRoundComplete(): boolean {
     const roundItems = this.getCurrentRoundItems();
     return roundItems.every(item => this.evaluatedItemIds.has(item.id));
+  }
+
+  public evaluateSmsDeliveryAction(action: string, investigation: DeliveryInvestigation): UserAnswer | null {
+    if (this.currentMode !== 'messages' || this.lives <= 0 ||
+      this.activeItemId !== DELIVERY_ITEM_ID || this.evaluatedItemIds.has(DELIVERY_ITEM_ID)) return null;
+    const item = this.getCurrentRoundItems().find(item => item.id === DELIVERY_ITEM_ID);
+    const result = evaluateDeliveryAction(action, investigation);
+    if (!item || !result) return null;
+
+    this.score += result.scoreDelta;
+    this.lives -= result.livesLost;
+    const answer: UserAnswer = {
+      item, userChoiceIsScam: result.action !== 'pay',
+      isCorrect: result.outcome === 'verified', smsAction: result,
+    };
+    this.evaluatedItemIds.add(item.id);
+    this.userAnswers.push(answer);
+    if (result.outcome !== 'cautious') this.playSound(result.outcome === 'verified' ? 'correct' : 'wrong');
+    return answer;
   }
 
   public playSound(type: 'correct' | 'wrong') {

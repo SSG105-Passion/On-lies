@@ -2,6 +2,8 @@ import { GameEngine } from './gameEngine';
 import { openPhoneGame } from './phoneGame';
 import { renderChannelList, renderChannelDetail } from './channelViews';
 import { InspectorUI } from './inspector/ui';
+import { DeliveryUI } from './sms/deliveryUI';
+import { createDeliveryInvestigation, DELIVERY_ITEM_ID } from './sms/deliveryModel';
 import type { ScenarioItem, GameMode } from './types';
 import {
   fetchLeaderboard,
@@ -18,6 +20,7 @@ import {
 } from './supabase';
 
 const engine = new GameEngine();
+let deliveryInvestigation = createDeliveryInvestigation();
 let inspectorUI: InspectorUI | null = null;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const desktop = $('desktop');
@@ -149,6 +152,7 @@ document.addEventListener('mail-completed', () => {
 });
 
 function showDesktop() {
+  clearDeliveryModal();
   $('phoneApp').classList.add('hidden');
   $('phoneStats').classList.add('hidden');
   $('inspectorApp')?.classList.add('hidden');
@@ -391,6 +395,11 @@ function openMode(mode: GameMode) {
 
   const introP = document.querySelector<HTMLElement>('.intro-content > p:not(.eyebrow)');
   if (introP) introP.textContent = config.intro;
+  const missionDetail = document.querySelectorAll<HTMLElement>('.intro-content > p:not(.eyebrow)')[1];
+  if (missionDetail) missionDetail.textContent = mode === 'messages'
+    ? 'Đọc từng SMS và kiểm tra yêu cầu. Tin shipper có thêm đơn hàng, liên kết và lịch sử để bạn tự xác minh trước khi chọn cách xử lý. Bỏ qua tin nhắn tránh được rủi ro nhưng chưa được điểm xác minh.'
+    : 'Mở từng hồ sơ email, đối chiếu sổ tay nghiệp vụ và đưa ra kết luận dựa trên thông tin trong tình huống.';
+  $('startGameBtn').textContent = mode === 'messages' ? 'Bắt đầu kiểm tra SMS →' : 'Nhận ca trực & Bắt đầu thẩm định →';
 
   const introEyebrow = document.querySelector<HTMLElement>('.intro-content .eyebrow');
   if (introEyebrow) {
@@ -471,6 +480,7 @@ document.addEventListener('click', event => {
 
 function startGame() {
   engine.resetGame();
+  deliveryInvestigation = createDeliveryInvestigation();
   mailIntro.classList.add('hidden');
   resultScreen.classList.add('hidden');
   gameApp.classList.remove('hidden');
@@ -484,6 +494,8 @@ function startGame() {
   if (lessonP) {
     lessonP.textContent = modes[engine.currentMode].hint;
   }
+  const lessonTitle = document.querySelector<HTMLElement>('.sidebar-lesson strong');
+  if (lessonTitle) lessonTitle.textContent = engine.currentMode === 'messages' ? 'Sổ tay an toàn SMS' : 'Sổ tay nghiệp vụ Email';
   updateUI();
 }
 
@@ -527,8 +539,29 @@ function updateUI() {
 function openInspectModal(itemId: number) {
   const item = engine.getItemById(itemId);
   if (!item) return;
+  clearDeliveryModal();
   engine.activeItemId = itemId;
   if (engine.currentMode === 'messages') {
+    if (item.id === DELIVERY_ITEM_ID) {
+      inspectModal.classList.add('sms-investigation-active');
+      inspectModal.classList.remove('hidden');
+      inspectModal.setAttribute('role', 'dialog');
+      inspectModal.setAttribute('aria-modal', 'true');
+      inspectModal.setAttribute('aria-label', 'Điều tra SMS: Đơn hàng đang bị giữ');
+      new DeliveryUI(inspectModal, {
+        investigation: deliveryInvestigation,
+        items: () => engine.getCurrentRoundItems(),
+        answers: () => engine.userAnswers,
+        stats: () => ({ score: engine.score, lives: engine.lives }),
+        submit: action => {
+          const answer = engine.evaluateSmsDeliveryAction(action, deliveryInvestigation);
+          if (answer) updateUI();
+          return answer;
+        },
+        close: closeModal,
+      }).start();
+      return;
+    }
     inspectModal.innerHTML = renderChannelDetail(engine.currentMode, item);
     inspectModal.classList.remove('hidden');
     if (engine.evaluatedItemIds.has(itemId)) showFeedback(item);
@@ -569,9 +602,20 @@ function openInspectModal(itemId: number) {
   if (evaluated) showFeedback(item);
 }
 
+function clearDeliveryModal() {
+  inspectModal.onclick = null;
+  inspectModal.onkeydown = null;
+  inspectModal.classList.remove('sms-investigation-active');
+  inspectModal.removeAttribute('role');
+  inspectModal.removeAttribute('aria-modal');
+  inspectModal.removeAttribute('aria-label');
+}
+
 function closeModal() {
   inspectModal.classList.add('hidden');
+  clearDeliveryModal();
   if (engine.lives <= 0) finishGame();
+  else itemList.querySelector<HTMLButtonElement>(`button[data-item-id="${engine.activeItemId}"]`)?.focus();
 }
 
 function submitEvaluation(userChoiceIsScam: boolean) {
@@ -633,7 +677,11 @@ async function finishGame() {
   if (subTitle) {
     subTitle.textContent = `Bạn đã xử lý ${engine.userAnswers.length}/9 tình huống. Ôn lại các dấu hiệu và cách tự bảo vệ bên dưới.`;
   }
-  $('breakdownContainer').innerHTML = engine.userAnswers.map(answer => `<div class="breakdown-item ${answer.isCorrect ? '' : 'wrong'}"><strong>${answer.isCorrect ? '✓' : '✕'} ${answer.item.sender} — ${answer.isCorrect ? 'Nhận diện đúng' : 'Cần lưu ý'}</strong><p>${answer.item.explanation}</p></div>`).join('');
+  $('breakdownContainer').innerHTML = engine.userAnswers.map(answer => {
+    const cautious = answer.smsAction?.outcome === 'cautious';
+    const label = cautious ? 'Tránh rủi ro, chưa xác minh' : answer.isCorrect ? 'Xử lý đúng' : 'Cần lưu ý';
+    return `<div class="breakdown-item ${cautious ? 'cautious' : answer.isCorrect ? '' : 'wrong'}"><strong>${cautious ? '△' : answer.isCorrect ? '✓' : '✕'} ${answer.item.sender} — ${label}</strong><p>${answer.smsAction?.feedback || answer.item.explanation}</p></div>`;
+  }).join('');
 
   // Update leaderboard in real time
   await renderLeaderboard();

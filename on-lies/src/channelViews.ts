@@ -1,6 +1,7 @@
 import type { GameMode, ScenarioItem, UserAnswer } from './types';
 
-const state = (answer?: UserAnswer) => answer ? (answer.isCorrect ? '✓ Đã xử lý' : '✕ Cần lưu ý') : 'Chưa đọc';
+const state = (answer?: UserAnswer) => answer?.smsAction?.outcome === 'cautious'
+  ? '△ Chưa xác minh' : answer ? (answer.isCorrect ? '✓ Đã xử lý' : '✕ Cần lưu ý') : 'Chưa đọc';
 
 export function renderChannelList(_mode: GameMode, items: ScenarioItem[], answers: UserAnswer[]): string {
   return `<div class="conversation-home sms-home">
@@ -20,7 +21,7 @@ export function renderChannelList(_mode: GameMode, items: ScenarioItem[], answer
           <span class="chat-avatar avatar-${item.id % 4}">${initial}</span>
           <div class="conversation-body">
             <div class="conversation-topline">
-              <strong>${item.sender}</strong>
+              <strong>${item.sender}${item.id === 202 ? ' <span class="sms-investigation-label">Điều tra</span>' : ''}</strong>
               <span class="conversation-time">${answer ? state(answer) : 'Hôm nay'}</span>
             </div>
             <p>${item.body.slice(0, 72)}…</p>

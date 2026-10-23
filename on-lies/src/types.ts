@@ -1,3 +1,5 @@
+import type { SmsActionResult } from './sms/deliveryModel';
+
 export type GameMode = 'mail' | 'messages' | 'posts' | 'browser' | 'market';
 
 export interface ScenarioItem {
@@ -17,4 +19,5 @@ export interface UserAnswer {
   item: ScenarioItem;
   userChoiceIsScam: boolean;
   isCorrect: boolean;
+  smsAction?: SmsActionResult;
 }
