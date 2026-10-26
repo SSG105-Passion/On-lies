@@ -1,0 +1,262 @@
+#familyApp {
+  --family-bg: #101823;
+  --family-panel: #192432;
+  --family-chat-bg: #141e2b;
+  --family-bubble: #263242;
+  --family-border: #2d3c4f;
+  --family-text: #edf1f7;
+  --family-muted: #a1b1c7;
+  --family-subtle: #7e91ab;
+  --family-blue: #9fc8ff;
+  --family-outgoing: #2465c4;
+  --family-outgoing-text: #fff;
+  --family-amber: #edb95a;
+  --family-coral: #ed8584;
+  background: var(--family-bg);
+  color: var(--family-text);
+  font-size: 14px;
+}
+[data-theme="light"] #familyApp {
+  --family-bg: #f2f5f9;
+  --family-panel: #fff;
+  --family-chat-bg: #fafbfd;
+  --family-bubble: #e9eef5;
+  --family-border: #d5deea;
+  --family-text: #203147;
+  --family-muted: #526780;
+  --family-subtle: #63768e;
+  --family-blue: #245da6;
+  --family-amber: #ba7b19;
+  --family-coral: #bc5156;
+}
+#familyApp h1, #familyApp h2, #familyApp h3, #familyApp p { margin: 0; }
+#familyApp button, #familyApp summary { -webkit-tap-highlight-color: transparent; }
+#familyApp button { font: inherit; }
+#familyApp button:focus-visible, #familyApp summary:focus-visible { outline: 2px solid var(--family-blue); outline-offset: 4px; }
+#familyApp [tabindex="-1"]:focus { outline: none; }
+.family-appbar { width: min(1440px, calc(100% - 96px)); margin: 0 auto; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-shrink: 0; }
+.family-breadcrumb { display: flex; gap: 12px; align-items: center; font-size: 12px; color: var(--family-subtle); }
+.family-breadcrumb strong { color: var(--family-muted); font-weight: 500; }
+.family-back { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--family-border); border-radius: 8px; padding: 8px 12px; color: var(--family-muted); font-size: 12px !important; min-height: 36px; }
+.family-back:hover { background: var(--family-panel); color: var(--family-text); }
+.family-content { flex: 1; min-height: 0; overflow: auto; padding: 0 48px 12px; scrollbar-width: thin; scrollbar-color: var(--family-border) transparent; }
+.family-stage { max-width: 1440px; height: 100%; min-height: 0; margin: 0 auto; display: flex; flex-direction: column; }
+.family-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 15px 0 26px; flex-shrink: 0; }
+.family-heading h1 { font-size: clamp(25px, 2.5vw, 36px); line-height: 1.25; letter-spacing: -.04em; font-weight: 750; }
+.family-heading p { color: var(--family-muted); font-size: 14px; margin-top: 10px !important; line-height: 1.65; }
+.family-session { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.family-step { color: var(--family-muted); border: 1px solid var(--family-border); padding: 9px 14px; border-radius: 30px; font-size: 12px; }
+.family-step b { color: var(--family-text); font-weight: 600; margin-left: 4px; }
+.family-score { color: var(--family-muted); font-size: 12px; white-space: nowrap; }
+.family-lives { display: inline-flex; gap: 5px; color: var(--family-coral); }
+.family-lives svg { width: 20px; height: 20px; }
+.family-lives .is-full { fill: currentColor; stroke-width: 1px; }
+.family-workspace { display: grid; grid-template-columns: minmax(290px, .36fr) minmax(0, .64fr); gap: 20px; flex: 1; min-height: 0; }
+.family-brief, .family-conversation { border: 1px solid var(--family-border); border-radius: 12px; min-width: 0; }
+.family-brief { background: var(--family-panel); padding: 26px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--family-border) transparent; }
+.family-eyebrow { color: var(--family-muted); font-size: 10px; letter-spacing: .15em; font-weight: 700; }
+.family-person { display: flex; align-items: center; gap: 16px; margin: 20px 0; }
+.family-portrait { width: 66px; height: 66px; flex-shrink: 0; display: inline-flex; border-radius: 50%; overflow: hidden; }
+.family-portrait svg { width: 100%; height: 100%; }
+.family-person strong { font-size: 17px; font-weight: 650; }
+.family-brief h2 { font-size: 21px; line-height: 1.5; letter-spacing: -.02em; font-weight: 700; }
+.family-brief-meters { border-top: 1px solid var(--family-border); border-bottom: 1px solid var(--family-border); padding: 20px 0; margin: 22px 0; }
+#familyApp .family-meter { display: grid; grid-template-columns: 105px minmax(45px, 1fr) 42px; align-items: center; gap: 12px; margin: 0; font-size: 13px; }
+#familyApp .family-meter + .family-meter { margin-top: 17px; }
+#familyApp .family-meter-track { height: 8px; border-radius: 20px; background: var(--family-bubble); overflow: hidden; }
+#familyApp .family-meter-track i { display: block; height: 100%; border-radius: inherit; background: var(--family-amber); transition: width .2s ease; }
+#familyApp .family-meter-track.is-trust i { background: var(--family-coral); }
+.family-meter strong { text-align: right; font-size: 14px; font-weight: 650; }
+.family-meter strong small { font-size: 12px; color: var(--family-muted); font-weight: 400; }
+.family-brief-details summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; color: var(--family-muted); font-size: 12px; padding: 2px 0 12px; }
+.family-brief-details[open] > summary { display: none; }
+.family-brief-details summary::-webkit-details-marker { display: none; }
+.family-context { font-size: 13px; line-height: 1.85; color: var(--family-muted); }
+.family-goal { display: flex; gap: 13px; padding-top: 22px; margin-top: 22px; border-top: 1px solid var(--family-border); }
+.family-goal > svg { width: 27px; height: 27px; flex-shrink: 0; color: var(--family-blue); }
+.family-goal h3 { font-size: 13px; color: var(--family-blue); font-weight: 650; }
+.family-goal p { font-size: 13px; line-height: 1.8; margin-top: 6px !important; }
+.family-brief-tip { font-size: 11px; line-height: 1.8; color: var(--family-subtle); margin-top: 18px !important; }
+.family-conversation { background: var(--family-chat-bg); display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.family-contact { display: flex; align-items: center; gap: 13px; padding: 18px 24px; border-bottom: 1px solid var(--family-border); flex-shrink: 0; }
+.family-contact .family-portrait { width: 43px; height: 43px; }
+.family-contact h2 { font-size: 16px; font-weight: 650; }
+.family-contact p { font-size: 11px; color: var(--family-muted); margin-top: 5px !important; display: flex; align-items: center; gap: 7px; }
+.family-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #66bba2; }
+.family-status-dot.is-ended { background: var(--family-subtle); }
+.family-contact-icon { color: var(--family-subtle); margin-left: auto; }
+#familyApp .family-chat { display: flex; flex-direction: column; gap: 17px; flex: 1; min-height: 110px; max-height: none; overflow-y: auto; padding: 18px 24px 24px; scroll-behavior: auto; scrollbar-width: thin; scrollbar-color: var(--family-border) transparent; }
+.family-chat-date { text-align: center; color: var(--family-subtle); font-size: 10px; padding: 0 0 2px; }
+.family-message { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+.family-message-avatar { width: 30px; height: 30px; margin-top: 4px; }
+.family-message-content { max-width: 86%; min-width: 0; }
+#familyApp .family-bubble { max-width: none; padding: 13px 16px; border-radius: 12px 12px 12px 3px; background: var(--family-bubble); font-size: 14px; line-height: 1.8; color: var(--family-text); overflow-wrap: anywhere; text-align: left; }
+.family-message-label { display: block; color: var(--family-subtle); font-size: 10px; margin: 5px 8px 0; }
+.family-message.is-me { justify-content: flex-end; padding-left: 30px; }
+#familyApp .is-me .family-bubble { background: var(--family-outgoing); color: var(--family-outgoing-text); border-radius: 12px 12px 3px 12px; }
+.family-message.is-me .family-message-label { text-align: right; }
+.family-message.is-scammer { padding-left: 40px; }
+#familyApp .is-scammer .family-bubble { background: transparent; border-left: 2px solid var(--family-coral); border-radius: 0 8px 8px 0; padding: 10px 14px; color: var(--family-muted); }
+.family-forwarded { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--family-coral); margin-bottom: 8px; }
+.family-forwarded svg { width: 13px; height: 13px; }
+.family-response { padding: 18px 24px 16px; border-top: 1px solid var(--family-border); background: var(--family-panel); flex-shrink: 0; }
+.family-response > h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px !important; }
+.family-choices { display: flex; flex-direction: column; gap: 8px; }
+.family-choice { display: flex; align-items: center; gap: 13px; padding: 10px 12px; border: 1px solid var(--family-border); border-radius: 8px; background: var(--family-bubble); text-align: left; font-size: 13px !important; line-height: 1.65; min-height: 48px; transition: border-color .15s, background .15s; }
+.family-choice:hover { border-color: var(--family-blue); background: color-mix(in srgb, var(--family-blue) 8%, var(--family-bubble)); }
+.family-choice-key { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--family-subtle); color: var(--family-muted); border-radius: 5px; flex-shrink: 0; font-size: 12px; }
+.family-response-hint { color: var(--family-subtle); font-size: 10px; margin-top: 11px !important; }
+.family-disclaimer { flex-shrink: 0; text-align: center; color: var(--family-subtle); font-size: 10px; line-height: 1.7; padding: 14px 0 2px; }
+.family-primary, .family-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 12px; border-radius: 8px; padding: 12px 18px; min-height: 44px; line-height: 1.5; font-size: 13px !important; font-weight: 600 !important; }
+.family-primary { background: var(--family-outgoing); color: #fff; border: 1px solid transparent; }
+.family-primary:hover { background: #2c73d6; }
+.family-primary svg { width: 17px; height: 17px; }
+.family-secondary { border: 1px solid var(--family-border); color: var(--family-muted); }
+.family-secondary:hover { background: var(--family-bubble); }
+.family-feedback { display: flex; align-items: flex-start; gap: 12px; }
+.family-feedback-icon { color: var(--family-blue); display: inline-flex; margin-top: 2px; }
+.family-feedback.is-warning .family-feedback-icon { color: var(--family-coral); }
+.family-feedback h2 { font-size: 15px; line-height: 1.6; font-weight: 650; }
+.family-feedback p { font-size: 12px; line-height: 1.8; color: var(--family-muted); margin: 8px 0 14px !important; }
+.family-feedback .family-primary { padding: 9px 14px; min-height: 39px; font-size: 12px !important; }
+.family-intro { width: min(1060px, 100%); margin: 60px auto 40px; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 70px; }
+.family-intro-copy h1 { font-size: clamp(30px, 3.4vw, 45px); line-height: 1.35; letter-spacing: -.04em; margin: 16px 0 20px !important; }
+.family-intro-copy > p:not(.family-eyebrow) { font-size: 14px; color: var(--family-muted); line-height: 1.85; }
+.family-intro-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; color: var(--family-blue); font-size: 11px; margin: 22px 0 28px; }
+.family-intro-copy .family-intro-note { font-size: 11px !important; margin-top: 12px !important; }
+.family-intro-preview { border: 1px solid var(--family-border); border-radius: 14px; background: var(--family-panel); padding-bottom: 20px; }
+.family-intro-preview .family-message { margin: 22px; }
+.family-intro-preview .family-message .family-bubble { font-size: 14px; }
+.family-intro-preview .family-contact { margin-bottom: 25px; }
+.family-intro-goal { display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--family-muted); font-size: 11px; padding: 12px 18px 0; }
+.family-intro-goal svg { color: var(--family-blue); }
+.family-summary { max-width: 860px; margin: 24px auto; }
+.family-summary-heading { text-align: center; }
+.family-summary-icon { display: inline-flex; padding: 15px; border: 1px solid var(--family-border); border-radius: 50%; color: var(--family-blue); margin-bottom: 18px; }
+.family-summary-icon svg { width: 29px; height: 29px; }
+.family-summary h1 { font-size: clamp(24px, 2.6vw, 33px); line-height: 1.4; letter-spacing: -.03em; margin: 10px 0 !important; }
+.family-summary-heading > p:last-child { font-size: 13px; color: var(--family-muted); line-height: 1.8; }
+.family-summary-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0; }
+.family-summary-metrics > div { border: 1px solid var(--family-border); background: var(--family-panel); border-radius: 10px; padding: 18px; text-align: center; }
+.family-summary-metrics span { display: block; font-size: 11px; color: var(--family-muted); }
+.family-summary-metrics strong { display: block; font-size: 27px; margin-top: 10px; font-weight: 650; }
+.family-summary-metrics small { font-size: 16px; color: var(--family-subtle); font-weight: 400; }
+.family-review-title { font-size: 15px; margin-bottom: 12px !important; }
+.family-reviews { border: 1px solid var(--family-border); background: var(--family-panel); border-radius: 10px; overflow: hidden; }
+.family-review + .family-review { border-top: 1px solid var(--family-border); }
+.family-review summary { padding: 16px 18px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 13px; line-height: 1.7; list-style: none; }
+.family-review summary::-webkit-details-marker { display: none; }
+.family-review summary > svg { margin-left: auto; width: 16px; height: 16px; flex-shrink: 0; color: var(--family-subtle); }
+.family-review[open] summary > svg { transform: rotate(90deg); }
+.family-review-mark { color: var(--family-blue); font-weight: 650; }
+.family-review.is-warning .family-review-mark { color: var(--family-coral); }
+.family-review > p { font-size: 12px; line-height: 1.85; padding: 0 18px 18px 43px; color: var(--family-muted); }
+.family-summary-actions { display: flex; justify-content: center; gap: 12px; margin-top: 25px; }
+@media (min-width: 1600px) {
+  .family-appbar { min-height: 68px; }
+  .family-heading { padding: 20px 0 30px; }
+  .family-heading h1 { font-size: 39px; }
+  .family-brief { padding: 30px; }
+  #familyApp .family-bubble { font-size: 16px; }
+  .family-choice { font-size: 14px !important; padding: 12px 14px; }
+  .family-contact { padding: 20px 26px; }
+}
+@media (max-height: 780px) and (min-width: 761px) {
+  .family-heading { padding: 6px 0 18px; }
+  .family-heading p { margin-top: 6px !important; }
+  .family-brief { padding: 20px; }
+  .family-person { margin: 14px 0; }
+  .family-person .family-portrait { width: 50px; height: 50px; }
+  .family-brief h2 { font-size: 19px; }
+  .family-brief-meters { padding: 15px 0; margin: 16px 0; }
+  .family-goal { margin-top: 16px; padding-top: 16px; }
+  .family-contact { padding-top: 12px; padding-bottom: 12px; }
+  #familyApp .family-chat { padding-top: 14px; padding-bottom: 14px; }
+  .family-response { padding-top: 14px; padding-bottom: 12px; }
+  .family-response > h2 { margin-bottom: 10px !important; }
+  .family-disclaimer { padding-top: 10px; }
+  .family-intro { margin-top: 35px; }
+}
+@media (max-height: 650px) and (min-width: 761px) {
+  .family-stage { height: auto; min-height: 100%; }
+  .family-workspace { min-height: 430px; }
+  .family-conversation { max-height: 600px; }
+}
+@media (max-width: 1050px) {
+  .family-appbar { width: calc(100% - 48px); }
+  .family-content { padding: 0 24px 12px; }
+  .family-workspace { grid-template-columns: 285px minmax(0, 1fr); gap: 14px; }
+  .family-brief { padding: 20px; }
+  .family-brief h2 { font-size: 18px; }
+  #familyApp .family-meter { grid-template-columns: 94px minmax(35px, 1fr) 37px; gap: 7px; font-size: 12px; }
+  .family-heading h1 { font-size: 28px; }
+  .family-session { gap: 10px; }
+  .family-score { display: none; }
+  .family-contact, #familyApp .family-chat, .family-response { padding-left: 18px; padding-right: 18px; }
+  .family-intro { gap: 35px; }
+}
+@media (max-width: 760px) {
+  .family-appbar { width: calc(100% - 32px); min-height: 57px; gap: 8px; }
+  .family-breadcrumb { font-size: 10px; gap: 6px; }
+  .family-back { font-size: 10px !important; padding: 7px 9px; gap: 5px; }
+  .family-back svg { width: 14px; height: 14px; }
+  .family-content { padding: 0 16px 16px; }
+  .family-stage { height: auto; }
+  .family-heading { align-items: flex-start; flex-direction: column; gap: 14px; padding: 15px 0 20px; }
+  .family-heading h1 { font-size: 26px; }
+  .family-heading p { font-size: 12px; margin-top: 7px !important; }
+  .family-session { width: 100%; gap: 12px; }
+  .family-score { display: inline; margin-left: auto; }
+  .family-step { padding: 6px 10px; font-size: 11px; }
+  .family-lives svg { width: 17px; height: 17px; }
+  .family-workspace { display: flex; flex-direction: column; gap: 14px; }
+  .family-brief { overflow: visible; padding: 18px; }
+  .family-brief > .family-eyebrow { display: none; }
+  .family-person { margin: 0 0 12px; gap: 10px; }
+  .family-person .family-portrait { width: 35px; height: 35px; }
+  .family-person strong { font-size: 13px; }
+  .family-brief h2 { font-size: 16px; }
+  .family-brief-meters { padding: 14px 0; margin: 14px 0 10px; }
+  #familyApp .family-meter { grid-template-columns: 95px minmax(40px, 1fr) 42px; }
+  #familyApp .family-meter + .family-meter { margin-top: 10px; }
+  .family-brief-details > summary, .family-brief-details[open] > summary { display: flex; padding: 4px 0; font-size: 11px; }
+  .family-brief-details[open] > summary svg { transform: rotate(90deg); }
+  .family-context { padding-top: 12px; }
+  .family-goal { margin-top: 16px; padding-top: 16px; }
+  .family-conversation { min-height: 0; flex: none; }
+  .family-contact { padding: 14px 16px; }
+  .family-contact .family-portrait { width: 35px; height: 35px; }
+  .family-contact h2 { font-size: 14px; }
+  #familyApp .family-chat { flex: none; min-height: 150px; max-height: 360px; padding: 16px; }
+  .family-message { gap: 8px; }
+  .family-message-avatar { display: none; }
+  .family-message-content { max-width: 95%; }
+  .family-message.is-me, .family-message.is-scammer { padding-left: 12px; }
+  #familyApp .family-bubble { padding: 11px 13px; font-size: 13px; }
+  .family-response { padding: 16px; }
+  .family-response > h2 { font-size: 14px; }
+  .family-choice { align-items: flex-start; gap: 10px; padding: 11px 10px; font-size: 12px !important; }
+  .family-choice-key { width: 24px; height: 24px; font-size: 10px; }
+  .family-response-hint, .family-disclaimer { font-size: 9px; }
+  .family-feedback-icon { display: none; }
+  .family-feedback h2 { font-size: 14px; }
+  .family-feedback p { font-size: 12px; }
+  .family-intro { grid-template-columns: 1fr; gap: 30px; margin: 30px auto 20px; max-width: 480px; }
+  .family-intro-copy h1 { font-size: 32px; }
+  .family-intro-copy > p:not(.family-eyebrow) { font-size: 13px; }
+  .family-intro-meta { margin: 18px 0 22px; }
+  .family-summary { margin: 20px auto; }
+  .family-summary h1 { font-size: 25px; }
+  .family-summary-metrics { gap: 8px; margin: 23px 0; }
+  .family-summary-metrics > div { padding: 14px 8px; }
+  .family-summary-metrics span { font-size: 10px; }
+  .family-summary-metrics strong { font-size: 23px; }
+  .family-summary-metrics small { font-size: 13px; }
+  .family-review summary { padding: 14px 12px; font-size: 12px; gap: 8px; }
+  .family-review > p { padding: 0 14px 15px 30px; }
+  .family-summary-actions { gap: 8px; }
+  .family-summary-actions button { font-size: 12px !important; padding: 10px 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #familyApp *, #familyApp *::before, #familyApp *::after { transition: none !important; scroll-behavior: auto !important; }
+}

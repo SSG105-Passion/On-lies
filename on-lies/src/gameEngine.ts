@@ -3,7 +3,7 @@ import { GAME_DATA } from './gameData';
 import { DELIVERY_ITEM_ID, evaluateDeliveryAction } from './sms/deliveryModel';
 import type { DeliveryInvestigation } from './sms/deliveryModel';
 
-declare const Tone: any;
+import { beep } from './audio';
 
 export class GameEngine {
   public currentMode: GameMode = 'mail';
@@ -13,6 +13,7 @@ export class GameEngine {
   public activeItemId: number | null = null;
   public evaluatedItemIds: Set<number> = new Set();
   public userAnswers: UserAnswer[] = [];
+  public finished = false;
 
   constructor() {}
 
@@ -21,6 +22,7 @@ export class GameEngine {
   }
 
   public resetGame() {
+    this.finished = false;
     this.currentRound = 1;
     this.score = 0;
     this.lives = 3;
@@ -38,8 +40,9 @@ export class GameEngine {
     return GAME_DATA[this.currentMode].find(item => item.id === id);
   }
 
-  public evaluateAnswer(itemId: number, userChoiceIsScam: boolean): { isCorrect: boolean; item: ScenarioItem } {
-    const item = this.getItemById(itemId)!;
+  public evaluateAnswer(itemId: number, userChoiceIsScam: boolean): { isCorrect: boolean; item: ScenarioItem } | null {
+    const item = this.getCurrentRoundItems().find(item => item.id === itemId);
+    if (!item || this.finished || this.lives <= 0 || this.evaluatedItemIds.has(itemId)) return null;
     const isCorrect = (userChoiceIsScam === item.isScam);
 
     if (isCorrect) {
@@ -66,7 +69,7 @@ export class GameEngine {
   }
 
   public evaluateSmsDeliveryAction(action: string, investigation: DeliveryInvestigation): UserAnswer | null {
-    if (this.currentMode !== 'messages' || this.lives <= 0 ||
+    if (this.finished || this.currentMode !== 'messages' || this.lives <= 0 ||
       this.activeItemId !== DELIVERY_ITEM_ID || this.evaluatedItemIds.has(DELIVERY_ITEM_ID)) return null;
     const item = this.getCurrentRoundItems().find(item => item.id === DELIVERY_ITEM_ID);
     const result = evaluateDeliveryAction(action, investigation);
@@ -85,15 +88,6 @@ export class GameEngine {
   }
 
   public playSound(type: 'correct' | 'wrong') {
-    try {
-      const synth = new Tone.Synth().toDestination();
-      if (type === 'correct') {
-        synth.triggerAttackRelease("C5", "8n");
-      } else {
-        synth.triggerAttackRelease("G2", "8n");
-      }
-    } catch (e) {
-      // Audio fallback
-    }
+    beep(type === 'correct' ? 'C5' : 'G2');
   }
 }

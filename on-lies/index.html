@@ -112,7 +112,7 @@
           <!-- Leaderboard Table -->
           <div class="leaderboard-section">
             <div class="leaderboard-tabs">
-              <button class="tab-item active" type="button" id="tabWeekly">Tuần này</button>
+              <span class="tab-item active">Tổng XP</span>
               <button class="tab-item" type="button" id="refreshLeaderboardBtn" title="Làm mới bảng xếp hạng">↻ Làm
                 mới</button>
             </div>
@@ -127,13 +127,13 @@
           <div class="sidebar-badges-card">
             <div class="card-title">Huy hiệu huấn luyện</div>
             <div class="badge-pill-grid">
-              <span class="badge-pill unlocked" title="Hoàn thành Mail">✉️ Thám tử Mail</span>
-              <span class="badge-pill unlocked" title="Xử lý cuộc gọi">☎️ Tỉnh táo</span>
-              <span class="badge-pill locked" title="Khắc tinh SMS">💬 Soi link SMS</span>
-              <span class="badge-pill locked" title="Ca trực thanh tra">⚖️ Thanh tra</span>
+              <span class="badge-pill locked" data-completion="mail">✉️ Thanh tra</span>
+              <span class="badge-pill locked" data-completion="phone">☎️ Tỉnh táo</span>
+              <span class="badge-pill locked" data-completion="messages">💬 Lá chắn SMS</span>
+              <span class="badge-pill locked" data-completion="family">🛡️ Chỗ dựa gia đình</span>
             </div>
             <div class="weekly-reset">
-              <span>⏳ Làm mới sau: <b>2 ngày 14 giờ</b></span>
+              <span>Huy hiệu ghi nhận trên thiết bị này.</span>
             </div>
           </div>
         </aside>
@@ -200,8 +200,19 @@
                   <span class="app-icon sms-icon">💬</span>
                 </div>
                 <span class="app-name">Lá chắn SMS</span>
-                <span class="app-description">Phát hiện link độc hại, mã độc và tin nhắn trúng thưởng giả.</span>
+                <span class="app-description">Kiểm tra yêu cầu trong SMS, đối chiếu thông tin và chọn cách xử lý.</span>
                 <span class="play-label">Soi tin nhắn <b>→</b></span>
+              </button>
+
+              <!-- Family Rescue App -->
+              <button class="app-tile" data-app="family" aria-label="Mở Cứu người thân">
+                <span class="notification-badge hot-badge">MỚI</span>
+                <div class="app-icon-wrap">
+                  <span class="app-icon phone-icon">🛡️</span>
+                </div>
+                <span class="app-name">Cứu người thân</span>
+                <span class="app-description">Người thân đang bị thao túng tâm lý. Chọn đúng lời khuyên để can ngăn và cứu họ kịp thời.</span>
+                <span class="play-label">Cứu người thân <b>→</b></span>
               </button>
             </div>
           </section>
@@ -221,6 +232,10 @@
         <button class="dock-item" data-app="sms" aria-label="Tin nhắn">
           <span class="dock-glyph">💬</span>
           <span class="dock-tooltip">Tin nhắn SMS</span>
+        </button>
+        <button class="dock-item" data-app="family" aria-label="Cứu người thân">
+          <span class="dock-glyph">🛡️</span>
+          <span class="dock-tooltip">Cứu người thân</span>
         </button>
         <div class="dock-divider"></div>
         <button class="dock-item" data-app="leaderboard" aria-label="Bảng xếp hạng">
@@ -414,11 +429,12 @@
           <p class="result-subtitle">Bạn đã hoàn thành ca trực thẩm định email lừa đảo tại Trung tâm An toàn số.</p>
           <div class="result-metrics">
             <div><small>ĐIỂM SỐ</small><strong id="finalScore">0 / 9</strong></div>
-            <div><small>CHÍNH XÁC</small><strong id="finalAccuracy">0%</strong></div>
+            <div><small>NHẬN DIỆN / XÁC MINH</small><strong id="finalAccuracy">0 đúng</strong></div>
             <div><small>TRÁI TIM</small><strong id="finalLives">3 / 3</strong></div>
             <div><small>XP KIẾM ĐƯỢC</small><strong id="finalXPEarned">+0 XP</strong></div>
           </div>
 
+          <p id="scoreSaveStatus" class="result-subtitle" role="status"></p>
           <div id="saveScorePrompt" class="save-score-banner">
             <div>
               <strong>Lưu điểm số vào Bảng xếp hạng</strong>
@@ -455,6 +471,16 @@
         <div id="phoneStats" class="game-stats hidden"></div>
       </header>
       <div id="phoneContent" class="phone-content"></div>
+    </section>
+
+    <!-- Family Rescue App Window -->
+    <section id="familyApp" class="app-window hidden" aria-label="Mini game cứu người thân">
+      <header class="family-appbar">
+        <nav class="family-breadcrumb" aria-label="Vị trí trong ứng dụng"><span>Huấn luyện</span><span aria-hidden="true">/</span><strong>Cứu người thân</strong></nav>
+        <button id="familyExit" class="family-back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>Về màn chính</button>
+      </header>
+      <div id="familyStats" class="hidden" aria-hidden="true"></div>
+      <div id="familyContent" class="family-content"></div>
     </section>
 
     <!-- Inspector Mode App Window -->

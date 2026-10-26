@@ -88,7 +88,7 @@ const RAW_CASES: RawCase[] = [
       'TUYỂN GẤP CTV XỬ LÝ ĐƠN HÀNG: ',
       ['làm 2 tiếng mỗi ngày tại nhà, thu nhập 400k–600k/ngày', 'bait', 'Việc quá nhẹ mà thù lao cao bất thường là bẫy lừa đảo nhiệm vụ phổ biến.', 3],
       '! Chỉ cần điện thoại. Ứng viên mới vui lòng ',
-      ['đóng cọc 300.000đ tiền tài liệu hướng dẫn và đồng phục', 'ask', 'Công việc chân chính không bao giờ thu tiền cọc trước khi nhận việc.', 3],
+      ['đóng cọc 300.000đ tiền tài liệu hướng dẫn và đồng phục', 'ask', 'Yêu cầu chuyển cọc trước để nhận việc từ nguồn chưa xác minh là dấu hiệu rủi ro cần dừng và kiểm chứng.', 3],
       ' để giữ chỉ tiêu. ',
       ['Chỉ còn đúng 3 suất cho ai nhắn tin Zalo trong hôm nay', 'urgent', 'Tạo cảm giác khan hiếm giả tạo để nạn nhân chuyển tiền gấp.', 3],
       '.'
@@ -123,7 +123,7 @@ const RAW_CASES: RawCase[] = [
       '. Mày chuyển khoản giúp tao gấp 2 triệu vào ',
       ['STK ngân hàng của một người tên Nguyễn Văn Lạ', 'sender', 'Số tài khoản nhận tiền không trùng tên người bạn quen là dấu hiệu mượn danh lừa đảo.', 5],
       ' nhé. Giờ ',
-      ['tao đang bận việc gia đình gấp, đừng gọi điện thoại cho tao', 'urgent', 'Kẻ gian cấm gọi điện thoại để bạn không thể xác minh giọng nói thật.', 5],
+      ['tao đang bận việc gia đình gấp, đừng gọi điện thoại cho tao', 'urgent', 'Ngăn bạn liên hệ số đã biết khiến việc đối chiếu qua kênh độc lập khó hơn. Giọng nói quen cũng chưa đủ chứng minh danh tính.', 5],
       '!'
     ]
   },
@@ -147,7 +147,7 @@ const RAW_CASES: RawCase[] = [
     channel: 'sms',
     who: 'Hồ sơ #203',
     note: 'Em nhận được tin nhắn SMS báo tài khoản ngân hàng bị khóa, em đang rất hoảng loạn.',
-    a: ['SafeBank-CSKH (Số cá nhân +84 987 234 112)', 'sender', 'Ngân hàng thật luôn dùng Brandname SMS, không gửi từ số điện thoại di động cá nhân.', 4],
+    a: 'SafeBank-CSKH (Số chưa lưu · +84 987 234 112)',
     p: [
       'SafeBank: Tài khoản của quý khách bị tạm khóa do phát hiện đăng nhập lạ. Vui lòng ',
       ['nhập mã OTP vừa nhận vào trang www.safebank-portal.cc', 'ask', 'Tuyệt đối không một ngân hàng nào yêu cầu bạn nhập OTP vào đường link lạ.', 4],
@@ -162,7 +162,7 @@ const RAW_CASES: RawCase[] = [
     k: 'Tin nhắn',
     channel: 'sms',
     who: 'Hồ sơ #204',
-    note: 'Em vừa chuyển khoản tiền ăn thì nhận tin nhắn này, không biết có an toàn không.',
+    note: 'Em đang tự chuyển khoản 45.000đ tiền ăn trong ứng dụng ngân hàng, chưa xác nhận thì nhận mã này.',
     a: 'V-Bank Brandname',
     ok: 'Đây là mã OTP gửi đến đúng khi người dùng chủ động thao tác giao dịch, có cảnh báo rõ ràng không được chia sẻ cho bất kỳ ai.',
     p: [
@@ -178,10 +178,10 @@ const RAW_CASES: RawCase[] = [
     channel: 'phone',
     who: 'Hồ sơ #301',
     note: 'Em vừa nghe cuộc gọi từ người tự xưng là cán bộ công an điều tra, dọa em dính vào đường dây rửa tiền.',
-    a: ['Số điện thoại lạ: +84 24 999 113', 'sender', 'Số điện thoại hiển thị số giả mạo đầu số cơ quan.', 7],
+    a: 'Số điện thoại chưa xác minh: +84 24 999 113',
     p: [
       'Biên bản ghi âm: "Tôi là trung úy Lê Văn Nam, Cục Cảnh sát Điều tra. Số CCCD của em đang đứng tên tài khoản rửa tiền 5 tỷ. ',
-      ['Vụ án này thuộc danh mục tuyệt mật, em không được nói cho bố mẹ hay bất kỳ ai', 'urgent', 'Cơ quan công an không bao giờ yêu cầu người dân giữ bí mật với người thân qua điện thoại.', 7],
+      ['Vụ án này thuộc danh mục tuyệt mật, em không được nói cho bố mẹ hay bất kỳ ai', 'urgent', 'Ép giữ bí mật và không hỏi người tin cậy là dấu hiệu cô lập nạn nhân cần cảnh giác.', 7],
       '. Hiện tại để chứng minh trong sạch, em phải ',
       ['rút toàn bộ tiền chuyển vào tài khoản an toàn của cơ quan điều tra: STK 992817263', 'ask', 'Cơ quan thực thi pháp luật không có "tài khoản an toàn" và không bao giờ yêu cầu chuyển tiền qua điện thoại.', 7],
       '."'
@@ -206,7 +206,7 @@ const RAW_CASES: RawCase[] = [
     k: 'Bài đăng',
     channel: 'social',
     who: 'Hồ sơ #303',
-    note: 'Bài viết kêu gọi từ thiện giúp em bé phẫu thuật được chia sẻ khắp mạng xã hội, em muốn ủng hộ nhưng hơi ngờ vực.',
+    note: 'Em thấy bài kêu gọi từ thiện này. Em đã tự liên hệ bệnh viện qua số chính thức; họ xác nhận không có hồ sơ và chương trình quyên góp như bài viết mô tả.',
     a: 'Chị Lan – Quỹ Trái Tim Bồ Đề',
     p: [
       'KHẨN CẤP: Bé Bo 3 tuổi vừa phát hiện bệnh tim bẩm sinh, bố mẹ nghèo không có tiền mổ. Mong các mạnh thường quân ',
@@ -225,7 +225,7 @@ const RAW_CASES: RawCase[] = [
     channel: 'market',
     who: 'Hồ sơ #304',
     note: 'Em đặt mua tai nghe trên sàn, người bán nhắn tin riêng bảo em chuyển cọc để được giảm giá sốc.',
-    a: ['Shop Phụ Kiện Giá Rẻ (Chat người bán)', 'sender', 'Người bán yêu cầu giao dịch ngoài quy trình sàn.', 8],
+    a: 'Shop Phụ Kiện Giá Rẻ (Chat người bán)',
     p: [
       'Tin nhắn người bán: "Chào bạn, mẫu tai nghe này bên mình đang có voucher nội bộ giảm 50% chỉ còn 150k. Bạn ',
       ['hủy đơn trên sàn và chuyển khoản trực tiếp qua số Momo này cho shop', 'ask', 'Giao dịch chuyển khoản riêng ngoài sàn làm mất hoàn toàn chính sách bảo vệ người mua của nền tảng.', 8],

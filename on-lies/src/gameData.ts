@@ -26,7 +26,7 @@ export const GAME_DATA: Record<GameMode, ScenarioItem[]> = {
       attachment: "UI_Design_v2.pdf",
       isScam: false,
       round: 1,
-      explanation: "Địa chỉ email chính xác từ nội bộ công ty (company.com), SPF xác minh chuẩn và file đính kèm định dạng PDF an toàn."
+      explanation: "Nội dung phù hợp với công việc đã biết trong tình huống. SPF và đuôi PDF không tự bảo đảm thư hay tệp an toàn; xác minh với đồng nghiệp qua kênh đã biết trước khi mở tệp bất thường."
     },
     {
       id: 103,
@@ -51,7 +51,7 @@ export const GAME_DATA: Record<GameMode, ScenarioItem[]> = {
       attachment: "none",
       isScam: false,
       round: 2,
-      explanation: "Domain chính thức (.com.vn), xác minh SPF hợp lệ và đây là cảnh báo tự động không chứa link lạ hay file đính kèm."
+      explanation: "Đuôi .com.vn và SPF PASS không đủ xác minh ngân hàng. Trong tình huống này, hãy tự mở ứng dụng hoặc gọi hotline trên thẻ để kiểm tra cảnh báo; không đăng nhập qua nguồn chưa xác minh."
     },
     {
       id: 105,
@@ -75,7 +75,7 @@ export const GAME_DATA: Record<GameMode, ScenarioItem[]> = {
       attachment: "vpn_config.ovpn",
       isScam: false,
       round: 2,
-      explanation: "Gửi từ phòng IT nội bộ, sử dụng đuôi cấu hình OpenVPN tiêu chuẩn (.ovpn)."
+      explanation: "Đối chiếu thông báo với phòng IT qua kênh nội bộ đã biết trước khi nhập cấu hình VPN. Đuôi .ovpn chỉ cho biết loại tệp, không bảo đảm nội dung đáng tin."
     },
     // Round 3
     {
@@ -120,7 +120,7 @@ export const GAME_DATA: Record<GameMode, ScenarioItem[]> = {
     { id: 202, sender: 'Giao hàng nhanh', address: 'Số chưa lưu · 09xx 224 xxx', subject: 'Đơn hàng chưa giao được', spf: 'UNKNOWN SENDER', body: 'Đơn hàng của bạn đang bị giữ. Thanh toán 18.000đ phí giao lại trong 30 phút tại https://giao-lai.example/phi. Quá thời hạn, đơn sẽ được chuyển hoàn.', attachment: 'none', isScam: true, round: 1, explanation: 'SMS yêu cầu phí nhưng đơn trong ứng dụng không có khoản thu mới. Tự liên hệ bên vận chuyển từ thông tin trong đơn để xác minh, không thanh toán theo liên kết SMS. Số lạ hoặc lời thúc giục riêng lẻ chưa đủ để kết luận.' },
     { id: 203, sender: 'QUA TANG 24H', address: 'SMS +84 783 551 209', subject: 'Bạn đã trúng iPhone!', spf: 'UNKNOWN SENDER', body: 'Chúc mừng bạn nhận iPhone 17. Xác nhận ngay tại http://nhanqua-vip.cc và nhập CCCD để nhận quà.', attachment: 'none', isScam: true, round: 1, explanation: 'Tin trúng thưởng bất ngờ yêu cầu CCCD và truy cập tên miền lạ là dấu hiệu lừa đảo điển hình.' },
     { id: 204, sender: 'Nhà mạng', address: 'SMS BRANDNAME', subject: 'Bảo trì hệ thống đêm nay', spf: 'BRANDNAME VERIFIED', body: 'Nhà mạng sẽ bảo trì hệ thống từ 00:00–02:00. Một số dịch vụ có thể gián đoạn. Tổng đài hỗ trợ vẫn hoạt động bình thường.', attachment: 'none', isScam: false, round: 2, explanation: 'Thông báo chỉ cung cấp thông tin, không kèm link, không đòi tiền hay dữ liệu cá nhân.' },
-    { id: 205, sender: 'Tài khoản định danh', address: '+84 336 818 020', subject: 'Tài khoản sẽ bị khóa', spf: 'UNKNOWN SENDER', body: 'Tài khoản định danh của bạn chưa cập nhật. Gửi mã OTP về số này để được mở khóa ngay: 482911.', attachment: 'none', isScam: true, round: 2, explanation: 'Không bao giờ gửi OTP cho người khác. Tin nhắn dùng đe dọa khóa tài khoản để đánh cắp mã xác thực.' },
+    { id: 205, sender: 'Tài khoản định danh', address: '+84 336 818 020', subject: 'Tài khoản sẽ bị khóa', spf: 'UNKNOWN SENDER', body: 'Tài khoản định danh của bạn chưa cập nhật. Nếu bạn nhận được mã OTP, hãy gửi lại mã đó cho số đang nhắn để được mở khóa ngay.', attachment: 'none', isScam: true, round: 2, explanation: 'Không bao giờ gửi OTP cho người khác. Tin nhắn dùng đe dọa khóa tài khoản để đánh cắp mã xác thực.' },
     { id: 206, sender: 'Lịch hẹn khám', address: 'SMS BRANDNAME', subject: 'Nhắc lịch khám ngày mai', spf: 'BRANDNAME VERIFIED', body: 'Phòng khám An Tâm nhắc bạn có lịch lúc 09:00 ngày mai. Vui lòng mang theo giấy tờ tùy thân khi đến.', attachment: 'none', isScam: false, round: 2, explanation: 'Tin nhắn nhắc lịch không yêu cầu chuyển tiền, bấm link hay cung cấp mã bảo mật.' },
     { id: 207, sender: 'Hỗ trợ ví điện tử', address: '+84 977 310 442', subject: 'Hoàn tiền giao dịch lỗi', spf: 'UNKNOWN SENDER', body: 'Bạn được hoàn 2.450.000đ. Đọc số thẻ, ngày hết hạn và mã CVV để xác nhận nhận tiền.', attachment: 'none', isScam: true, round: 3, explanation: 'Đơn vị thật không cần CVV để hoàn tiền. Đây là chiêu lấy thông tin thẻ qua cuộc trò chuyện.' },
     { id: 208, sender: 'Gia đình', address: '+84 912 345 678', subject: 'Mẹ đã về đến nhà', spf: 'CONTACT SAVED', body: 'Mẹ về đến nhà rồi nhé. Tối nay con có ăn cơm ở nhà không?', attachment: 'none', isScam: false, round: 3, explanation: 'Tin nhắn hội thoại thông thường, không có yêu cầu bất thường hoặc dấu hiệu thúc giục.' },

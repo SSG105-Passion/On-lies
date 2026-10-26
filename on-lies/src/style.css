@@ -2181,6 +2181,8 @@ button.window-dot {
   margin-top: 4px;
 }
 
+#finalAccuracy { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+
 .breakdown {
   background: #1e293b;
   border: 1px solid rgba(255, 255, 255, 0.08);

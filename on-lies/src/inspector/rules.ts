@@ -17,7 +17,7 @@ export const RULES: Rule[] = [
     id: 3,
     day: 1,
     cat: 'bait',
-    text: 'Việc làm thêm chân chính KHÔNG thu tiền cọc giữ chỗ, tiền hồ sơ hay tiền đồng phục trước.'
+    text: 'Yêu cầu chuyển tiền trước để được nhận việc là dấu hiệu cần dừng và kiểm chứng. Không chuyển cọc theo lời mời tuyển dụng chưa xác minh.'
   },
   {
     id: 4,
@@ -29,11 +29,11 @@ export const RULES: Rule[] = [
     id: 5,
     day: 2,
     cat: 'fake',
-    text: 'Người quen nhắn tin vay tiền gấp: phải GỌI ĐIỆN THOẠI TRỰC TIẾP đến số đã biết để xác minh.'
+    text: 'Người quen nhắn vay tiền gấp: dừng chuyển tiền, liên hệ số đã biết và đối chiếu qua kênh độc lập; giọng nói quen chưa đủ xác minh.'
   },
   {
     id: 6,
-    day: 3,
+    day: 1,
     cat: 'link',
     text: 'Link rút gọn (bit.ly, tinyurl) hoặc tên miền lạ: tự mở ứng dụng/trang chính thức, không bấm link.'
   },
@@ -41,11 +41,11 @@ export const RULES: Rule[] = [
     id: 7,
     day: 3,
     cat: 'fake',
-    text: 'Cơ quan công an, tòa án KHÔNG làm việc qua điện thoại và KHÔNG yêu cầu chuyển tiền vào "tài khoản an toàn".'
+    text: 'Không chuyển tiền vào "tài khoản an toàn" theo cuộc gọi tự xưng công an hoặc tòa án. Dừng cuộc gọi và xác minh qua kênh độc lập.'
   },
   {
     id: 8,
-    day: 4,
+    day: 3,
     cat: 'ask',
     text: 'Mua sắm trực tuyến: thanh toán theo quy trình có bảo vệ, KHÔNG giao dịch hay chuyển tiền riêng ngoài sàn.'
   }

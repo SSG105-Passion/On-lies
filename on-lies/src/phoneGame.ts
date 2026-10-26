@@ -1,7 +1,10 @@
+import { createSessionId } from './session';
+
 export interface PhoneGameResult {
   score: number;
   maxScore: number;
   livesLeft: number;
+  sessionId: string;
 }
 
 declare global {
@@ -20,6 +23,7 @@ const calls: CallCase[] = [
   { name: 'Phòng khám', number: 'Số liên hệ đã lưu', story: 'Bạn đã đặt lịch khám và nhận cuộc gọi nhắc lịch.', dialogue: ['Bạn có lịch lúc 9 giờ sáng mai.', 'Bạn muốn giữ lịch hay đổi lịch? Không cần gửi thông tin tài khoản hay mã xác thực.'], choices: ['Đối chiếu lịch đã đặt và xác nhận thời gian', 'Đọc mã OTP để xác nhận lịch', 'Gửi thông tin thẻ để giữ lịch'], correct: 0, lesson: 'Cuộc gọi phù hợp với lịch bạn đã đặt, không yêu cầu dữ liệu bảo mật. Vẫn xác minh qua kênh chính thức nếu có yêu cầu bất thường phát sinh.' },
 ];
 let index = 0, lives = 3, score = 0, answered = false, listening = false;
+let sessionId = '', finished = false;
 const history: { index: number; correct: boolean }[] = [];
 const content = () => document.getElementById('phoneContent')!;
 const stats = () => document.getElementById('phoneStats')!;
@@ -28,12 +32,12 @@ export function openPhoneGame() {
   stats().classList.add('hidden');
   content().innerHTML = `<div class="phone-intro"><div class="call-avatar">☎</div><p class="eyebrow">MINI GAME • ĐIỆN THOẠI</p><h2>Alo, ai đang gọi?</h2><p>6 cuộc gọi. Có người thật, có kẻ mạo danh. Nghe lời người gọi và chọn cách xử lý để bảo vệ tiền và thông tin của bạn.</p><p class="phone-note">Mô phỏng trong game • Không thực hiện cuộc gọi hay giao dịch thật.</p><button class="primary-button" data-phone="start">Nhận nhiệm vụ →</button></div>`;
 }
-function start() { index = 0; lives = 3; score = 0; history.length = 0; stats().classList.remove('hidden'); renderCall(); }
+function start() { index = 0; lives = 3; score = 0; history.length = 0; sessionId = createSessionId(); finished = false; stats().classList.remove('hidden'); renderCall(); }
 function renderCall() {
   answered = false; listening = false;
   stats().innerHTML = `<span>Cuộc gọi ${index + 1}/${calls.length}</span><span>${score} điểm</span><span class="call-lives" aria-label="${lives} mạng còn lại">${'♥'.repeat(lives)}${'♡'.repeat(3-lives)}</span>`;
   const item = calls[index];
-  content().innerHTML = `<div class="call-layout"><aside class="call-guide"><p class="eyebrow">HỒ SƠ TÌNH HUỐNG</p><h3>${item.story}</h3><p>Người gọi tự xưng là ai không chứng minh được danh tính của họ.</p><div class="phone-note">💡 Đừng vội quyết định. Bạn có quyền kết thúc cuộc gọi và tự xác minh.</div></aside><article class="call-device"><p class="eyebrow">CUỘC GỌI ĐẾN</p><div class="call-avatar ringing">☎</div><h2>${item.name}</h2><p>${item.number}</p><button class="safe-button" data-phone="listen">☎ Nghe tình huống</button><div id="callConversation" class="hidden"><div class="call-transcript">${item.dialogue.map(line=>`<p>“${line}”</p>`).join('')}</div><h3>Bạn sẽ xử lý thế nào?</h3><div class="call-choices">${item.choices.map((choice,i)=>`<button class="secondary-button" data-phone="answer" data-choice="${i}">${choice}</button>`).join('')}</div></div><div id="callFeedback" role="status"></div></article></div>`;
+  content().innerHTML = `<div class="call-layout"><aside class="call-guide"><p class="eyebrow">HỒ SƠ TÌNH HUỐNG</p><h3>${item.story}</h3><p>Người gọi tự xưng là ai không chứng minh được danh tính của họ.</p><div class="phone-note">💡 Đừng vội quyết định. Bạn có quyền kết thúc cuộc gọi và tự xác minh.</div></aside><article class="call-device"><p class="eyebrow">CUỘC GỌI ĐẾN</p><div class="call-avatar ringing">☎</div><h2>${item.name}</h2><p>${item.number}</p><button class="safe-button" data-phone="listen">Xem hội thoại</button><div id="callConversation" class="hidden"><div class="call-transcript">${item.dialogue.map(line=>`<p>“${line}”</p>`).join('')}</div><h3>Bạn sẽ xử lý thế nào?</h3><div class="call-choices">${item.choices.map((choice,i)=>`<button class="secondary-button" data-phone="answer" data-choice="${i}">${choice}</button>`).join('')}</div></div><div id="callFeedback" role="status"></div></article></div>`;
 }
 function answer(choice: number) {
   if (answered || !listening) return;
@@ -46,9 +50,11 @@ function answer(choice: number) {
   document.getElementById('callFeedback')!.innerHTML = `<div class="call-feedback ${correct?'good':'bad'}"><strong>${correct?'✓ Xử lý đúng!':'✕ Bạn vừa mắc bẫy.'}</strong><p>${item.lesson}</p><button class="primary-button" data-phone="next">${lives === 0 || index === calls.length-1?'Xem kết quả':'Cuộc gọi tiếp theo →'}</button></div>`;
 }
 function finish() {
+  if (finished) return;
+  finished = true;
   if (lives > 0 && history.length === calls.length) {
     document.dispatchEvent(new CustomEvent<PhoneGameResult>('phone-completed', {
-      detail: { score, maxScore: calls.length, livesLeft: lives },
+      detail: { score, maxScore: calls.length, livesLeft: lives, sessionId },
     }));
   }
   stats().classList.add('hidden');

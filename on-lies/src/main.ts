@@ -1,11 +1,16 @@
 import { GameEngine } from './gameEngine';
 import { openPhoneGame } from './phoneGame';
+import { openFamilyGame } from './familyGame';
 import { renderChannelList } from './channelViews';
 import { InspectorUI } from './inspector/ui';
 import { DeliveryUI } from './sms/deliveryUI';
 import { createDeliveryInvestigation, DELIVERY_ITEM_ID } from './sms/deliveryModel';
 import { getSmsContinuation } from './sms/navigation';
 import type { ScenarioItem, GameMode } from './types';
+import { createSessionId } from './session';
+import { getLevelProgress, readCompletedGames, TRACKED_GAMES } from './playerProgress';
+import { escapeHtml } from './html';
+import { unlockAudio } from './audio';
 import {
   fetchLeaderboard,
   getCurrentProfile,
@@ -16,12 +21,15 @@ import {
   subscribeToLeaderboard,
   onAuthStateChange,
   isSupabaseConfigured,
+  getLeaderboardSource,
+  scoreSaveMessage,
   type LeaderboardEntry,
   type UserProfile
 } from './supabase';
 
 const engine = new GameEngine();
 let deliveryInvestigation = createDeliveryInvestigation();
+let gameSessionId = '';
 let inspectorUI: InspectorUI | null = null;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const desktop = $('desktop');
@@ -77,20 +85,15 @@ const modes: Record<GameMode, { title: string; icon: string; intro: string; noun
   }
 };
 
-const completedGames = new Set<string>();
+let completedGames = new Set<string>();
 try {
-  const saved: unknown = JSON.parse(localStorage.getItem('on-lies-completed') || '[]');
-  if (Array.isArray(saved)) {
-    saved
-      .filter(mode => typeof mode === 'string' && ['mail', 'messages', 'phone', 'inspector'].includes(mode))
-      .forEach(mode => completedGames.add(mode));
-  }
+  completedGames = readCompletedGames(localStorage.getItem('on-lies-completed'));
 } catch {
   /* Tiến độ vẫn hoạt động trong phiên nếu bộ nhớ không khả dụng. */
 }
 
 function updateProgress() {
-  const total = 4;
+  const total = TRACKED_GAMES.length;
   const count = completedGames.size;
   const headingSpan = document.querySelector<HTMLElement>('.progress-heading span');
   if (headingSpan) headingSpan.textContent = `${count}/${total} kỹ năng`;
@@ -104,9 +107,16 @@ function updateProgress() {
       ? 'Xuất sắc! Bạn đã hoàn thành tất cả các nhiệm vụ an toàn.'
       : 'Hoàn thành thêm nhiệm vụ để thăng hạng trên Bảng xếp hạng.';
   }
+  document.querySelectorAll<HTMLElement>('[data-completion]').forEach(badge => {
+    const unlocked = completedGames.has(badge.dataset.completion!);
+    badge.classList.toggle('unlocked', unlocked);
+    badge.classList.toggle('locked', !unlocked);
+    badge.title = unlocked ? 'Đã hoàn thành trên thiết bị này' : 'Hoàn thành chế độ để mở huy hiệu';
+  });
 }
 
 function recordCompletion(mode: string) {
+  if (!(TRACKED_GAMES as readonly string[]).includes(mode)) return;
   completedGames.add(mode);
   try {
     localStorage.setItem('on-lies-completed', JSON.stringify([...completedGames]));
@@ -117,9 +127,15 @@ function recordCompletion(mode: string) {
 }
 
 document.addEventListener('phone-completed', event => {
-  const { score, maxScore, livesLeft } = event.detail;
+  const { score, maxScore, livesLeft, sessionId } = event.detail;
   recordCompletion('phone');
-  recordGameScore('phone', score, maxScore, livesLeft).then(renderLeaderboard);
+  void recordGameScore('phone', score, maxScore, livesLeft, sessionId).then(renderLeaderboard);
+});
+
+document.addEventListener('family-completed', event => {
+  const { score, maxScore, livesLeft, sessionId } = event.detail;
+  recordCompletion('family');
+  void recordGameScore('family', score, maxScore, livesLeft, sessionId).then(renderLeaderboard);
 });
 
 function updateClock() {
@@ -149,13 +165,15 @@ $('themeToggleBtn')?.addEventListener('click', toggleTheme);
 
 document.addEventListener('mail-completed', () => {
   recordCompletion('mail');
-  renderLeaderboard();
 });
+document.addEventListener('score-saved', () => { void renderLeaderboard(); });
 
 function showDesktop() {
   clearDeliveryModal();
   $('phoneApp').classList.add('hidden');
   $('phoneStats').classList.add('hidden');
+  $('familyApp').classList.add('hidden');
+  $('familyStats').classList.add('hidden');
   $('inspectorApp')?.classList.add('hidden');
   inspectorUI?.stop();
   statsBar.classList.add('hidden');
@@ -217,9 +235,7 @@ async function renderLeaderboard() {
   const dbStatusSubtitle = $('dbStatusSubtitle');
 
   if (dbStatusSubtitle) {
-    dbStatusSubtitle.textContent = isSupabaseConfigured
-      ? 'Supabase Cloud • Trực tiếp'
-      : 'Dữ liệu cục bộ • Sẵn sàng kết nối';
+    dbStatusSubtitle.textContent = 'Đang tải bảng xếp hạng…';
   }
 
   if (userProfileName) userProfileName.textContent = currentUserProfile.username;
@@ -228,13 +244,14 @@ async function renderLeaderboard() {
   }
   if (userProfileXP) userProfileXP.textContent = `${currentUserProfile.total_xp.toLocaleString()} XP`;
 
-  const nextThreshold = currentUserProfile.level * 1000;
-  const progressPercent = Math.min(100, Math.round((currentUserProfile.total_xp / nextThreshold) * 100));
+  const levelProgress = getLevelProgress(currentUserProfile.total_xp);
+  if (userProfileRankTitle) userProfileRankTitle.textContent = `Cấp ${levelProgress.level} • ${levelProgress.role_title}`;
   if (userProfileNextXP) {
-    userProfileNextXP.textContent = `${nextThreshold.toLocaleString()} XP tới Cấp ${currentUserProfile.level + 1}`;
+    userProfileNextXP.textContent = levelProgress.nextXp === null ? 'Đã đạt cấp cao nhất'
+      : `${levelProgress.nextXp.toLocaleString()} XP → Cấp ${levelProgress.level + 1}`;
   }
   if (userProfileXPTrack) {
-    userProfileXPTrack.style.width = `${progressPercent}%`;
+    userProfileXPTrack.style.width = `${levelProgress.percent}%`;
   }
 
   if (sidebarAuthBtn) {
@@ -247,27 +264,31 @@ async function renderLeaderboard() {
 
   try {
     const entries = await fetchLeaderboard();
+    if (dbStatusSubtitle) dbStatusSubtitle.textContent = getLeaderboardSource() === 'cloud'
+      ? 'Bảng xếp hạng trực tuyến'
+      : isSupabaseConfigured ? 'Dữ liệu trên máy • Chưa kết nối' : 'Dữ liệu trên máy • Có hồ sơ mẫu';
     if (entries.length === 0) {
       listContainer.innerHTML = '<div class="leaderboard-loading">Chưa có người chơi nào. Hãy là người đầu tiên!</div>';
       return;
     }
 
-    listContainer.innerHTML = entries.map((entry: LeaderboardEntry) => {
+    listContainer.innerHTML = entries.map((entry: LeaderboardEntry, index) => {
       const isCurrent = entry.user_id === currentUserProfile?.id;
-      const rankBadge = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `${entry.rank}`;
+      const rank = Number.isInteger(entry.rank) && entry.rank > 0 ? entry.rank : index + 1;
+      const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
       const avatarText = entry.avatar_url && entry.avatar_url.length <= 3
         ? entry.avatar_url
         : entry.username.slice(0, 2).toUpperCase();
 
-      return `<div class="rank-row ${isCurrent ? 'rank-current' : ''} rank-${entry.rank}">
+      return `<div class="rank-row ${isCurrent ? 'rank-current' : ''} rank-${rank}">
         <span class="rank-num">${rankBadge}</span>
-        <div class="agent-avatar ${isCurrent ? 'current' : ''}">${avatarText}</div>
+        <div class="agent-avatar ${isCurrent ? 'current' : ''}">${escapeHtml(avatarText)}</div>
         <div class="rank-info">
-          <strong>${entry.username} ${isCurrent ? '(Bạn)' : ''}</strong>
-          <small>${entry.role_title} • Cấp ${entry.level}</small>
+          <strong>${escapeHtml(entry.username)} ${isCurrent ? '(Bạn)' : ''}</strong>
+          <small>${escapeHtml(entry.role_title)} • Cấp ${Number(entry.level) || 1}</small>
         </div>
         <div class="rank-score">
-          <strong>${entry.total_xp.toLocaleString()}</strong>
+          <strong>${(Number(entry.total_xp) || 0).toLocaleString()}</strong>
           <small>XP</small>
         </div>
       </div>`;
@@ -366,6 +387,12 @@ $('authForm')?.addEventListener('submit', async event => {
     }
     return;
   }
+  if ('message' in result && typeof result.message === 'string' && result.message) {
+    setAuthMode(false);
+    errorMsg.textContent = result.message;
+    errorMsg.classList.remove('hidden');
+    return;
+  }
 
   closeAuthModal();
   await renderLeaderboard();
@@ -448,6 +475,12 @@ document.addEventListener('click', event => {
       $('phoneApp').classList.remove('hidden');
       openPhoneGame();
       updateDockActive('phone');
+    } else if (app === 'family') {
+      showDesktop();
+      desktop.classList.add('hidden');
+      $('familyApp').classList.remove('hidden');
+      openFamilyGame();
+      updateDockActive('family');
     } else if (app === 'sms') {
       openMode('messages');
     } else if (app === 'leaderboard') {
@@ -458,6 +491,7 @@ document.addEventListener('click', event => {
 
   const actions: Record<string, () => void> = {
     phoneExit: showDesktop,
+    familyExit: showDesktop,
     closeTipBtn: () => {
       const tip = document.getElementById('dailyTip') || document.querySelector('.daily-tip');
       if (tip) tip.classList.add('hidden');
@@ -481,6 +515,7 @@ document.addEventListener('click', event => {
 
 function startGame() {
   engine.resetGame();
+  gameSessionId = createSessionId();
   deliveryInvestigation = createDeliveryInvestigation();
   mailIntro.classList.add('hidden');
   resultScreen.classList.add('hidden');
@@ -609,6 +644,7 @@ function openInspectModal(itemId: number) {
 }
 
 function continueSms() {
+  if (engine.finished) return;
   const next = getSmsContinuation(engine.getCurrentRoundItems(), engine.userAnswers, engine.activeItemId!, engine.currentRound, engine.lives);
   if (next.kind === 'item') { openInspectModal(next.itemId!); return; }
   if (next.kind === 'round' && engine.isRoundComplete()) {
@@ -641,6 +677,7 @@ function closeModal() {
 function submitEvaluation(userChoiceIsScam: boolean) {
   if (engine.activeItemId === null || engine.evaluatedItemIds.has(engine.activeItemId)) return;
   const result = engine.evaluateAnswer(engine.activeItemId, userChoiceIsScam);
+  if (!result) return;
   updateUI();
   showFeedback(result.item);
 }
@@ -667,44 +704,60 @@ function advanceRound() {
 }
 
 async function finishGame() {
+  if (engine.finished || (engine.lives > 0 && engine.userAnswers.length !== 9)) return;
+  engine.finished = true;
+  const sessionId = gameSessionId;
+  const mode = engine.currentMode;
+  const answers = [...engine.userAnswers];
+  const score = engine.score;
+  const lives = engine.lives;
   if (engine.lives > 0 && engine.userAnswers.length === 9) {
     recordCompletion(engine.currentMode);
   }
 
-  // Record score into database / local profile
-  const scoreResult = await recordGameScore(
-    engine.currentMode === 'messages' ? 'sms' : (engine.currentMode as any),
-    engine.score,
-    9,
-    engine.lives
-  );
-
+  // Results are usable immediately, including when cloud saving is unavailable.
+  inspectModal.classList.add('hidden');
+  clearDeliveryModal();
+  gameApp.classList.add('hidden');
   resultScreen.classList.remove('hidden');
   $('finalScore').textContent = `${engine.score} / 9`;
-  $('finalAccuracy').textContent = `${Math.round((engine.score / Math.max(1, engine.userAnswers.length)) * 100)}%`;
+  const cautiousCount = answers.filter(answer => answer.smsAction?.outcome === 'cautious').length;
+  $('finalAccuracy').textContent = `${score} đúng · ${cautiousCount} chưa xác minh`;
   $('finalLives').textContent = `${engine.lives} / 3`;
-  $('finalRounds').textContent = `${engine.currentRound} / 3`;
-  $('finalXPEarned').textContent = `+${scoreResult.xpEarned} XP`;
+  $('finalXPEarned').textContent = 'Đang lưu…';
+  $('scoreSaveStatus').textContent = 'Đang lưu kết quả phiên chơi…';
   $('resultStatusIcon').textContent = engine.score >= 7 ? '🏆' : engine.score >= 5 ? '🛡️' : '🎓';
   $('resultTitle').textContent = `${modes[engine.currentMode].title} — ${engine.lives <= 0 ? 'Cùng luyện tập thêm' : 'Hoàn thành!'}`;
+  $('resultTitle').tabIndex = -1;
+  $('resultTitle').focus({ preventScroll: true });
 
   const saveScorePrompt = $('saveScorePrompt');
   if (saveScorePrompt) {
-    saveScorePrompt.classList.toggle('hidden', !scoreResult.requiresLogin);
+    saveScorePrompt.classList.add('hidden');
   }
 
   const subTitle = document.querySelector<HTMLElement>('.result-subtitle');
   if (subTitle) {
     subTitle.textContent = `Bạn đã xử lý ${engine.userAnswers.length}/9 tình huống. Ôn lại các dấu hiệu và cách tự bảo vệ bên dưới.`;
   }
-  $('breakdownContainer').innerHTML = engine.userAnswers.map(answer => {
+  $('breakdownContainer').innerHTML = answers.map(answer => {
     const cautious = answer.smsAction?.outcome === 'cautious';
     const label = cautious ? 'Tránh rủi ro, chưa xác minh' : answer.isCorrect ? 'Xử lý đúng' : 'Cần lưu ý';
-    return `<div class="breakdown-item ${cautious ? 'cautious' : answer.isCorrect ? '' : 'wrong'}"><strong>${cautious ? '△' : answer.isCorrect ? '✓' : '✕'} ${answer.item.sender} — ${label}</strong><p>${answer.smsAction?.feedback || answer.item.explanation}</p></div>`;
+    return `<div class="breakdown-item ${cautious ? 'cautious' : answer.isCorrect ? '' : 'wrong'}"><strong>${cautious ? '△' : answer.isCorrect ? '✓' : '✕'} ${escapeHtml(answer.item.sender)} — ${label}</strong><p>${escapeHtml(answer.smsAction?.feedback || answer.item.explanation)}</p></div>`;
   }).join('');
 
-  // Update leaderboard in real time
-  await renderLeaderboard();
+  try {
+    const saved = await recordGameScore(mode === 'messages' ? 'sms' : mode, score, 9, lives, sessionId);
+    if (gameSessionId !== sessionId || resultScreen.classList.contains('hidden')) return;
+    $('finalXPEarned').textContent = `+${saved.xpEarned} XP`;
+    $('scoreSaveStatus').textContent = scoreSaveMessage(saved);
+    saveScorePrompt?.classList.toggle('hidden', !saved.requiresLogin);
+    void renderLeaderboard();
+  } catch {
+    if (gameSessionId !== sessionId || resultScreen.classList.contains('hidden')) return;
+    $('finalXPEarned').textContent = 'Chưa lưu';
+    $('scoreSaveStatus').textContent = 'Chưa lưu được điểm. Kết quả chơi vẫn hiển thị bên dưới.';
+  }
 }
 
 // Initializations
@@ -715,3 +768,4 @@ renderLeaderboard();
 subscribeToLeaderboard(() => renderLeaderboard());
 onAuthStateChange(() => renderLeaderboard());
 window.setInterval(updateClock, 30_000);
+document.addEventListener('pointerdown', () => void unlockAudio(), { once: true });

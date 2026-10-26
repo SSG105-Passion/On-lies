@@ -1,6 +1,7 @@
 import { InspectorEngine } from './engine';
 import { CLUE_CATEGORIES } from './types';
-import { recordGameScore } from '../supabase';
+import { recordGameScore, scoreSaveMessage } from '../supabase';
+import { createSessionId } from '../session';
 import './inspector.css';
 
 export class InspectorUI {
@@ -9,6 +10,8 @@ export class InspectorUI {
   private onExit: () => void;
   private timerId: number | null = null;
   private toastTimerId: number | null = null;
+  private sessionId = '';
+  private finalized = false;
 
   constructor(container: HTMLElement, onExit: () => void) {
     this.container = container;
@@ -19,13 +22,19 @@ export class InspectorUI {
   }
 
   public start() {
+    this.stop();
+    this.sessionId = createSessionId();
+    this.finalized = false;
     this.engine.newGame();
+    this.updateTopBar();
     this.showDayIntroModal();
     this.startTimer();
   }
 
   public stop() {
     this.stopTimer();
+    if (this.toastTimerId !== null) window.clearTimeout(this.toastTimerId);
+    this.toastTimerId = null;
     this.engine.isRunning = false;
   }
 
@@ -118,6 +127,7 @@ export class InspectorUI {
       // Click vào nút chuyển hồ sơ hoặc kết thúc ngày
       const nextBtn = target.closest<HTMLButtonElement>('#inspNextBtn');
       if (nextBtn) {
+        if (!this.engine.isCaseEvaluated || this.engine.isFired() || this.finalized) return;
         if (this.engine.isDayComplete()) {
           this.showDayEndModal(false);
         } else {
@@ -128,10 +138,19 @@ export class InspectorUI {
         }
       }
     });
+    desk.addEventListener('keydown', event => {
+      const key = event as KeyboardEvent;
+      const token = (key.target as HTMLElement).closest<HTMLElement>('.insp-token');
+      if (token && (key.key === 'Enter' || key.key === ' ')) {
+        key.preventDefault();
+        token.click();
+        desk.querySelector<HTMLElement>(`[data-index="${token.dataset.index}"]`)?.focus({ preventScroll: true });
+      }
+    });
   }
 
   private handleStamp(isReject: boolean) {
-    if (this.engine.isCaseEvaluated) return;
+    if (this.engine.isCaseEvaluated || !this.engine.isRunning || this.engine.isFired() || this.finalized) return;
 
     const { needReason } = this.engine.stamp(isReject);
 
@@ -149,8 +168,8 @@ export class InspectorUI {
     }
 
     if (this.engine.isFired()) {
-      this.engine.isRunning = false;
-      window.setTimeout(() => this.showFiredModal(), 800);
+      this.stop();
+      this.showFiredModal();
     }
   }
 
@@ -223,7 +242,7 @@ export class InspectorUI {
         classes += ' flagged';
       }
 
-      return `<span class="${classes}" data-index="${index}" tabindex="${evaluated ? -1 : 0}">${this.escapeHtml(item.text)}</span>`;
+      return `<span class="${classes}" data-index="${index}" role="button" aria-pressed="${this.engine.flaggedIndices.has(index)}" tabindex="${evaluated ? -1 : 0}">${this.escapeHtml(item.text)}</span>`;
     };
 
     // Vết mực đóng dấu
@@ -260,7 +279,7 @@ export class InspectorUI {
           <div class="feedback-logs">
             ${res.logs.map(log => `<div class="feedback-log-item ${log.type}">${log.message}</div>`).join('')}
           </div>
-          <button class="inspector-next-btn" id="inspNextBtn">
+          <button class="inspector-next-btn" id="inspNextBtn" ${this.engine.isFired() ? 'disabled' : ''}>
             ${isNextDay ? 'KẾT THÚC NGÀY TRỰC →' : 'HỒ SƠ TIẾP THEO →'}
           </button>
         </div>
@@ -339,7 +358,7 @@ export class InspectorUI {
       <ol>
         ${newRules.map(r => `<li><b>Quy tắc ${r.id}:</b> ${this.escapeHtml(r.text)}</li>`).join('')}
       </ol>
-      <p>⚠️ <b>Quy định xử phạt:</b> Bạn sẽ bị cảnh cáo nếu cho lọt email lừa đảo hoặc từ chối nhầm email an toàn. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ bị sa thải ngay lập tức!</b></p>
+      <p>⚠️ <b>Quy định xử phạt:</b> Kết luận sai hoặc đánh dấu nhầm chi tiết bình thường đều bị cảnh cáo. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ kết thúc ca trực.</b></p>
       <button class="inspector-next-btn" id="modalStartDayBtn">BẮT ĐẦU CA TRỰC THẨM ĐỊNH →</button>
     `;
 
@@ -354,13 +373,14 @@ export class InspectorUI {
   }
 
   private showDayEndModal(isTimeUp: boolean) {
-    const isFinalDay = this.engine.day >= 3;
+    this.engine.isRunning = false;
+    const isFinalDay = this.engine.day >= this.engine.lastDay;
     const modalHtml = `
       <h2>BÁO CÁO KẾT THÚC NGÀY ${this.engine.day}</h2>
       ${isTimeUp ? '<p style="color:#d32f2f;font-weight:700;">Hết giờ làm việc! Các hồ sơ còn lại đã bị chuyển hoàn.</p>' : '<p>Bạn đã hoàn thành ca trực hôm nay.</p>'}
       <div class="inspector-summary-row">
         <span>Hồ sơ đã xử lý:</span>
-        <b>${this.engine.totalProcessed}/${this.engine.queue.length}</b>
+        <b>${this.engine.dayProcessed}/${this.engine.queue.length}</b>
       </div>
       <div class="inspector-summary-row">
         <span>Số lần bị cảnh cáo:</span>
@@ -409,6 +429,11 @@ export class InspectorUI {
   }
 
   private showFinalPerformanceModal() {
+    if (this.finalized) return;
+    this.finalized = true;
+    this.stop();
+    const sessionId = this.sessionId;
+    const completed = this.engine.isTrainingComplete;
     const tally = this.engine.categoryTally;
     const cats = Object.keys(tally) as (keyof typeof tally)[];
 
@@ -424,18 +449,19 @@ export class InspectorUI {
         ? 'Thanh tra viên Khá'
         : 'Thanh tra viên Tập sự';
 
-    // Record score to database / localStorage
-    recordGameScore('mail', this.engine.correctCount, Math.max(1, this.engine.totalProcessed), Math.max(0, 3 - this.engine.citations));
-    document.dispatchEvent(new CustomEvent('mail-completed'));
+    if (completed) document.dispatchEvent(new CustomEvent('mail-completed'));
 
     const modalHtml = `
       <h2>ĐÁNH GIÁ KẾT QUẢ THỰC TẬP</h2>
-      <p>Danh hiệu đạt được: <b style="color:#2b743c;font-size:16px;">${title}</b></p>
+      <p>${completed ? 'Đã hoàn thành đủ hồ sơ.' : 'Ca trực chưa hoàn thành đủ hồ sơ; chưa mở huy hiệu.'}</p>
+      <p>Đánh giá: <b style="color:#2b743c;font-size:16px;">${title}</b></p>
       
       <div class="inspector-summary-row">
         <span>Xử lý chính xác:</span>
-        <b>${this.engine.correctCount}/${this.engine.totalProcessed} hồ sơ</b>
+        <b>${this.engine.correctCount}/${this.engine.totalProcessed} hồ sơ đã xử lý</b>
       </div>
+      <p>Đã xử lý ${this.engine.totalProcessed}/${this.engine.totalCases} hồ sơ trong toàn bộ ca trực.</p>
+      <p id="inspScoreSaveStatus" role="status">${this.engine.totalProcessed ? 'Đang lưu điểm…' : 'Chưa xử lý hồ sơ nào nên không nhận XP.'}</p>
       <div class="inspector-summary-row">
         <span>Tổng thu nhập đạt được:</span>
         <b>${this.engine.salary} đ</b>
@@ -467,6 +493,19 @@ export class InspectorUI {
     `;
 
     this.showModal(modalHtml);
+    if (this.engine.totalProcessed > 0) {
+      void recordGameScore('mail', this.engine.correctCount, this.engine.totalCases,
+        completed ? Math.max(0, 3 - this.engine.citations) : 0, sessionId).then(saved => {
+        if (this.sessionId !== sessionId) return;
+        const status = this.container.querySelector('#inspScoreSaveStatus');
+        if (status) status.textContent = `+${saved.xpEarned} XP · ${scoreSaveMessage(saved)}`;
+        document.dispatchEvent(new CustomEvent('score-saved'));
+      }).catch(() => {
+        if (this.sessionId !== sessionId) return;
+        const status = this.container.querySelector('#inspScoreSaveStatus');
+        if (status) status.textContent = 'Chưa lưu được điểm. Báo cáo vẫn hiển thị để bạn xem lại.';
+      });
+    }
     this.container.querySelector('#modalFinalRestartBtn')?.addEventListener('click', () => {
       this.hideModal();
       this.start();
@@ -483,6 +522,7 @@ export class InspectorUI {
     if (overlay && box) {
       box.innerHTML = html;
       overlay.classList.add('active');
+      box.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
     }
   }
 

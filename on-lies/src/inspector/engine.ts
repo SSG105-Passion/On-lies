@@ -3,7 +3,7 @@ import { CASES } from './cases';
 import { RULES } from './rules';
 import { CLUE_CATEGORIES } from './types';
 
-declare const Tone: any;
+import { beep, stamp } from '../audio';
 
 export class InspectorEngine {
   public day: number = 1;
@@ -11,6 +11,14 @@ export class InspectorEngine {
   public citations: number = 0;
   public correctCount: number = 0;
   public totalProcessed: number = 0;
+  public dayProcessed = 0;
+  private processedIds = new Set<number>();
+
+  public get totalCases() { return CASES.length; }
+  public get lastDay() { return Math.max(...CASES.map(item => item.day)); }
+  public get isTrainingComplete() {
+    return !this.isFired() && this.processedIds.size === this.totalCases;
+  }
 
   public queue: CaseFile[] = [];
   public currentCaseIndex: number = 0;
@@ -38,6 +46,7 @@ export class InspectorEngine {
     this.citations = 0;
     this.correctCount = 0;
     this.totalProcessed = 0;
+    this.processedIds.clear();
     this.categoryTally = {
       sender: [0, 0],
       urgent: [0, 0],
@@ -51,6 +60,7 @@ export class InspectorEngine {
 
   public startDay(dayNumber: number) {
     this.day = dayNumber;
+    this.dayProcessed = 0;
     this.citations = 0;
     const dayCases = CASES.filter(c => c.day === this.day);
     this.queue = this.shuffle([...dayCases]);
@@ -71,7 +81,7 @@ export class InspectorEngine {
   }
 
   public toggleFlag(index: number) {
-    if (this.isCaseEvaluated) return;
+    if (this.isCaseEvaluated || this.isFired() || !this.getCurrentCase()?.allItems[index]) return;
     if (this.flaggedIndices.has(index)) {
       this.flaggedIndices.delete(index);
     } else {
@@ -82,7 +92,7 @@ export class InspectorEngine {
 
   public stamp(userRejected: boolean): { result: CaseResult; needReason?: boolean } {
     const currentCase = this.getCurrentCase();
-    if (!currentCase || this.isCaseEvaluated) {
+    if (!currentCase || this.isCaseEvaluated || this.isFired() || this.timeRemaining <= 0 || this.processedIds.has(currentCase.id)) {
       throw new Error('Không thể đóng dấu vào lúc này');
     }
 
@@ -130,6 +140,8 @@ export class InspectorEngine {
     }
 
     this.totalProcessed++;
+    this.dayProcessed++;
+    this.processedIds.add(currentCase.id);
 
     // Xây dựng log phân tích
     const logs: { type: 'hit' | 'miss' | 'warn'; message: string }[] = [];
@@ -180,7 +192,7 @@ export class InspectorEngine {
   }
 
   public nextCase(): boolean {
-    if (this.currentCaseIndex < this.queue.length - 1) {
+    if (this.isCaseEvaluated && !this.isFired() && this.timeRemaining > 0 && this.currentCaseIndex < this.queue.length - 1) {
       this.currentCaseIndex++;
       this.resetCurrentCaseState();
       return true;
@@ -189,7 +201,7 @@ export class InspectorEngine {
   }
 
   public isDayComplete(): boolean {
-    return this.currentCaseIndex >= this.queue.length - 1 && this.isCaseEvaluated;
+    return this.queue.length > 0 && this.dayProcessed === this.queue.length && this.isCaseEvaluated;
   }
 
   public isFired(): boolean {
@@ -225,32 +237,17 @@ export class InspectorEngine {
   }
 
   public playStampSound(isRejected: boolean) {
-    try {
-      const membrane = new Tone.MembraneSynth().toDestination();
-      if (isRejected) {
-        membrane.triggerAttackRelease("A1", "16n");
-      } else {
-        membrane.triggerAttackRelease("C2", "16n");
-      }
-    } catch {
-      // Audio fallback
-    }
+    stamp(isRejected ? 'A1' : 'C2', '16n');
   }
 
   public playSound(type: 'click' | 'correct' | 'warning' | 'chime') {
-    try {
-      const synth = new Tone.Synth().toDestination();
-      if (type === 'click') {
-        synth.triggerAttackRelease("G4", "32n");
-      } else if (type === 'correct') {
-        synth.triggerAttackRelease("E5", "16n");
-      } else if (type === 'warning') {
-        synth.triggerAttackRelease("F2", "8n");
-      } else if (type === 'chime') {
-        synth.triggerAttackRelease("B5", "8n");
-      }
-    } catch {
-      // Audio fallback
-    }
+    const notes: Record<'click' | 'correct' | 'warning' | 'chime', [string, string]> = {
+      click: ['G4', '32n'],
+      correct: ['E5', '16n'],
+      warning: ['F2', '8n'],
+      chime: ['B5', '8n'],
+    };
+    const [note, duration] = notes[type];
+    beep(note, duration);
   }
 }
