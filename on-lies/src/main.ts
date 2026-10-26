@@ -11,6 +11,7 @@ import { createSessionId } from './session';
 import { getLevelProgress, readCompletedGames, TRACKED_GAMES } from './playerProgress';
 import { escapeHtml } from './html';
 import { unlockAudio } from './audio';
+import './gameNavigation.css';
 import {
   fetchLeaderboard,
   getCurrentProfile,
@@ -46,6 +47,27 @@ const mailInspectionMarkup = inspectModal.innerHTML;
 
 let currentUserProfile: UserProfile | null = null;
 let isSignUpMode = false;
+type PlayableGame = 'mail' | 'sms' | 'phone' | 'family';
+let lastOpenedGame: PlayableGame = 'mail';
+const gameNames: Record<PlayableGame, string> = {
+  mail: 'Thanh tra Hộp thư', sms: 'Lá chắn SMS', phone: 'Cuộc gọi khẩn', family: 'Cứu người thân',
+};
+
+function showGameNavigation(app: PlayableGame) {
+  lastOpenedGame = app;
+  $('gameModeName').textContent = gameNames[app];
+  $<HTMLSelectElement>('gameModeSelect').value = app;
+  $('gameNavigation').classList.remove('hidden');
+}
+
+$('gameHomeBtn').addEventListener('click', () => showDesktop());
+$('gameModeSelect').addEventListener('change', event => {
+  const app = (event.target as HTMLSelectElement).value;
+  if (app === 'mail' || app === 'sms' || app === 'phone' || app === 'family') {
+    openGame(app);
+    $<HTMLSelectElement>('gameModeSelect').focus({ preventScroll: true });
+  }
+});
 
 const modes: Record<GameMode, { title: string; icon: string; intro: string; noun: string; hint: string }> = {
   mail: {
@@ -168,7 +190,7 @@ document.addEventListener('mail-completed', () => {
 });
 document.addEventListener('score-saved', () => { void renderLeaderboard(); });
 
-function showDesktop() {
+function showDesktop(restoreFocus = true) {
   clearDeliveryModal();
   $('phoneApp').classList.add('hidden');
   $('phoneStats').classList.add('hidden');
@@ -182,7 +204,31 @@ function showDesktop() {
   resultScreen.classList.add('hidden');
   inspectModal.classList.add('hidden');
   $('windowTitle').textContent = 'Mail Inspector';
+  $('gameNavigation').classList.add('hidden');
   updateDockActive('desktop');
+  if (restoreFocus) document.querySelector<HTMLButtonElement>(`[data-app="${lastOpenedGame}"]`)?.focus({ preventScroll: true });
+}
+
+function openGame(app: PlayableGame) {
+  if (app === 'sms') {
+    openMode('messages');
+    return;
+  }
+  showDesktop(false);
+  desktop.classList.add('hidden');
+  if (app === 'mail') {
+    $('inspectorApp').classList.remove('hidden');
+    if (!inspectorUI) inspectorUI = new InspectorUI($('inspectorApp'), showDesktop);
+    inspectorUI.start();
+  } else if (app === 'phone') {
+    $('phoneApp').classList.remove('hidden');
+    openPhoneGame();
+  } else {
+    $('familyApp').classList.remove('hidden');
+    openFamilyGame();
+  }
+  showGameNavigation(app);
+  updateDockActive(app);
 }
 
 function updateDockActive(appName: string) {
@@ -399,7 +445,7 @@ $('authForm')?.addEventListener('submit', async event => {
 });
 
 function openMode(mode: GameMode) {
-  showDesktop();
+  showDesktop(false);
   engine.setMode(mode);
   const config = modes[mode];
   desktop.classList.add('hidden');
@@ -448,6 +494,7 @@ function openMode(mode: GameMode) {
   }
 
   updateDockActive(mode === 'messages' ? 'sms' : mode);
+  showGameNavigation(mode === 'messages' ? 'sms' : 'mail');
 }
 
 document.addEventListener('click', event => {
@@ -461,28 +508,9 @@ document.addEventListener('click', event => {
   if (button.dataset.app) {
     const app = button.dataset.app;
     if (app === 'mail' || app === 'inspector') {
-      showDesktop();
-      desktop.classList.add('hidden');
-      $('inspectorApp').classList.remove('hidden');
-      if (!inspectorUI) {
-        inspectorUI = new InspectorUI($('inspectorApp'), showDesktop);
-      }
-      inspectorUI.start();
-      updateDockActive('mail');
-    } else if (app === 'phone') {
-      showDesktop();
-      desktop.classList.add('hidden');
-      $('phoneApp').classList.remove('hidden');
-      openPhoneGame();
-      updateDockActive('phone');
-    } else if (app === 'family') {
-      showDesktop();
-      desktop.classList.add('hidden');
-      $('familyApp').classList.remove('hidden');
-      openFamilyGame();
-      updateDockActive('family');
-    } else if (app === 'sms') {
-      openMode('messages');
+      openGame('mail');
+    } else if (app === 'phone' || app === 'family' || app === 'sms') {
+      openGame(app);
     } else if (app === 'leaderboard') {
       toggleLeaderboard();
     }
@@ -580,8 +608,8 @@ function openInspectModal(itemId: number) {
   if (engine.currentMode === 'messages') {
       inspectModal.classList.add('sms-investigation-active');
       inspectModal.classList.remove('hidden');
-      inspectModal.setAttribute('role', 'dialog');
-      inspectModal.setAttribute('aria-modal', 'true');
+      inspectModal.setAttribute('role', 'region');
+      gameApp.inert = true;
       inspectModal.setAttribute('aria-label', `SMS: ${item.subject}`);
       new DeliveryUI(inspectModal, {
         item,
@@ -659,6 +687,7 @@ function continueSms() {
 }
 
 function clearDeliveryModal() {
+  gameApp.inert = false;
   inspectModal.onclick = null;
   inspectModal.onkeydown = null;
   inspectModal.classList.remove('sms-investigation-active');

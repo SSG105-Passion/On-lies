@@ -302,6 +302,18 @@
       </article>
     </div>
 
+    <nav id="gameNavigation" class="game-navigation hidden" aria-label="Điều hướng màn chơi">
+      <button id="gameHomeBtn" class="game-home-button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h15"/></svg>Về tổng quan</button>
+      <span class="game-navigation-divider" aria-hidden="true"></span>
+      <strong id="gameModeName" class="game-mode-name">Thanh tra Hộp thư</strong>
+      <label class="game-mode-picker"><span>Đổi màn</span><select id="gameModeSelect" aria-label="Đổi màn chơi; bắt đầu lượt mới">
+        <option value="mail">Thanh tra Hộp thư</option>
+        <option value="sms">Lá chắn SMS</option>
+        <option value="phone">Cuộc gọi khẩn</option>
+        <option value="family">Cứu người thân</option>
+      </select></label>
+    </nav>
+
     <!-- Mail App Window -->
     <section id="mailApp" class="app-window hidden" aria-label="Mini game kiểm tra email">
       <header class="app-window-bar">

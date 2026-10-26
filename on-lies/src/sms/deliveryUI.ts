@@ -185,11 +185,6 @@ export class DeliveryUI {
 
   private onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Escape') { event.preventDefault(); this.options.close(); return; }
-    if (event.key !== 'Tab') return;
-    const focusable = [...this.container.querySelectorAll<HTMLElement>('button:not(:disabled), [tabindex="0"]')]
-      .filter(element => element.getClientRects().length > 0);
-    const first = focusable[0], last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    // This is a full game screen; Tab must still reach the shared navigation.
   }
 }

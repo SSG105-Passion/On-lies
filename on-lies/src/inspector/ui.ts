@@ -4,6 +4,13 @@ import { recordGameScore, scoreSaveMessage } from '../supabase';
 import { createSessionId } from '../session';
 import './inspector.css';
 
+const icon = (path: string) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+const mailIcon = () => icon('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>');
+const bookIcon = () => icon('<path d="M12 5v16M12 5C9 2 4 3 2 4v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-2-1-7-2-10 1Z"/>');
+const warningIcon = () => icon('<path d="M10.3 4.8 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/>');
+const checkIcon = () => icon('<path d="m5 12 4 4L19 6"/>');
+const closeIcon = () => icon('<path d="m6 6 12 12M6 18 18 6"/>');
+
 export class InspectorUI {
   private container: HTMLElement;
   private engine: InspectorEngine;
@@ -12,6 +19,7 @@ export class InspectorUI {
   private toastTimerId: number | null = null;
   private sessionId = '';
   private finalized = false;
+  private displayedCaseId: number | null = null;
 
   constructor(container: HTMLElement, onExit: () => void) {
     this.container = container;
@@ -25,6 +33,7 @@ export class InspectorUI {
     this.stop();
     this.sessionId = createSessionId();
     this.finalized = false;
+    this.displayedCaseId = null;
     this.engine.newGame();
     this.updateTopBar();
     this.showDayIntroModal();
@@ -63,16 +72,16 @@ export class InspectorUI {
       <div class="inspector-window">
         <header class="inspector-topbar">
           <div class="inspector-stat-group">
-            <span class="inspector-mode-tag">✉ THANH TRA HỘP THƯ</span>
+            <h1 class="inspector-mode-tag">${mailIcon()}<span>Thanh tra Hộp thư</span></h1>
             <span>NGÀY <b id="inspDay">1</b></span>
             <span>THỜI GIAN <b id="inspTimer">02:00</b></span>
             <span>HỒ SƠ <b id="inspProgress">0/0</b></span>
           </div>
           <div class="inspector-stat-group">
             <span class="inspector-warn-icons" id="inspWarnings" aria-label="Cảnh cáo">
-              <span class="warn-off">⚠</span>
-              <span class="warn-off">⚠</span>
-              <span class="warn-off">⚠</span>
+              <span class="warn-off">${warningIcon()}</span>
+              <span class="warn-off">${warningIcon()}</span>
+              <span class="warn-off">${warningIcon()}</span>
             </span>
             <span>LƯƠNG <b id="inspSalary">0 đ</b></span>
             <button class="inspector-exit-btn" id="inspExitBtn">← Màn hình chính</button>
@@ -83,7 +92,7 @@ export class InspectorUI {
 
         <div id="inspToast" class="inspector-toast" role="status"></div>
 
-        <div id="inspModalOverlay" class="inspector-modal-overlay" role="dialog" aria-modal="true">
+        <div id="inspModalOverlay" class="inspector-modal-overlay" role="dialog" aria-label="Thông tin ca trực">
           <div class="inspector-modal-box" id="inspModalBox"></div>
         </div>
       </div>
@@ -102,12 +111,22 @@ export class InspectorUI {
     desk.addEventListener('click', (event) => {
       const target = event.target as HTMLElement;
 
+      const removeFlag = target.closest<HTMLButtonElement>('[data-remove-flag]');
+      if (removeFlag && !this.engine.isCaseEvaluated) {
+        const index = Number(removeFlag.dataset.removeFlag);
+        this.engine.toggleFlag(index);
+        this.renderDesk();
+        desk.querySelector<HTMLElement>(`.insp-token[data-index="${index}"]`)?.focus({ preventScroll: true });
+        return;
+      }
+
       // Click vào token chi tiết
       const token = target.closest<HTMLElement>('.insp-token');
       if (token && !this.engine.isCaseEvaluated) {
         const index = Number(token.dataset.index);
         this.engine.toggleFlag(index);
         this.renderDesk();
+        desk.querySelector<HTMLElement>(`.insp-token[data-index="${index}"]`)?.focus({ preventScroll: true });
         return;
       }
 
@@ -165,6 +184,7 @@ export class InspectorUI {
     const desk = this.container.querySelector('#inspDesk');
     if (desk) {
       desk.scrollTo({ top: desk.scrollHeight, behavior: 'smooth' });
+      desk.querySelector<HTMLButtonElement>('#inspNextBtn')?.focus({ preventScroll: true });
     }
 
     if (this.engine.isFired()) {
@@ -194,6 +214,7 @@ export class InspectorUI {
     if (timerEl) {
       const mins = Math.floor(this.engine.timeRemaining / 60);
       const secs = this.engine.timeRemaining % 60;
+      // taste-skill-ignore: MM:SS is a clock; both fields need two digits.
       timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
@@ -207,8 +228,9 @@ export class InspectorUI {
     if (warnEl) {
       const citations = this.engine.citations;
       warnEl.innerHTML = [0, 1, 2].map(k => `
-        <span class="${k < citations ? 'warn-active' : 'warn-off'}">⚠</span>
+        <span class="${k < citations ? 'warn-active' : 'warn-off'}">${warningIcon()}</span>
       `).join(' ');
+      warnEl.setAttribute('aria-label', `${citations} trên 3 cảnh cáo`);
     }
   }
 
@@ -225,6 +247,11 @@ export class InspectorUI {
     const { allItems } = currentCase;
     const evaluated = this.engine.isCaseEvaluated;
     const res = this.engine.currentResult;
+    const sameCase = this.displayedCaseId === currentCase.id;
+    const paperScroll = sameCase ? desk.querySelector('.inspector-paper')?.scrollTop ?? 0 : 0;
+    const bookScroll = sameCase ? desk.querySelector('.inspector-handbook')?.scrollTop ?? 0 : 0;
+    const bookOpen = sameCase ? desk.querySelector<HTMLDetailsElement>('.inspector-handbook')?.open ?? true : true;
+    this.displayedCaseId = currentCase.id;
 
     // Render các token chữ
     const renderToken = (index: number) => {
@@ -242,7 +269,7 @@ export class InspectorUI {
         classes += ' flagged';
       }
 
-      return `<span class="${classes}" data-index="${index}" role="button" aria-pressed="${this.engine.flaggedIndices.has(index)}" tabindex="${evaluated ? -1 : 0}">${this.escapeHtml(item.text)}</span>`;
+      return `<span class="${classes}" data-index="${index}" role="button" aria-pressed="${this.engine.flaggedIndices.has(index)}" aria-disabled="${evaluated}" tabindex="${evaluated ? -1 : 0}">${this.escapeHtml(item.text)}</span>`;
     };
 
     // Vết mực đóng dấu
@@ -259,11 +286,13 @@ export class InspectorUI {
       interactionHtml = `
         <div class="inspector-stamps">
           <button class="stamp-btn stamp-approve" id="stampApprove">
-            <span>✔ ĐÃ DUYỆT</span>
+            <span class="stamp-handle">${checkIcon()}</span>
+            <span>ĐÃ DUYỆT</span>
             <small>Hồ sơ an toàn</small>
           </button>
           <button class="stamp-btn stamp-reject" id="stampReject">
-            <span>✖ TỪ CHỐI</span>
+            <span class="stamp-handle">${closeIcon()}</span>
+            <span>TỪ CHỐI</span>
             <small>Có chiêu trò lừa đảo</small>
           </button>
         </div>
@@ -271,7 +300,7 @@ export class InspectorUI {
     } else if (res) {
       const isNextDay = this.engine.currentCaseIndex === this.engine.queue.length - 1;
       const headlineClass = res.isCorrect ? 'headline-correct' : 'headline-wrong';
-      const headlineText = res.isCorrect ? '✔ KẾT LUẬN CHÍNH XÁC' : '✖ KẾT LUẬN SAI — BỊ CẢNH CÁO';
+      const headlineText = res.isCorrect ? `${checkIcon()} Kết luận chính xác` : `${warningIcon()} Kết luận sai — bị cảnh cáo`;
 
       interactionHtml = `
         <div class="inspector-feedback-card">
@@ -296,14 +325,13 @@ export class InspectorUI {
       });
     }
 
+    const flags = [...this.engine.flaggedIndices];
     desk.innerHTML = `
-      <div class="inspector-col">
-        <div class="inspector-said">${this.escapeHtml(currentCase.note)}</div>
-
+      <section class="inspector-col inspector-case-column" aria-label="Hồ sơ kiểm duyệt">
         <div class="inspector-paper">
           <div class="inspector-paper-header">
-            <span>HỒ SƠ CẦU CỨU · ${this.escapeHtml(currentCase.who)}</span>
-            <span>HÌNH THỨC: ${this.escapeHtml(currentCase.channelLabel)}</span>
+            <h2>${this.escapeHtml(currentCase.who)}</h2>
+            <span>${this.escapeHtml(currentCase.channelLabel)} · Ngày ${this.engine.day}</span>
           </div>
 
           ${currentCase.senderItem ? `
@@ -313,36 +341,43 @@ export class InspectorUI {
             </div>
           ` : ''}
 
-          <div class="inspector-msg-body">
-            ${allItems.map((_, i) => i === 0 && currentCase.senderItem ? '' : renderToken(i)).join('')}
-          </div>
+          <div class="inspector-msg-body">${allItems.map((_, i) => i === 0 && currentCase.senderItem ? '' : renderToken(i)).join('')}</div>
 
           ${!evaluated ? `
             <div class="inspector-hint">
-              💡 Bấm vào từ ngữ/chi tiết đáng ngờ trên giấy để đánh dấu. Nếu từ chối, bạn phải đánh dấu ít nhất một lý do.
+              Bấm vào chi tiết đáng ngờ để ghim bằng chứng. Muốn từ chối, hãy đánh dấu ít nhất một lý do.
             </div>
           ` : ''}
 
-          ${stampMarkHtml}
+          <div class="inspector-paper-bottom"><div class="inspector-said"><span>Người gửi nhờ bạn kiểm tra</span><p>${this.escapeHtml(currentCase.note)}</p></div>${stampMarkHtml}</div>
         </div>
 
-        ${interactionHtml}
-      </div>
+        <section class="inspector-evidence" aria-label="Bằng chứng đã ghim">
+          <h2>${icon('<path d="m21 11-8.5 8.5a6 6 0 0 1-8.5-8.5L13 2.5a4 4 0 0 1 5.7 5.7l-8.5 8.5a2 2 0 0 1-2.8-2.8L15 6.3"/>')}Bằng chứng đã ghim <span>${flags.length}</span></h2>
+          <div class="inspector-evidence-list">${flags.length ? flags.map(i => `<div class="inspector-evidence-item"><p>${this.escapeHtml(allItems[i].text)}</p>${!evaluated ? `<button data-remove-flag="${i}" aria-label="Bỏ ghim: ${this.escapeHtml(allItems[i].text)}">${closeIcon()}</button>` : ''}</div>`).join('') : '<p class="inspector-evidence-empty">Chưa ghim chi tiết nào. Chọn trực tiếp trên hồ sơ để đối chiếu trước khi đóng dấu.</p>'}</div>
+        </section>
+      </section>
 
-      <div class="inspector-col">
-        <div class="inspector-handbook">
-          <h3>📒 SỔ TAY NGHIỆP VỤ</h3>
+      <aside class="inspector-col inspector-tools-column" aria-label="Sổ tay và quyết định">
+        <details class="inspector-handbook" ${bookOpen ? 'open' : ''}>
+          <summary>${bookIcon()}<span>Sổ tay nghiệp vụ<small>Quy định ngày ${this.engine.day}</small></span>${icon('<path d="m9 5 7 7-7 7"/>')}</summary>
           <ol>
             ${rules.map(rule => `
               <li class="${highlightedRules.has(rule.id) ? 'highlight-rule' : ''}" value="${rule.id}">
-                ${this.escapeHtml(rule.text)}
-                ${rule.day === this.engine.day ? '<span class="rule-tag-new">MỚI</span>' : ''}
+                <span class="inspector-rule-number">${rule.id}</span><p>${this.escapeHtml(rule.text)}</p>
+                ${rule.day === this.engine.day && this.engine.day > 1 ? '<span class="rule-tag-new">MỚI</span>' : ''}
               </li>
             `).join('')}
           </ol>
-        </div>
-      </div>
+        </details>
+        <section class="inspector-decision" aria-label="Kết luận hồ sơ"><h2>Quyết định của bạn</h2>${interactionHtml}</section>
+      </aside>
+      <footer class="inspector-desk-footer">Đọc hồ sơ <span aria-hidden="true">→</span> Đối chiếu sổ tay <span aria-hidden="true">→</span> Đóng dấu <small>Tình huống mô phỏng</small></footer>
     `;
+    const paper = desk.querySelector('.inspector-paper');
+    const handbook = desk.querySelector('.inspector-handbook');
+    if (paper) paper.scrollTop = paperScroll;
+    if (handbook) handbook.scrollTop = bookScroll;
   }
 
   private showDayIntroModal() {
@@ -358,7 +393,7 @@ export class InspectorUI {
       <ol>
         ${newRules.map(r => `<li><b>Quy tắc ${r.id}:</b> ${this.escapeHtml(r.text)}</li>`).join('')}
       </ol>
-      <p>⚠️ <b>Quy định xử phạt:</b> Kết luận sai hoặc đánh dấu nhầm chi tiết bình thường đều bị cảnh cáo. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ kết thúc ca trực.</b></p>
+      <p><b>Quy định xử phạt:</b> Kết luận sai hoặc đánh dấu nhầm chi tiết bình thường đều bị cảnh cáo. <b>Nhận đủ 3 cảnh cáo trong ngày sẽ kết thúc ca trực.</b></p>
       <button class="inspector-next-btn" id="modalStartDayBtn">BẮT ĐẦU CA TRỰC THẨM ĐỊNH →</button>
     `;
 
@@ -484,7 +519,7 @@ export class InspectorUI {
 
       ${mostMissed && tally[mostMissed][0] < tally[mostMissed][1] ? `
         <p style="color:#b45309;font-size:12px;margin-top:8px;">
-          💡 <i>Nhắc nhở nghiệp vụ:</i> Bạn hay bỏ sót nhóm <b>${CLUE_CATEGORIES[mostMissed]}</b> nhất. Hãy chú ý hơn ở nhóm này!
+          <i>Nhắc nhở nghiệp vụ:</i> Bạn hay bỏ sót nhóm <b>${CLUE_CATEGORIES[mostMissed]}</b> nhất. Hãy chú ý hơn ở nhóm này!
         </p>
       ` : ''}
 
@@ -522,6 +557,8 @@ export class InspectorUI {
     if (overlay && box) {
       box.innerHTML = html;
       overlay.classList.add('active');
+      const desk = this.container.querySelector<HTMLElement>('#inspDesk');
+      if (desk) desk.inert = true;
       box.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
     }
   }
@@ -530,6 +567,8 @@ export class InspectorUI {
     const overlay = this.container.querySelector('#inspModalOverlay');
     if (overlay) {
       overlay.classList.remove('active');
+      const desk = this.container.querySelector<HTMLElement>('#inspDesk');
+      if (desk) desk.inert = false;
     }
   }
 

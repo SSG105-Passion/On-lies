@@ -17,7 +17,7 @@ function loader({ globals = {}, mocks = {}, exposeMain = false } = {}) {
     const module = { exports: {} };
     cache.set(absolute, module.exports);
     let source = fs.readFileSync(absolute, 'utf8').replace(/import\.meta\.env/g, '__env');
-    if (exposeMain && name === 'main.ts') source += '\nexports.__test = { engine, startGame, finishGame, renderLeaderboard };';
+    if (exposeMain && name === 'main.ts') source += '\nexports.__test = { engine, startGame, finishGame, renderLeaderboard, openGame, showDesktop };';
     vm.runInNewContext(ts.transpileModule(source, {
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2023 },
     }).outputText, {
@@ -51,6 +51,7 @@ function node() {
 const savedResult = { xpEarned: 950, newTotalXp: 950, newLevel: 1, requiresLogin: true, syncStatus: 'local' };
 const guest = { id: 'local-guest-id', username: 'Guest', total_xp: 0, level: 1, is_authenticated: false };
 function mainHarness(save = async () => savedResult, entries = []) {
+  let inspectorRunning = false;
   // IDs come from the real document: a reference to missing markup fails this test.
   const html = fs.readFileSync(path.join(root, '../index.html'), 'utf8');
   const nodes = new Map([...html.matchAll(/id="([^"]+)"/g)].map(match => [match[1], node()]));
@@ -68,6 +69,11 @@ function mainHarness(save = async () => savedResult, entries = []) {
         getLeaderboardSource: () => 'local', scoreSaveMessage: () => 'Điểm đã lưu trên máy này.',
       },
       'phoneGame.ts': { openPhoneGame() {} },
+      'familyGame.ts': { openFamilyGame() {} },
+      'ui.ts': { InspectorUI: class {
+        start() { inspectorRunning = true; }
+        stop() { inspectorRunning = false; }
+      } },
     },
   });
   const main = load(path.join(root, 'main.ts')).__test;
@@ -82,8 +88,42 @@ function mainHarness(save = async () => savedResult, entries = []) {
       ...(item.id === 202 ? { smsAction: { outcome: 'cautious', feedback: 'Chưa xác minh' } } : {}),
     }));
   }
-  return { main, nodes, complete };
+  return { main, nodes, complete, isInspectorRunning: () => inspectorRunning };
 }
+
+test('all four games share navigation and return to the overview with no visible game left behind', () => {
+  const { main, nodes } = mainHarness();
+  const games = { mail: ['inspectorApp', 'Thanh tra Hộp thư'], sms: ['mailApp', 'Lá chắn SMS'],
+    phone: ['phoneApp', 'Cuộc gọi khẩn'], family: ['familyApp', 'Cứu người thân'] };
+  for (const [mode, [visibleApp, name]] of Object.entries(games)) {
+    main.openGame(mode);
+    assert.equal(nodes.get('gameNavigation').classList.contains('hidden'), false);
+    assert.equal(nodes.get('gameModeName').textContent, name);
+    assert.equal(nodes.get('gameModeSelect').value, mode);
+    for (const [app] of Object.values(games)) assert.equal(nodes.get(app).classList.contains('hidden'), app !== visibleApp);
+    main.showDesktop();
+    assert.equal(nodes.get('gameNavigation').classList.contains('hidden'), true);
+    assert.equal(nodes.get('desktop').classList.contains('hidden'), false);
+    for (const [app] of Object.values(games)) assert.equal(nodes.get(app).classList.contains('hidden'), true);
+  }
+});
+
+test('switching games stops the inspector timer and leaving SMS closes the investigation and results', () => {
+  const { main, nodes, isInspectorRunning } = mainHarness();
+  main.openGame('mail');
+  assert.equal(isInspectorRunning(), true);
+  main.openGame('sms');
+  assert.equal(isInspectorRunning(), false);
+  const modal = nodes.get('inspectModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('sms-investigation-active');
+  nodes.get('resultScreen').classList.remove('hidden');
+  main.openGame('family');
+  assert.equal(modal.classList.contains('hidden'), true);
+  assert.equal(modal.classList.contains('sms-investigation-active'), false);
+  assert.equal(nodes.get('resultScreen').classList.contains('hidden'), true);
+  assert.equal(nodes.get('gameModeName').textContent, 'Cứu người thân');
+});
 
 test('SMS renders complete results before saving; repeated finish awards only once', async () => {
   let resolve, writes = 0;

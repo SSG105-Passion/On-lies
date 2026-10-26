@@ -1,0 +1,81 @@
+/* One exit and one mode switch, outside every game's scrolling or modal layer. */
+.game-navigation {
+  position: fixed;
+  inset: 38px 0 auto;
+  z-index: 100;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 28px;
+  background: #193f3e;
+  border-bottom: 1px solid #42605b;
+  color: #fff9ea;
+}
+.game-home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid #c5ad77;
+  border-radius: 6px;
+  background: #edc779;
+  color: #233f38;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.game-home-button:hover { background: #f4d69a; }
+.game-navigation svg { flex: none; }
+.game-navigation-divider { width: 1px; height: 24px; background: #53706a; }
+.game-mode-name { font-size: 15px; font-weight: 600; }
+.game-mode-picker { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #d1dfd2; }
+.game-mode-picker select {
+  max-width: 230px;
+  min-height: 42px;
+  padding: 8px 30px 8px 12px;
+  border: 1px solid #7d9790;
+  border-radius: 6px;
+  background: #254d47;
+  color: #fff9ea;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.game-navigation button:focus-visible, .game-mode-picker select:focus-visible { outline: 2px solid #fff0c3; outline-offset: 3px; }
+#mailApp, #phoneApp, #familyApp, #inspectorApp { top: 96px; }
+#familyApp > .family-appbar { display: none; }
+#mailApp #resetGameBtn, #mailApp #introBackBtn { display: none; }
+#mailApp > .app-window-bar .window-controls,
+#mailApp > .app-window-bar .window-title,
+#phoneApp > .app-window-bar .window-controls,
+#phoneApp > .app-window-bar .window-title { display: none; }
+#mailApp > .app-window-bar, #phoneApp > .app-window-bar {
+  display: flex;
+  justify-content: flex-end;
+  height: auto;
+  min-height: 38px;
+  background: #1d3036;
+  color: #e0e6dd;
+  padding: 6px 28px;
+}
+#mailApp > .app-window-bar:has(#statsBar.hidden),
+#phoneApp > .app-window-bar:has(#phoneStats.hidden) { display: none; }
+#inspectorApp .inspector-mode-tag, #inspectorApp #inspExitBtn { display: none; }
+#inspectorApp .inspector-topbar { min-height: 44px; padding: 6px 28px; }
+#inspectorApp .inspector-stat-group { gap: 20px; }
+#inspectorApp .inspector-topbar .inspector-stat-group:last-child { width: auto; }
+@media (max-width: 760px) {
+  .game-navigation { height: 58px; padding: 0 12px; gap: 10px; }
+  .game-home-button { min-height: 44px; font-size: 12px; padding: 9px 10px; gap: 6px; }
+  .game-home-button svg { width: 16px; height: 16px; }
+  .game-navigation-divider, .game-mode-name, .game-mode-picker > span { display: none; }
+  .game-mode-picker { min-width: 0; }
+  .game-mode-picker select { min-height: 44px; max-width: 190px; width: 100%; font-size: 12px; padding-left: 8px; padding-right: 8px; }
+  #mailApp > .app-window-bar, #phoneApp > .app-window-bar { padding: 6px 14px; }
+  #inspectorApp .inspector-topbar { padding: 10px 16px; gap: 10px; }
+  #inspectorApp .inspector-stat-group { gap: 12px; width: auto; }
+  #inspectorApp .inspector-topbar .inspector-stat-group:last-child { margin-left: auto; }
+}
