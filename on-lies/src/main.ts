@@ -135,6 +135,20 @@ function updateProgress() {
     badge.classList.toggle('unlocked', unlocked);
     badge.classList.toggle('locked', !unlocked);
     badge.title = unlocked ? 'Đã hoàn thành trên thiết bị này' : 'Hoàn thành chế độ để mở huy hiệu';
+    const modeKey = badge.dataset.completion!;
+    const modeTotals: Record<string, { max: number; unit: string }> = {
+      mail: { max: 13, unit: 'hồ sơ' },
+      messages: { max: 9, unit: 'tin nhắn' },
+      phone: { max: 6, unit: 'cuộc gọi' },
+      family: { max: 5, unit: 'tình huống' },
+    };
+    const meta = modeTotals[modeKey];
+    if (meta) {
+      const countEl = document.querySelector<HTMLElement>(`[data-mode-count="${modeKey}"]`);
+      if (countEl) countEl.textContent = `${unlocked ? meta.max : 0} / ${meta.max} ${meta.unit}`;
+      const barEl = document.querySelector<HTMLElement>(`[data-mode-bar="${modeKey}"]`);
+      if (barEl) barEl.style.width = unlocked ? '100%' : '0%';
+    }
   });
 }
 
@@ -541,13 +555,13 @@ document.addEventListener('click', event => {
     closeLeaderboardBtn: () => toggleLeaderboard(false),
     exitMailBtn: showDesktop,
     introBackBtn: showDesktop,
-    startGameBtn: startGame,
+    startGameBtn: () => { startGame(); if (engine.currentMode === 'messages') { const first = engine.getCurrentRoundItems()[0]; if (first) openInspectModal(first.id); } },
     resetGameBtn: showDesktop,
     closeModalBtn: closeModal,
     btnActionScam: () => submitEvaluation(true),
     btnActionSafe: () => submitEvaluation(false),
-    nextRoundBtn: advanceRound,
-    restartGameBtn: startGame,
+    nextRoundBtn: () => { advanceRound(); if (engine.currentMode === 'messages' && !engine.finished) { const first = engine.getCurrentRoundItems()[0]; if (first) openInspectModal(first.id); } },
+    restartGameBtn: () => { startGame(); if (engine.currentMode === 'messages') { const first = engine.getCurrentRoundItems()[0]; if (first) openInspectModal(first.id); } },
     continueAnswerBtn: continueAnswer,
     changeModeBtn: showDesktop,
   };

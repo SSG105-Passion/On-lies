@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="/src/style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -21,9 +21,9 @@
     <header class="system-bar home-shell-nav">
       <div class="system-bar-left">
         <button class="brand-mark home-brand" id="overviewHomeBtn" aria-label="On-lies — Về tổng quan">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>
-            <path d="m8.5 12 2.3 2.3 4.7-5"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
           </svg>
           <strong>On-lies</strong>
           <span>Học cách không mắc bẫy.</span>
@@ -41,7 +41,7 @@
           <span id="themeText">Giao diện</span>
         </button>
         <button id="authBtn" class="home-account" aria-label="Mở tài khoản">
-          <span id="homeAccountAvatar" class="home-account-avatar">B</span>
+          <span id="homeAccountAvatar" class="home-account-avatar">TV</span>
           <span>
             <strong id="authBtnText">Đăng nhập</strong>
             <small id="homeAccountLevel">Cấp 1 · 0 XP</small>
@@ -53,237 +53,289 @@
     <section id="desktop" class="desktop-screen overview-home" aria-label="Sảnh chơi On-lies">
       <div class="home-content">
         <header class="home-heading">
-          <div>
-            <p class="home-eyebrow">TRUNG TÂM HUẤN LUYỆN AN TOÀN SỐ</p>
-            <h1>Nhìn kỹ một chút.<br>An toàn hơn một bước.</h1>
-            <p class="home-intro">Tin nhắn lạ, cuộc gọi gấp hay một lời nhờ vả. Bạn sẽ xử lý thế nào?</p>
+          <div class="home-heading-copy">
+            <p class="home-eyebrow"><span class="home-eyebrow-dot" aria-hidden="true"></span>TRUNG TÂM HUẤN LUYỆN AN TOÀN SỐ</p>
+            <h1>Nhìn kỹ một chút. An toàn hơn một bước.</h1>
+            <p class="home-intro">Tin nhắn lạ, cuộc gọi gấp hay một lời nhờ vả — bạn sẽ xử lý thế nào?</p>
           </div>
-          <button class="home-help" data-home-dialog="homeHelpDialog">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 11v6m0-10h.01"/>
-            </svg>Hướng dẫn</button>
-          </header>
-          <div class="home-layout">
-            <section class="home-training" aria-labelledby="appsTitle">
-              <div class="home-section-heading">
-                <h2 id="appsTitle">Chọn tình huống của bạn</h2>
-                <span>4 chế độ · Chơi theo thứ tự bất kỳ</span>
+          <div class="home-heading-actions">
+            <aside id="dailyTip" class="home-tip" aria-label="Mẹo an toàn">
+              <span class="home-tip-icon" aria-hidden="true">💡</span>
+              <div class="home-tip-body">
+                <strong>Mẹo thực chiến:</strong> Khi ai đó thúc giục bạn chuyển tiền hoặc đọc OTP ngay, hãy dừng lại 60 giây để kiểm chứng.
               </div>
-              <div class="home-game-grid">
-                <article class="home-game inspector">
-                  <div class="home-game-art" aria-hidden="true">
-                    <div class="mini-folder">
-                      <span>Hồ sơ #101</span>
-                      <div class="mini-paper">
-                        <p>Thông báo học bổng</p>
-                        <small>Từ: hocbong@fpt-edu-hotro.top</small>
-                        <p>Để giữ suất, vui lòng chuyển<br>
-                          <mark>lệ phí xét duyệt 500.000đ</mark>
-                        </p>
-                        <div class="mini-stamp">CẦN XÁC MINH</div>
-                      </div>
-                      <span class="folder-tab">HỒ SƠ</span>
+              <button id="closeTipBtn" aria-label="Ẩn mẹo an toàn">×</button>
+            </aside>
+            <button class="home-help" data-home-dialog="homeHelpDialog">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 11v6m0-10h.01"/>
+              </svg>Hướng dẫn</button>
+          </div>
+        </header>
+
+        <div class="home-layout">
+          <aside class="home-player" aria-label="Hồ sơ và xếp hạng">
+            <section class="home-profile" aria-label="Hồ sơ của bạn">
+              <div class="home-profile-heading">
+                <span id="userAvatarBadge" class="home-account-avatar">TV</span>
+                <div>
+                  <h2 id="userProfileName">Bạn (Thanh tra viên)</h2>
+                  <p id="userProfileRankTitle">Cấp 1 · Tân binh tập sự</p>
+                </div>
+              </div>
+              <div class="home-xp-box">
+                <div class="home-xp-labels">
+                  <strong id="userProfileXP">0 XP</strong>
+                  <small id="userProfileNextXP">1.000 XP → Cấp 2</small>
+                </div>
+                <div class="xp-track">
+                  <span id="userProfileXPTrack" style="width:0%"></span>
+                </div>
+              </div>
+              <div class="home-profile-foot">
+                <p>Mỗi lần kiểm tra kỹ là một bước tiến.</p>
+                <button id="sidebarAuthBtn">Lưu điểm</button>
+              </div>
+            </section>
+
+            <section id="leaderboardSidebar" class="home-leaderboard" aria-labelledby="homeRankTitle" tabindex="-1">
+              <div class="home-leaderboard-top">
+                <div class="home-section-heading">
+                  <h2 id="homeRankTitle">Bảng xếp hạng</h2>
+                  <button id="refreshLeaderboardBtn" aria-label="Làm mới bảng xếp hạng">Làm mới <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 12h14m-6-6 6 6-6 6"/>
+                  </svg></button>
+                </div>
+                <p id="dbStatusSubtitle" role="status">Đang tải bảng xếp hạng…</p>
+                <div id="leaderboardList" class="home-rank-list" aria-live="polite">
+                  <p>Đang tải…</p>
+                </div>
+              </div>
+              <p class="home-rank-note" id="userRankSummary">Luyện tập để ghi tên bạn vào Top 3.</p>
+            </section>
+          </aside>
+
+          <section class="home-training" aria-labelledby="appsTitle">
+            <div class="home-section-heading">
+              <h2 id="appsTitle">Chọn tình huống thực hành</h2>
+              <span>4 chế độ · Chơi theo thứ tự bất kỳ</span>
+            </div>
+            <div class="home-game-grid">
+              <article class="home-game inspector">
+                <div class="home-game-art" aria-hidden="true">
+                  <span class="home-case-pill">CA 01</span>
+                  <div class="mini-folder">
+                    <div class="mini-paper">
+                      <span class="mini-paper-tag">HỒ SƠ #101</span>
+                      <p class="mini-paper-title">Thông báo học bổng</p>
+                      <small>Từ: hocbong@fpt-edu-hotro.top</small>
+                      <p class="mini-paper-highlight">Để giữ suất, vui lòng chuyển lệ phí xét duyệt 500.000đ</p>
+                    </div>
+                    <div class="mini-stamp">CẦN XÁC MINH</div>
+                  </div>
+                </div>
+                <div class="home-game-copy">
+                  <div class="home-game-top">
+                    <div class="home-game-title-row">
+                      <h3>Thanh tra Hộp thư</h3>
+                      <span class="home-xp-reward">+100 XP / hồ sơ</span>
+                    </div>
+                    <p class="home-game-description">Soi kỹ email, đối chiếu sổ nghiệp vụ và đóng dấu phê duyệt hoặc cảnh báo.</p>
+                  </div>
+                  <div class="home-game-progress">
+                    <div class="home-game-progress-row">
+                      <span class="home-game-skill">🔍 Soi tên miền &amp; con dấu</span>
+                      <p class="home-game-count" data-mode-count="mail">0 / 13 hồ sơ</p>
+                    </div>
+                    <div class="home-game-progress-bar">
+                      <span data-mode-bar="mail" style="width: 0%"></span>
                     </div>
                   </div>
-                  <div class="home-game-copy">
-                    <h3>Thanh tra Hộp thư</h3>
-                    <p class="home-game-count">13 hồ sơ</p>
-                    <p class="home-game-description">Soi lá thư, tra sổ nghiệp vụ và đóng dấu quyết định.</p>
-                    <button class="home-game-action" data-app="mail" aria-label="Vào ca trực — Thanh tra Hộp thư">Vào ca trực<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <button class="home-game-action" data-app="mail" aria-label="Vào ca trực — Thanh tra Hộp thư">
+                    <span>Vào ca trực</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M5 12h14m-6-6 6 6-6 6"/>
                     </svg>
                   </button>
                 </div>
               </article>
+
               <article class="home-game sms">
                 <div class="home-game-art" aria-hidden="true">
+                  <span class="home-case-pill">CA 02</span>
                   <div class="mini-messenger">
                     <div class="mini-contact">
                       <span class="mini-avatar">GH</span>
-                      <span>Giao hàng nhanh<small>Số chưa lưu</small>
-                      </span>
+                      <span>Giao hàng nhanh<small>Số lạ · Chưa lưu</small></span>
                     </div>
-                    <div class="mini-bubble">Đơn hàng đang bị giữ.<br>Thanh toán thêm 18.000đ?</div>
-                    <span class="mini-source">Kiểm tra đơn hàng <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <div class="mini-bubble">
+                      Đơn hàng đang bị giữ tại kho. Thanh toán thêm 18.000đ?
+                      <span class="mini-source">kiemtra-donhang.vn →</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="home-game-copy">
+                  <div class="home-game-top">
+                    <div class="home-game-title-row">
+                      <h3>Lá chắn SMS</h3>
+                      <span class="home-xp-reward">+80 XP / tin</span>
+                    </div>
+                    <p class="home-game-description">Phân tích tin nhắn trúng thưởng, phạt nguội, bưu phẩm và chặn đường link độc.</p>
+                  </div>
+                  <div class="home-game-progress">
+                    <div class="home-game-progress-row">
+                      <span class="home-game-skill">🛡️ Kiểm tra link &amp; đầu số</span>
+                      <p class="home-game-count" data-mode-count="messages">0 / 9 tin nhắn</p>
+                    </div>
+                    <div class="home-game-progress-bar">
+                      <span data-mode-bar="messages" style="width: 0%"></span>
+                    </div>
+                  </div>
+                  <button class="home-game-action" data-app="sms" aria-label="Mở hộp tin — Lá chắn SMS">
+                    <span>Mở hộp tin</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M5 12h14m-6-6 6 6-6 6"/>
                     </svg>
-                  </span>
+                  </button>
+                </div>
+              </article>
+
+              <article class="home-game phone">
+                <div class="home-game-art" aria-hidden="true">
+                  <span class="home-case-pill">CA 03</span>
+                  <div class="mini-caller">
+                    <span class="mini-caller-ring">● ĐANG ĐỔ CHUÔNG</span>
+                    <strong>Nhân viên ngân hàng?</strong>
+                    <small>09xx 218 xxx · Số lạ</small>
+                    <p>“Đọc ngay mã OTP để hủy lệnh trừ 25 triệu!”</p>
+                  </div>
+                </div>
+                <div class="home-game-copy">
+                  <div class="home-game-top">
+                    <div class="home-game-title-row">
+                      <h3>Cuộc gọi khẩn</h3>
+                      <span class="home-xp-reward">+120 XP / cuộc</span>
+                    </div>
+                    <p class="home-game-description">Lắng nghe lời hù dọa từ người gọi, giữ cái đầu lạnh và bảo vệ mã OTP.</p>
+                  </div>
+                  <div class="home-game-progress">
+                    <div class="home-game-progress-row">
+                      <span class="home-game-skill">📞 Chặn thao túng tâm lý</span>
+                      <p class="home-game-count" data-mode-count="phone">0 / 6 cuộc gọi</p>
+                    </div>
+                    <div class="home-game-progress-bar">
+                      <span data-mode-bar="phone" style="width: 0%"></span>
+                    </div>
+                  </div>
+                  <button class="home-game-action" data-app="phone" aria-label="Nhận cuộc gọi — Cuộc gọi khẩn">
+                    <span>Nhận cuộc gọi</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14m-6-6 6 6-6 6"/>
+                    </svg>
+                  </button>
+                </div>
+              </article>
+
+              <article class="home-game family">
+                <div class="home-game-art" aria-hidden="true">
+                  <span class="home-case-pill">CA 04</span>
+                  <div class="mini-family">
+                    <div class="mini-contact">
+                      <span class="mini-avatar">BN</span>
+                      <span>Bà ngoại<small>Đang hoảng loạn · Cần giúp</small></span>
+                    </div>
+                    <div class="mini-bubble">“Con ơi, công an bảo bà phải chuyển 50 triệu để minh oan…”</div>
+                    <div class="mini-bubble outgoing">“Bà khoan chuyển! Để con kiểm tra cùng bà.”</div>
+                  </div>
+                </div>
+                <div class="home-game-copy">
+                  <div class="home-game-top">
+                    <div class="home-game-title-row">
+                      <h3>Cứu người thân</h3>
+                      <span class="home-xp-reward">+150 XP / ca</span>
+                    </div>
+                    <p class="home-game-description">Trấn an người nhà đúng lúc khi kẻ gian liên tục nhắn tin thúc ép chuyển tiền.</p>
+                  </div>
+                  <div class="home-game-progress">
+                    <div class="home-game-progress-row">
+                      <span class="home-game-skill">💚 Trấn an &amp; bóc mẽ</span>
+                      <p class="home-game-count" data-mode-count="family">0 / 5 tình huống</p>
+                    </div>
+                    <div class="home-game-progress-bar">
+                      <span data-mode-bar="family" style="width: 0%"></span>
+                    </div>
+                  </div>
+                  <button class="home-game-action" data-app="family" aria-label="Bắt đầu trò chuyện — Cứu người thân">
+                    <span>Bắt đầu trò chuyện</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14m-6-6 6 6-6 6"/>
+                    </svg>
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            <section class="home-journey" aria-label="Hành trình huấn luyện">
+              <div class="home-journey-left">
+                <div class="progress-heading">
+                  <strong>Hành trình huấn luyện</strong>
+                  <span>0/4 kỹ năng</span>
+                </div>
+                <small id="progressSubtext">Hoàn thành từng chế độ để mở khóa kỹ năng phòng vệ.</small>
+                <div class="progress-track">
+                  <span></span>
                 </div>
               </div>
-              <div class="home-game-copy">
-                <h3>Lá chắn SMS</h3>
-                <p class="home-game-count">9 tin nhắn</p>
-                <p class="home-game-description">Đọc tin nhắn, kiểm tra nguồn rồi chọn cách xử lý.</p>
-                <button class="home-game-action" data-app="sms" aria-label="Mở hộp tin — Lá chắn SMS">Mở hộp tin<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M5 12h14m-6-6 6 6-6 6"/>
-                </svg>
-              </button>
-            </div>
-          </article>
-          <article class="home-game phone">
-            <div class="home-game-art" aria-hidden="true">
-              <div class="mini-caller">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M21 16v4c-10 1-18-7-18-17h4l3 5-3 2a16 16 0 0 0 7 7l2-3z"/>
-                </svg>
-                <span>Cuộc gọi đến</span>
-                <strong>Nhân viên ngân hàng?</strong>
-                <small>Số lạ · 09xx 218 xxx</small>
-                <p>“Bạn đọc mã OTP để tôi hủy giao dịch.”</p>
-              </div>
-            </div>
-            <div class="home-game-copy">
-              <h3>Cuộc gọi khẩn</h3>
-              <p class="home-game-count">6 cuộc gọi</p>
-              <p class="home-game-description">Lắng nghe lời người gọi. Bảo vệ thông tin của bạn.</p>
-              <button class="home-game-action" data-app="phone" aria-label="Nhận cuộc gọi — Cuộc gọi khẩn">Nhận cuộc gọi<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14m-6-6 6 6-6 6"/>
-              </svg>
-            </button>
-          </div>
-        </article>
-        <article class="home-game family">
-          <div class="home-game-art" aria-hidden="true">
-            <div class="mini-family">
-              <div class="mini-contact">
-                <span class="mini-avatar">BN</span>
-                <span>Bà ngoại<small>Đang cần bạn giúp</small>
+              <div class="home-badges">
+                <span class="home-badge locked" data-completion="mail">
+                  <span class="home-badge-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="14" rx="2"/>
+                      <path d="m3 6 9 7 9-7"/>
+                    </svg>
+                    <span>Thanh tra</span>
+                  </span>
+                  <span class="home-badge-lock">🔒</span>
+                </span>
+                <span class="home-badge locked" data-completion="messages">
+                  <span class="home-badge-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 11a8 8 0 0 1-8 8H9l-6 3 2-6a8 8 0 1 1 16-5Z"/>
+                    </svg>
+                    <span>Lá chắn SMS</span>
+                  </span>
+                  <span class="home-badge-lock">🔒</span>
+                </span>
+                <span class="home-badge locked" data-completion="phone">
+                  <span class="home-badge-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 16v4c-10 1-18-7-18-17h4l3 5-3 2a16 16 0 0 0 7 7l2-3z"/>
+                    </svg>
+                    <span>Tỉnh táo</span>
+                  </span>
+                  <span class="home-badge-lock">🔒</span>
+                </span>
+                <span class="home-badge locked" data-completion="family">
+                  <span class="home-badge-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>
+                      <path d="m8.5 12 2.3 2.3 4.7-5"/>
+                    </svg>
+                    <span>Chỗ dựa gia đình</span>
+                  </span>
+                  <span class="home-badge-lock">🔒</span>
                 </span>
               </div>
-              <div class="mini-bubble">Con ơi, bà sợ quá…</div>
-              <div class="mini-bubble outgoing">Bà bình tĩnh, con ở đây với bà.</div>
-            </div>
-          </div>
-          <div class="home-game-copy">
-            <h3>Cứu người thân</h3>
-            <p class="home-game-count">5 tình huống</p>
-            <p class="home-game-description">Trấn an đúng lúc. Cùng người thân tìm cách xác minh.</p>
-            <button class="home-game-action" data-app="family" aria-label="Bắt đầu trò chuyện — Cứu người thân">Bắt đầu trò chuyện<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14m-6-6 6 6-6 6"/>
-            </svg>
-          </button>
+            </section>
+          </section>
         </div>
-      </article>
-    </div>
-    <section class="home-journey" aria-label="Hành trình huấn luyện">
-      <div class="progress-heading">
-        <strong>Hành trình huấn luyện</strong>
-        <span>0/4 kỹ năng</span>
+
+        <footer class="home-footer">
+          <span>On-lies · Tập bình tĩnh. Tập xác minh.</span>
+          <span>Mọi tình huống và số điện thoại đều được mô phỏng phục vụ giáo dục.</span>
+        </footer>
       </div>
-      <div class="home-badges">
-        <span class="home-badge locked" data-completion="mail">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="5" width="18" height="14" rx="2"/>
-            <path d="m3 6 9 7 9-7"/>
-          </svg>
-          <span>Thanh tra</span>
-          <span class="home-badge-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="5" y="10" width="14" height="11" rx="2"/>
-              <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-            </svg>
-          </span>
-        </span>
-        <span class="home-badge locked" data-completion="messages">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 11a8 8 0 0 1-8 8H9l-6 3 2-6a8 8 0 1 1 16-5Z"/>
-          </svg>
-          <span>Lá chắn SMS</span>
-          <span class="home-badge-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="5" y="10" width="14" height="11" rx="2"/>
-              <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-            </svg>
-          </span>
-        </span>
-        <span class="home-badge locked" data-completion="phone">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 16v4c-10 1-18-7-18-17h4l3 5-3 2a16 16 0 0 0 7 7l2-3z"/>
-          </svg>
-          <span>Tỉnh táo</span>
-          <span class="home-badge-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="5" y="10" width="14" height="11" rx="2"/>
-              <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-            </svg>
-          </span>
-        </span>
-        <span class="home-badge locked" data-completion="family">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/>
-            <path d="m8.5 12 2.3 2.3 4.7-5"/>
-          </svg>
-          <span>Chỗ dựa gia đình</span>
-          <span class="home-badge-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="5" y="10" width="14" height="11" rx="2"/>
-              <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-            </svg>
-          </span>
-        </span>
-      </div>
-      <div class="progress-track">
-        <span>
-        </span>
-      </div>
-      <small id="progressSubtext">Hoàn thành một màn để nhận huy hiệu.</small>
-    </section>
-    </section>
-    <aside class="home-player" aria-label="Hồ sơ và xếp hạng">
-      <section class="home-profile" aria-label="Hồ sơ của bạn">
-        <div class="home-profile-heading">
-          <span id="userAvatarBadge" class="home-account-avatar">B</span>
-          <div>
-            <h2 id="userProfileName">Hồ sơ của bạn</h2>
-            <p id="userProfileRankTitle">Tân binh · Cấp 1</p>
-          </div>
-        </div>
-        <div class="home-xp-labels">
-          <strong id="userProfileXP">0 XP</strong>
-          <small id="userProfileNextXP">1.000 XP tới cấp 2</small>
-        </div>
-        <div class="xp-track">
-          <span id="userProfileXPTrack" style="width:0%">
-          </span>
-        </div>
-        <p>Mỗi lần kiểm tra kỹ là một bước tiến.</p>
-        <button id="sidebarAuthBtn">Lưu hành trình của bạn <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14m-6-6 6 6-6 6"/>
-        </svg>
-      </button>
-    </section>
-    <section id="leaderboardSidebar" class="home-leaderboard" aria-labelledby="homeRankTitle" tabindex="-1">
-      <div class="home-section-heading">
-        <h2 id="homeRankTitle">Bảng xếp hạng</h2>
-        <button id="refreshLeaderboardBtn" aria-label="Làm mới bảng xếp hạng">Làm mới <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M5 12h14m-6-6 6 6-6 6"/>
-        </svg>
-      </button>
-    </div>
-    <p id="dbStatusSubtitle" role="status">Đang tải bảng xếp hạng…</p>
-    <div id="leaderboardList" class="home-rank-list" aria-live="polite">
-      <p>Đang tải…</p>
-    </div>
-    <p class="home-rank-note">Luyện tập để ghi tên bạn vào bảng.</p>
-    </section>
-    </aside>
-    </div>
-    <aside id="dailyTip" class="home-tip" aria-label="Mẹo an toàn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 4H9c0-2 0-3-1-4Z"/>
-      </svg>
-      <div>
-        <strong>Một điều cần nhớ</strong>
-        <p>Khi ai đó thúc giục bạn hành động ngay, hãy cho mình thêm một phút để kiểm tra.</p>
-      </div>
-      <button id="closeTipBtn" aria-label="Ẩn mẹo an toàn">×</button>
-    </aside>
-    <footer class="home-footer">
-      <span>On-lies · Tập bình tĩnh. Tập xác minh.</span>
-      <span>Mọi tình huống đều được mô phỏng.</span>
-    </footer>
-    </div>
     </section>
     <dialog id="homeHelpDialog" class="home-dialog" aria-labelledby="homeHelpTitle">
       <form method="dialog">
