@@ -12,6 +12,7 @@ import { getLevelProgress, readCompletedGames, TRACKED_GAMES } from './playerPro
 import { escapeHtml } from './html';
 import { unlockAudio } from './audio';
 import './gameNavigation.css';
+import './overview.css';
 import {
   fetchLeaderboard,
   getCurrentProfile,
@@ -238,17 +239,25 @@ function updateDockActive(appName: string) {
 }
 
 function toggleLeaderboard(force?: boolean) {
-  const sidebar = document.getElementById('leaderboardSidebar');
-  const toggleBtn = document.getElementById('toggleLeaderboardBtn');
-  if (!sidebar) return;
-  const isCurrentlyCollapsed = sidebar.classList.contains('collapsed');
-  const shouldCollapse = force !== undefined ? !force : !isCurrentlyCollapsed;
-
-  sidebar.classList.toggle('collapsed', shouldCollapse);
-  if (toggleBtn) {
-    toggleBtn.classList.toggle('active', !shouldCollapse);
-  }
+  if (force === false) return;
+  showDesktop(false);
+  const sidebar = $('leaderboardSidebar');
+  sidebar?.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
+  sidebar?.focus({ preventScroll: true });
 }
+
+function goToOverview() {
+  showDesktop();
+  desktop.scrollTo({ top: 0, behavior: 'instant' });
+}
+$('overviewHomeBtn').addEventListener('click', goToOverview);
+$('homeLobbyBtn').addEventListener('click', goToOverview);
+document.querySelectorAll<HTMLButtonElement>('[data-home-dialog]').forEach(button => {
+  button.addEventListener('click', () => {
+    const dialog = document.getElementById(button.dataset.homeDialog!) as HTMLDialogElement | null;
+    dialog?.showModal();
+  });
+});
 
 // ==============================================================================
 // DYNAMIC LEADERBOARD & AUTH CONNECTIONS
@@ -285,6 +294,10 @@ async function renderLeaderboard() {
   }
 
   if (userProfileName) userProfileName.textContent = currentUserProfile.username;
+  const initials = currentUserProfile.username.trim().split(/\s+/).slice(-2).map(word => word[0]).join('').toUpperCase();
+  $('userAvatarBadge').textContent = initials || 'B';
+  $('homeAccountAvatar').textContent = initials || 'B';
+  $('homeAccountLevel').textContent = `Cấp ${getLevelProgress(currentUserProfile.total_xp).level} · ${currentUserProfile.total_xp.toLocaleString('vi-VN')} XP`;
   if (userProfileRankTitle) {
     userProfileRankTitle.textContent = `Cấp ${currentUserProfile.level} • ${currentUserProfile.role_title}`;
   }
@@ -321,7 +334,7 @@ async function renderLeaderboard() {
     listContainer.innerHTML = entries.map((entry: LeaderboardEntry, index) => {
       const isCurrent = entry.user_id === currentUserProfile?.id;
       const rank = Number.isInteger(entry.rank) && entry.rank > 0 ? entry.rank : index + 1;
-      const rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
+      const rankBadge = `${rank}`;
       const avatarText = entry.avatar_url && entry.avatar_url.length <= 3
         ? entry.avatar_url
         : entry.username.slice(0, 2).toUpperCase();
