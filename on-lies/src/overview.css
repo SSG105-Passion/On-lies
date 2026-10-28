@@ -1,5 +1,8 @@
 /* Refined Tactile Overview Lobby — On-lies */
-.overview-home {
+:root,
+.device-shell,
+.overview-home,
+.home-dialog {
   --home-ground: #F5F4EF;
   --home-paper: #FFFFFF;
   --home-subtle: #FAF9F5;
@@ -13,7 +16,9 @@
   --home-emerald: #047857;
   --home-emerald-soft: #ECFDF5;
   --home-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+}
 
+.overview-home {
   background: var(--home-ground) !important;
   color: var(--home-ink);
   font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1285,8 +1290,10 @@
 
 .home-dialog h2 {
   font-size: 22px;
+  font-weight: 800;
+  color: var(--home-ink);
   line-height: 1.4;
-  margin: 0 25px 12px 0;
+  margin: 0 32px 12px 0;
 }
 
 .home-dialog p,
@@ -1308,11 +1315,300 @@
 
 .home-dialog-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  min-width: 40px;
+  top: 14px;
+  right: 14px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--home-line);
+  background: var(--home-subtle);
+  color: var(--home-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.home-dialog-close:hover {
+  background: #E2E8F0;
+  color: var(--home-ink);
+}
+
+/* ==========================================================================
+   REFINED LIGHT TACTILE AUTH MODAL (#authModal)
+   ========================================================================== */
+#authModal.modal-backdrop {
+  background: rgba(20, 27, 45, 0.55);
+  backdrop-filter: none;
+  z-index: 150;
+}
+
+#authModal .auth-card {
+  width: min(440px, 92vw);
+  background: var(--home-paper);
+  border: 1px solid var(--home-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(20, 27, 45, 0.18);
+  color: var(--home-ink);
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  backdrop-filter: none;
+}
+
+#authModal .auth-card-header {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--home-subtle);
+  border-bottom: 1px solid var(--home-line);
+}
+
+#authModal .auth-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#authModal .auth-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--home-blue-soft);
+  border: 1px solid #C6D8FA;
+  color: var(--home-blue);
+  flex-shrink: 0;
+}
+
+#authModal .auth-card-title h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--home-ink);
+  letter-spacing: -0.01em;
+}
+
+#authModal .auth-card-title small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--home-secondary);
+  margin-top: 2px;
+}
+
+#authModal .close-modal-x {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--home-line);
+  background: #FFFFFF;
+  color: var(--home-secondary);
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+#authModal .close-modal-x:hover {
+  background: #E2E8F0;
+  color: var(--home-ink);
+  border-color: var(--home-line-strong);
+}
+
+#authModal .auth-form {
+  padding: 22px;
+}
+
+/* Framed-sheet underline tabs for Sign In / Sign Up */
+#authModal .auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--home-line);
+  margin-bottom: 18px;
+}
+
+#authModal .auth-tab {
+  padding: 8px 10px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--home-secondary);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease;
+}
+
+#authModal .auth-tab:hover {
+  color: var(--home-ink);
+}
+
+#authModal .auth-tab.active {
+  background: transparent;
+  color: var(--home-blue);
+  border-bottom-color: var(--home-blue);
+  box-shadow: none;
+}
+
+#authModal .form-group {
+  margin-bottom: 14px;
+}
+
+#authModal .form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--home-ink);
+  margin-bottom: 6px;
+}
+
+#authModal .form-group input {
+  width: 100%;
   min-height: 40px;
-  font-size: 22px;
+  padding: 9px 13px;
+  background: #FFFFFF;
+  border: 1px solid var(--home-line-strong);
+  border-radius: 9px;
+  color: var(--home-ink);
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+#authModal .form-group input::placeholder {
+  color: var(--home-muted);
+}
+
+#authModal .form-group input:focus {
+  outline: none;
+  border-color: var(--home-blue);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.14);
+}
+
+#authModal .auth-error {
+  padding: 10px 12px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B91C1C;
+  margin: 12px 0;
+}
+
+#authModal .primary-button {
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--home-blue);
+  background: var(--home-blue);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  justify-content: center;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+}
+
+#authModal .primary-button:hover {
+  background: #1E40AF;
+}
+
+#authModal .auth-disclaimer {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--home-subtle);
+  border: 1px solid var(--home-line);
+  font-size: 11.5px;
+  color: var(--home-secondary);
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* Logged-in profile state */
+#authModal .auth-profile-view {
+  padding: 24px 22px;
+  text-align: center;
+}
+
+#authModal .auth-avatar-big {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  background: var(--home-blue-soft);
+  border: 1px solid #C6D8FA;
+  color: var(--home-blue);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+#authModal .auth-profile-view h4 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--home-ink);
+}
+
+#authModal .auth-email-text {
+  font-size: 12px;
+  color: var(--home-secondary);
+  margin-top: 3px;
+}
+
+#authModal .auth-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+#authModal .auth-stats-row div {
+  padding: 10px 8px;
+  background: var(--home-subtle);
+  border: 1px solid var(--home-line);
+  border-radius: 10px;
+}
+
+#authModal .auth-stats-row small {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--home-muted);
+}
+
+#authModal .auth-stats-row strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--home-blue);
+  margin-top: 3px;
+}
+
+#authModal .secondary-button {
+  min-height: 40px;
+  border-radius: 9px;
+  border: 1px solid var(--home-line-strong);
+  background: #FFFFFF;
+  color: var(--home-ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#authModal .secondary-button:hover {
+  background: var(--home-subtle);
 }
 
 /* RESPONSIVE BREAKPOINTS */
