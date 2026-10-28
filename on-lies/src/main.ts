@@ -23,7 +23,6 @@ import {
   subscribeToLeaderboard,
   onAuthStateChange,
   isSupabaseConfigured,
-  getLeaderboardSource,
   scoreSaveMessage,
   type LeaderboardEntry,
   type UserProfile
