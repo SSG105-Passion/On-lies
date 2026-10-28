@@ -337,9 +337,11 @@ async function renderLeaderboard() {
 
   try {
     const entries = await fetchLeaderboard();
-    if (dbStatusSubtitle) dbStatusSubtitle.textContent = getLeaderboardSource() === 'cloud'
-      ? 'Bảng xếp hạng trực tuyến'
-      : isSupabaseConfigured ? 'Dữ liệu trên máy • Đang đồng bộ' : 'Dữ liệu trên máy';
+    if (dbStatusSubtitle) {
+      dbStatusSubtitle.textContent = isSupabaseConfigured
+        ? 'Máy chủ Đám mây Supabase • Trực tuyến'
+        : 'Đang kết nối Supabase Cloud...';
+    }
     if (entries.length === 0) {
       listContainer.innerHTML = `<div class="leaderboard-empty-state">
         <div class="empty-badge">🛡️</div>

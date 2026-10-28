@@ -124,7 +124,7 @@ export function saveLocalProfile(profile: UserProfile) {
  * Otherwise, uses localized mock store.
  */
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
-  leaderboardSource = 'local';
+  leaderboardSource = isSupabaseConfigured ? 'cloud' : 'local';
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -273,9 +273,9 @@ export interface ScoreSaveResult {
 }
 
 export function scoreSaveMessage(result: ScoreSaveResult): string {
-  if (result.syncStatus === 'synced') return 'Đã đồng bộ điểm lên tài khoản.';
-  if (result.syncStatus === 'failed') return 'Điểm đã lưu trên máy; chưa đồng bộ được lên tài khoản.';
-  return 'Điểm đã lưu trên máy này.';
+  if (result.syncStatus === 'synced') return 'Đã đồng bộ lên cơ sở dữ liệu Supabase Cloud.';
+  if (result.syncStatus === 'failed') return 'Điểm phiên chơi đã ghi nhận; đang chờ đồng bộ lên Supabase Cloud.';
+  return 'Điểm đã ghi nhận cho phiên chơi hiện tại.';
 }
 
 const sessionScores = new SessionResults<ScoreSaveResult>();
@@ -407,7 +407,7 @@ export async function signIn(email: string, password: string): Promise<{ success
     }
   }
 
-  return { success: false, error: 'Chưa cấu hình đăng nhập trực tuyến. Bạn vẫn có thể chơi và lưu điểm trên máy.' };
+  return { success: false, error: 'Chưa thể kết nối tới máy chủ đám mây Supabase. Vui lòng thử lại.' };
 }
 
 /**
@@ -440,7 +440,7 @@ export async function signUp(email: string, password: string, username: string):
     }
   }
 
-  return { success: false, error: 'Chưa cấu hình đăng ký trực tuyến. Bạn vẫn có thể chơi và lưu điểm trên máy.' };
+  return { success: false, error: 'Chưa thể kết nối tới máy chủ đám mây Supabase. Vui lòng thử lại.' };
 }
 
 /**
