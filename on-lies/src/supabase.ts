@@ -43,6 +43,9 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
 let leaderboardSource: 'local' | 'cloud' = 'local';
 export const getLeaderboardSource = () => leaderboardSource;
 
+const LOCAL_STORAGE_PROFILE_KEY = 'on-lies-user-profile';
+const LOCAL_STORAGE_LEADERBOARD_KEY = 'on-lies-local-leaderboard';
+
 const MOCK_NAMES_SET = new Set(['Hoàng Long', 'Mai Anh', 'Tuấn Kiệt', 'Bảo Trâm', 'Minh Đức']);
 
 function getLocalLeaderboard(): LeaderboardEntry[] {
