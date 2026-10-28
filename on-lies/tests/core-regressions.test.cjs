@@ -245,7 +245,7 @@ test('inspector counts each day separately and only completes after all 13 cases
   assert.throws(() => engine.stamp(false));
 });
 
-test('inspector cannot advance or stamp again after the third warning', () => {
+test('inspector third warning fines income but allows the shift to continue', () => {
   const { InspectorEngine } = loader()(path.join(root, 'inspector/engine.ts'));
   const engine = new InspectorEngine();
   engine.newGame();
@@ -255,9 +255,10 @@ test('inspector cannot advance or stamp again after the third warning', () => {
     engine.stamp(!item.isScam);
     if (i < 2) assert.equal(engine.nextCase(), true);
   }
-  assert.equal(engine.isFired(), true);
-  assert.equal(engine.nextCase(), false);
+  assert.equal(engine.isFired(), false);
+  assert.equal(engine.salary, -5);
   assert.throws(() => engine.stamp(false));
+  assert.equal(engine.nextCase(), true);
 });
 
 function inspectorHarness() {
@@ -386,4 +387,17 @@ test('email confirmation does not impersonate a signed-in user', async () => {
   assert.equal(result.success, true);
   assert.match(result.message, /xác nhận/);
   assert.equal(getLocalProfile().is_authenticated, false);
+});
+
+test('inspector verdict needs no flags and exploratory flags never cause a citation', () => {
+  const { InspectorEngine } = loader()(path.join(root, 'inspector/engine.ts'));
+  const engine = new InspectorEngine();
+  engine.newGame();
+  const file = engine.getCurrentCase();
+  engine.flaggedIndices = new Set(file.allItems.map((_, i) => i));
+  assert.equal(engine.stamp(file.isScam).result.isCorrect, true);
+  assert.equal(engine.citations, 0);
+  assert.equal(engine.salary, 10);
+  engine.nextCase();
+  assert.equal(engine.stamp(engine.getCurrentCase().isScam).result.isCorrect, true);
 });

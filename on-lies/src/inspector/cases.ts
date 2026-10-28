@@ -37,7 +37,7 @@ function createCase(raw: RawCase): CaseFile {
     senderItem,
     bodyItems,
     allItems,
-    isScam: clueIndices.length > 0,
+    isScam: raw.verdict,
     clueIndices,
     okWhy: raw.ok
   };
@@ -47,6 +47,7 @@ const RAW_CASES: RawCase[] = [
   // ==================== NGÀY 1 ====================
   {
     id: 101,
+    verdict: true,
     d: 1,
     k: 'Email',
     channel: 'mail',
@@ -65,6 +66,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 102,
+    verdict: false,
     d: 1,
     k: 'Email',
     channel: 'mail',
@@ -78,6 +80,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 103,
+    verdict: true,
     d: 1,
     k: 'Bài đăng',
     channel: 'social',
@@ -96,6 +99,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 104,
+    verdict: false,
     d: 1,
     k: 'Email',
     channel: 'mail',
@@ -111,6 +115,7 @@ const RAW_CASES: RawCase[] = [
   // ==================== NGÀY 2 ====================
   {
     id: 201,
+    verdict: true,
     d: 2,
     k: 'Tin nhắn',
     channel: 'sms',
@@ -129,6 +134,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 202,
+    verdict: false,
     d: 2,
     k: 'Tin nhắn',
     channel: 'sms',
@@ -142,22 +148,17 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 203,
-    d: 2,
-    k: 'Tin nhắn',
-    channel: 'sms',
-    who: 'Hồ sơ #203',
-    note: 'Em nhận được tin nhắn SMS báo tài khoản ngân hàng bị khóa, em đang rất hoảng loạn.',
-    a: 'SafeBank-CSKH (Số chưa lưu · +84 987 234 112)',
-    p: [
-      'SafeBank: Tài khoản của quý khách bị tạm khóa do phát hiện đăng nhập lạ. Vui lòng ',
-      ['nhập mã OTP vừa nhận vào trang www.safebank-portal.cc', 'ask', 'Tuyệt đối không một ngân hàng nào yêu cầu bạn nhập OTP vào đường link lạ.', 4],
-      ' ',
-      ['trong vòng 10 phút để tránh bị phong tỏa vĩnh viễn', 'urgent', 'Đe dọa khóa tài khoản nhằm gây tâm lý sợ hãi, thúc ép nạn nhân làm theo.', 4],
-      '.'
-    ]
+    verdict: true,
+    d: 2, k: 'Email', channel: 'mail', who: 'Hồ sơ #203',
+    note: 'Email gửi ngày 10/09/2026 lúc 08:30. Lịch thu chính thức được cung cấp trong sổ tra cứu.',
+    a: 'taichinh@fpt.edu.vn',
+    p: ['Chào bạn, đợt thu học phí học kỳ I đã mở. Vui lòng thanh toán 6.500.000đ ',
+      ['trong ngày 10/09/2026', 'urgent', 'Lịch chính thức chỉ thu từ 16/09 đến 30/09. Thư này yêu cầu thanh toán trước khi đợt thu bắt đầu.', 9],
+      ' qua cổng FAP của trường.']
   },
   {
     id: 204,
+    verdict: false,
     d: 2,
     k: 'Tin nhắn',
     channel: 'sms',
@@ -173,6 +174,7 @@ const RAW_CASES: RawCase[] = [
   // ==================== NGÀY 3 ====================
   {
     id: 301,
+    verdict: true,
     d: 3,
     k: 'Biên bản gọi',
     channel: 'phone',
@@ -189,6 +191,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 302,
+    verdict: false,
     d: 3,
     k: 'Email',
     channel: 'mail',
@@ -202,6 +205,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 303,
+    verdict: true,
     d: 3,
     k: 'Bài đăng',
     channel: 'social',
@@ -220,6 +224,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 304,
+    verdict: true,
     d: 3,
     k: 'Phiếu đơn hàng',
     channel: 'market',
@@ -236,6 +241,7 @@ const RAW_CASES: RawCase[] = [
   },
   {
     id: 305,
+    verdict: false,
     d: 3,
     k: 'Tin nhắn',
     channel: 'sms',

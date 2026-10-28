@@ -1,6 +1,7 @@
 import type { Rule } from './types';
 
 export const RULES: Rule[] = [
+  { id: 9, day: 2, cat: 'urgent', text: 'Học phí học kỳ I: thông báo ngày 15/09/2026, thời gian thu 16/09–30/09/2026. Thư nhắc lịch được gửi sớm; yêu cầu thanh toán phải nằm trong đợt thu.' },
   {
     id: 1,
     day: 1,

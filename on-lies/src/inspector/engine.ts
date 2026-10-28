@@ -96,14 +96,6 @@ export class InspectorEngine {
       throw new Error('Không thể đóng dấu vào lúc này');
     }
 
-    // Nếu từ chối (báo lừa đảo) thì phải có ít nhất 1 chi tiết đánh dấu làm lý do
-    if (userRejected && this.flaggedIndices.size === 0) {
-      return {
-        result: null as any,
-        needReason: true
-      };
-    }
-
     this.playStampSound(userRejected);
 
     const isScam = currentCase.isScam;
@@ -112,22 +104,23 @@ export class InspectorEngine {
     // Phân tích các chi tiết đánh dấu
     const wrongFlags = [...this.flaggedIndices].filter(i => !currentCase.allItems[i].clue);
     const detectedClues = currentCase.clueIndices.filter(i => this.flaggedIndices.has(i));
-    const isPerfect = isCorrect && isScam && detectedClues.length === currentCase.clueIndices.length && wrongFlags.length === 0;
+    const isPerfect = false;
 
     // Ghi nhận thống kê nhóm dấu hiệu
     currentCase.clueIndices.forEach(idx => {
       const clue = currentCase.allItems[idx].clue;
       if (clue) {
         this.categoryTally[clue.cat][1]++;
-        if (this.flaggedIndices.has(idx)) {
+        if (isCorrect) {
           this.categoryTally[clue.cat][0]++;
         }
       }
     });
 
-    const hasCitation = !isCorrect || wrongFlags.length > 0;
+    const hasCitation = !isCorrect;
     if (hasCitation) {
       this.citations++;
+      if (this.citations > 2) this.salary -= 5 * (this.citations - 2);
       this.playSound('warning');
     } else {
       this.playSound('correct');
@@ -136,7 +129,7 @@ export class InspectorEngine {
     if (isCorrect) {
       this.correctCount++;
       // Tiền lương: +10đ đúng, +5đ thưởng nếu tìm trọn vẹn không đánh dấu nhầm
-      this.salary += 10 + (isPerfect ? 5 : 0);
+      this.salary += 10;
     }
 
     this.totalProcessed++;
@@ -153,20 +146,15 @@ export class InspectorEngine {
           ? '⚠ Đây là chiêu trò lừa đảo nhưng bạn đã cho qua!'
           : '⚠ Hồ sơ này hoàn toàn an toàn nhưng bạn đã từ chối nhầm.'
       });
-    } else if (wrongFlags.length > 0) {
-      logs.push({
-        type: 'warn',
-        message: `⚠ Kết luận đúng, nhưng bạn đã đánh dấu nhầm ${wrongFlags.length} chi tiết bình thường. Báo cáo thiếu chính xác bị cảnh cáo.`
-      });
     }
 
     // Chi tiết từng clue
     currentCase.clueIndices.forEach(idx => {
       const clue = currentCase.allItems[idx].clue!;
-      const wasDetected = this.flaggedIndices.has(idx);
+      const wasDetected = isCorrect;
       logs.push({
         type: wasDetected ? 'hit' : 'miss',
-        message: `${wasDetected ? '✔ Đã phát hiện' : '✖ Bỏ sót'} · [${CLUE_CATEGORIES[clue.cat]}]: "${clue.text}". ${clue.why}${clue.rule ? ` (Quy tắc ${clue.rule})` : ''}`
+        message: `${wasDetected ? '✔ Đối chiếu sau xử lý' : '✖ Quy định vi phạm'} · [${CLUE_CATEGORIES[clue.cat]}]: "${clue.text}". ${clue.why}${clue.rule ? ` (Quy tắc ${clue.rule})` : ''}`
       });
     });
 
@@ -205,7 +193,7 @@ export class InspectorEngine {
   }
 
   public isFired(): boolean {
-    return this.citations >= 3;
+    return false; // Citations affect income; they never end a shift.
   }
 
   public tickTimer(): boolean {

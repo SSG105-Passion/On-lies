@@ -30,6 +30,7 @@ export interface RawCase {
   a?: RawPart; // sender / from field
   p: RawPart[]; // message body parts
   ok?: string; // explanation if safe
+  verdict: boolean;
   conflict?: [string, string];
 }
 
