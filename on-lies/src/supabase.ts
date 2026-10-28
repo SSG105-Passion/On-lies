@@ -25,8 +25,8 @@ export interface UserProfile {
   is_authenticated: boolean;
 }
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tpluixrztjahwiuesgdd.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_QJ7tOyZTCZs7CdXSZjzDvw_SyjG7jyz';
 
 // Detect if real Supabase keys are provided
 export const isSupabaseConfigured = Boolean(
@@ -43,26 +43,30 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
 let leaderboardSource: 'local' | 'cloud' = 'local';
 export const getLeaderboardSource = () => leaderboardSource;
 
-// Initial starter roster for the leaderboard when database is empty or running local mock
-const INITIAL_MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { user_id: 'agent-1', username: 'Hoàng Long', avatar_url: 'HL', role_title: 'Thanh tra cấp 5', level: 5, total_xp: 4890, streak_days: 14, rank: 1 },
-  { user_id: 'agent-2', username: 'Mai Anh', avatar_url: 'MA', role_title: 'Cảnh sát mạng', level: 4, total_xp: 4120, streak_days: 12, rank: 2 },
-  { user_id: 'agent-3', username: 'Tuấn Kiệt', avatar_url: 'TK', role_title: 'Chuyên gia Mail', level: 4, total_xp: 3750, streak_days: 8, rank: 3 },
-  { user_id: 'agent-4', username: 'Bảo Trâm', avatar_url: 'BT', role_title: 'Đặc vụ Thực tập', level: 2, total_xp: 2100, streak_days: 3, rank: 4 },
-  { user_id: 'agent-5', username: 'Minh Đức', avatar_url: 'MĐ', role_title: 'Tân binh', level: 1, total_xp: 1820, streak_days: 2, rank: 5 },
-];
-
-const LOCAL_STORAGE_PROFILE_KEY = 'on-lies-user-profile';
-const LOCAL_STORAGE_LEADERBOARD_KEY = 'on-lies-local-leaderboard';
+const MOCK_NAMES_SET = new Set(['Hoàng Long', 'Mai Anh', 'Tuấn Kiệt', 'Bảo Trâm', 'Minh Đức']);
 
 function getLocalLeaderboard(): LeaderboardEntry[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_LEADERBOARD_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const cleaned = parsed.filter(
+          (e: LeaderboardEntry) =>
+            e &&
+            typeof e.total_xp === 'number' &&
+            e.total_xp > 0 &&
+            !String(e.user_id || '').startsWith('agent-') &&
+            !MOCK_NAMES_SET.has(e.username)
+        );
+        localStorage.setItem(LOCAL_STORAGE_LEADERBOARD_KEY, JSON.stringify(cleaned));
+        return cleaned;
+      }
+    }
   } catch {
     // fallback
   }
-  return [...INITIAL_MOCK_LEADERBOARD];
+  return [];
 }
 
 function saveLocalLeaderboard(data: LeaderboardEntry[]) {
@@ -123,60 +127,84 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
       const { data, error } = await supabase
         .from('leaderboard_view')
         .select('*')
+        .gt('total_xp', 0)
         .order('total_xp', { ascending: false })
         .limit(20);
 
-      if (!error && data) {
-        leaderboardSource = 'cloud';
-        return data as LeaderboardEntry[];
+      if (!error && data && data.length > 0) {
+        const real = (data as LeaderboardEntry[]).filter(
+          entry =>
+            entry &&
+            entry.total_xp > 0 &&
+            !String(entry.user_id || '').startsWith('agent-') &&
+            !MOCK_NAMES_SET.has(entry.username)
+        );
+        if (real.length > 0) {
+          leaderboardSource = 'cloud';
+          return real.map((entry, index) => ({
+            ...entry,
+            rank: index + 1,
+          }));
+        }
       }
 
       // If view doesn't exist yet, query profiles directly
       const { data: profiles, error: pError } = await supabase
         .from('profiles')
         .select('*')
+        .gt('total_xp', 0)
         .order('total_xp', { ascending: false })
         .limit(20);
 
-      if (!pError && profiles) {
-        leaderboardSource = 'cloud';
-        return profiles.map((p, idx) => ({
-          user_id: p.id,
-          username: p.username,
-          avatar_url: p.avatar_url || p.username.slice(0, 2).toUpperCase(),
-          role_title: p.role_title || 'Đặc vụ',
-          level: p.level || 1,
-          total_xp: p.total_xp || 0,
-          streak_days: p.streak_days || 1,
-          rank: idx + 1,
-        }));
+      if (!pError && profiles && profiles.length > 0) {
+        const real = profiles.filter(
+          (p: any) =>
+            p &&
+            (p.total_xp || 0) > 0 &&
+            !String(p.id || '').startsWith('agent-') &&
+            !MOCK_NAMES_SET.has(p.username)
+        );
+        if (real.length > 0) {
+          leaderboardSource = 'cloud';
+          return real.map((p, idx) => ({
+            user_id: p.id,
+            username: p.username || 'Thanh tra viên',
+            avatar_url: p.avatar_url || (p.username ? p.username.slice(0, 2).toUpperCase() : '👤'),
+            role_title: p.role_title || 'Đặc vụ',
+            level: p.level || 1,
+            total_xp: p.total_xp || 0,
+            streak_days: p.streak_days || 1,
+            rank: idx + 1,
+          }));
+        }
       }
     } catch (e) {
       console.warn('Supabase query failed, falling back to local leaderboard:', e);
     }
   }
 
-  // Local/Offline Fallback with current user integrated
+  // Local/Offline Fallback with current user integrated ONLY if total_xp > 0
   const localList = getLocalLeaderboard();
   const currentProfile = getLocalProfile();
 
-  // If user has earned XP, blend them into local leaderboard ranking
-  const existingIdx = localList.findIndex(e => e.user_id === currentProfile.id || e.username === currentProfile.username);
-  const userEntry: LeaderboardEntry = {
-    user_id: currentProfile.id,
-    username: currentProfile.username,
-    avatar_url: currentProfile.avatar_url,
-    role_title: currentProfile.role_title,
-    level: currentProfile.level,
-    total_xp: currentProfile.total_xp,
-    streak_days: currentProfile.streak_days,
-    rank: 1,
-  };
+  if (currentProfile.total_xp > 0) {
+    const existingIdx = localList.findIndex(e => e.user_id === currentProfile.id || e.username === currentProfile.username);
+    const userEntry: LeaderboardEntry = {
+      user_id: currentProfile.id,
+      username: currentProfile.username,
+      avatar_url: currentProfile.avatar_url,
+      role_title: currentProfile.role_title,
+      level: currentProfile.level,
+      total_xp: currentProfile.total_xp,
+      streak_days: currentProfile.streak_days,
+      rank: 1,
+    };
 
-  if (existingIdx >= 0) {
-    localList[existingIdx] = userEntry;
-  } else if (currentProfile.total_xp > 0) {
-    localList.push(userEntry);
+    if (existingIdx >= 0) {
+      localList[existingIdx] = userEntry;
+    } else {
+      localList.push(userEntry);
+    }
   }
 
   // Sort by XP

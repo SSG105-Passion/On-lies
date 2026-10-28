@@ -339,9 +339,15 @@ async function renderLeaderboard() {
     const entries = await fetchLeaderboard();
     if (dbStatusSubtitle) dbStatusSubtitle.textContent = getLeaderboardSource() === 'cloud'
       ? 'Bảng xếp hạng trực tuyến'
-      : isSupabaseConfigured ? 'Dữ liệu trên máy • Chưa kết nối' : 'Dữ liệu trên máy • Có hồ sơ mẫu';
+      : isSupabaseConfigured ? 'Dữ liệu trên máy • Đang đồng bộ' : 'Dữ liệu trên máy';
     if (entries.length === 0) {
-      listContainer.innerHTML = '<div class="leaderboard-loading">Chưa có người chơi nào. Hãy là người đầu tiên!</div>';
+      listContainer.innerHTML = `<div class="leaderboard-empty-state">
+        <div class="empty-badge">🛡️</div>
+        <strong>Bảng vàng đang mở!</strong>
+        <p>Chưa có dữ liệu xếp hạng. Hãy hoàn thành 1 ca trực để là người đầu tiên vinh danh tại đây!</p>
+      </div>`;
+      const rankSummary = $('userRankSummary');
+      if (rankSummary) rankSummary.textContent = 'Hãy hoàn thành ca trực để ghi tên bạn vào Top 1!';
       return;
     }
 

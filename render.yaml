@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     region: oregon
-    buildCommand: cd on-lies && npm install && npm run build
+    buildCommand: cd on-lies && npm install --include=dev && npm run build
     startCommand: cd on-lies && node server/index.js
     envVars:
       - key: NODE_ENV
