@@ -32,3 +32,14 @@ Không đặt mật khẩu database hoặc service-role key vào biến `VITE_*`
 Bản hiện tại vẫn dùng các bảng/view Supabase đã có (`profiles`, `game_records`, `leaderboard_view`). Các sửa lỗi local không thay schema hoặc chính sách RLS trên cloud. Cơ chế chống nộp lặp hiện bảo vệ trong phiên ứng dụng; bảng xếp hạng cạnh tranh cần chấm điểm và chống trùng phía server trước khi phát hành. Không tự chạy SQL mẫu đè lên database đang dùng.
 
 `RENDER_DEPLOY.md` còn mô tả kiến trúc MongoDB cũ. Server hiện phục vụ bản build tĩnh; `/api/health` xác nhận server đang chạy, không kiểm tra kết nối database.
+
+
+## Cloudflare Web Analytics
+
+1. Đăng nhập Cloudflare Dashboard > Web Analytics > Add a site.
+2. Nhập hostname `on-lies-game.onrender.com` (không có https:// hoặc đường dẫn), chọn Done.
+3. Vào Manage site, lấy giá trị `token` trong `data-cf-beacon` của đoạn mã Cloudflare cung cấp. Đây là token site công khai, không phải API token quản trị.
+4. Token công khai cho `on-lies-game.onrender.com` đã gắn sẵn trong code. Build/deploy lại để bật. Có thể đặt `VITE_CLOUDFLARE_ANALYTICS_TOKEN` trên Render để ghi đè token; đặt giá trị rỗng để tắt thống kê.
+5. Mở bản deploy, kiểm tra Network có `beacon.min.js` và yêu cầu `cdn-cgi/rum`. Chờ vài phút rồi xem thống kê trong Cloudflare Dashboard. Tiện ích chặn quảng cáo có thể chặn thống kê.
+
+Không cần chuyển DNS hoặc hosting khỏi Render. Token rỗng/không hợp lệ hoặc đang chạy Vite dev thì không tải beacon. Việc đổi màn game hiện dùng DOM, nên không coi mỗi lượt đổi màn là một page view riêng; thống kê này đo lượt vào trang và hiệu năng, chưa đo sự kiện hoàn thành từng game. Hướng dẫn chính thức: https://developers.cloudflare.com/web-analytics/get-started/

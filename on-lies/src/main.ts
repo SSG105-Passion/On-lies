@@ -1,3 +1,4 @@
+import { initWebAnalytics } from './analytics';
 import { GameEngine } from './gameEngine';
 import { openPhoneGame } from './phoneGame';
 import { openFamilyGame } from './familyGame';
@@ -832,3 +833,5 @@ subscribeToLeaderboard(() => renderLeaderboard());
 onAuthStateChange(() => renderLeaderboard());
 window.setInterval(updateClock, 30_000);
 document.addEventListener('pointerdown', () => void unlockAudio(), { once: true });
+
+initWebAnalytics();
