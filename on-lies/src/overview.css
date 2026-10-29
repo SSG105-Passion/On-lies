@@ -4,6 +4,7 @@
 .device-shell,
 .overview-home,
 .home-dialog {
+  --home-background: #ffffff;
   --home-ground: #f8fafc;
   --home-paper: #ffffff;
   --home-subtle: #f1f5f9;
@@ -23,6 +24,7 @@
 [data-theme="dark"] .device-shell,
 [data-theme="dark"] .overview-home,
 [data-theme="dark"] .home-dialog {
+  --home-background: #121826;
   --home-ground: #0b0f19;
   --home-paper: #121826;
   --home-subtle: #172033;
@@ -1328,7 +1330,7 @@
   overflow: auto;
   border: 1px solid var(--home-line-strong);
   border-radius: 14px;
-  background: #FFFFFF;
+  background: var(--home-background);
   color: var(--home-ink);
   padding: 28px;
   font-family: 'Be Vietnam Pro', sans-serif;
