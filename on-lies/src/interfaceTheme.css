@@ -1,0 +1,68 @@
+/* Theme surfaces for training screens. */
+[data-theme="light"] .mail-intro,
+[data-theme="light"] .phone-content { background: #edf3f8; color: #172d42; }
+[data-theme="light"] .phone-intro,
+[data-theme="light"] .phone-summary,
+[data-theme="light"] .call-guide,
+[data-theme="light"] .call-device { background: #fff; border-color: #ccd8e3; color: #172d42; }
+[data-theme="light"] .intro-content h2,
+[data-theme="light"] .phone-content h2,
+[data-theme="light"] .phone-content h3 { color: #172d42; }
+[data-theme="light"] .rules-list li { color: #40566c; }
+[data-theme="light"] .call-transcript p { background: #edf3f8; border-color: #ccd8e3; color: #243c51; }
+[data-theme="light"] .call-choices button { background: #f1f5f9; border-color: #bccddd; color: #172d42; }
+[data-theme="light"] .phone-note { color: #77520c; background: #fff6db; border-color: #e6cd8d; }
+[data-theme="light"] .correct-choice { color: #176343 !important; background: #e4f5ed !important; }
+.chat-search { width: 100%; box-sizing: border-box; font: inherit; color: inherit; }
+.conversation-row[hidden], [data-sms-empty][hidden] { display: none !important; }
+[data-sms-empty] { padding: 20px; color: var(--text-secondary); }
+[data-theme="dark"] #familyApp {
+ --family-bg: #152625; --family-panel: #203532; --family-chat-bg: #192d2a;
+ --family-bubble: #2c433d; --family-border: #496257; --family-text: #f1f3e8;
+ --family-muted: #c2d2c5; --family-subtle: #acbdb1; --family-blue: #9cd7bd;
+ --family-outgoing: #356e59; --family-outgoing-text: #fff9ea;
+ --family-amber: #efc574; --family-coral: #edac96; --family-context: #2b4037;
+ --family-contact: #304237; --family-accent: #edc779;
+}
+[data-theme="dark"] #familyApp .family-bubble { border-color: #496257; }
+[data-theme="dark"] #familyApp .is-scammer .family-bubble { background: #49382f; border-color: #b48770; }
+[data-theme="dark"] #familyApp .family-choice { border-color: #638471; }
+[data-theme="dark"] #familyApp .family-choice:hover { background: #354f42; }
+[data-theme="dark"] #familyApp .family-choice:active { background: #43634e; }
+[data-theme="dark"] #familyApp .family-forwarded { color: #efb5a4; }
+
+[data-theme="light"] .conversation-home.sms-home,
+[data-theme="light"] .chat-detail.sms-detail { background: #fff; border-color: #ccd8e3; box-shadow: 0 12px 30px #142b4212; }
+[data-theme="light"] .conversation-heading h2,
+[data-theme="light"] .conversation-topline strong,
+[data-theme="light"] .chat-header-center strong { color: #172d42; }
+[data-theme="light"] .chat-search,
+[data-theme="light"] .conversation-row,
+[data-theme="light"] .chat-detail header,
+[data-theme="light"] .chat-incoming { background: #edf3f8; border-color: #ccd8e3; color: #243c51; }
+[data-theme="light"] .conversation-row:hover { background: #dfebf5; }
+[data-theme="dark"] #familyApp .family-choice-key { background: #3a5044; color: #f1e3bf; }
+[data-theme="dark"] #familyApp .family-brief,
+[data-theme="dark"] #familyApp .family-goal,
+[data-theme="dark"] #familyApp .family-brief-meters { border-color: var(--family-border); }
+
+[data-theme="light"] .result-screen { background: #edf3f8; }
+[data-theme="light"] .result-card h2 { color: #172d42; }
+[data-theme="light"] .result-metrics div { background: #fff; border-color: #ccd8e3; }
+[data-theme="dark"] #mailApp[data-mode="messages"] { background: #101c2a; color: #edf3fa; }
+[data-theme="dark"] #inspectModal.sms-investigation-active {
+ --sx-bg: #101c2a; --sx-panel: #192838; --sx-subtle: #1e3042; --sx-raised: #263d53;
+ --sx-border: #365068; --sx-border-strong: #52718e; --sx-text: #edf3fa;
+ --sx-secondary: #c4d4e5; --sx-muted: #b1c5da; --sx-blue: #99c5ff; --sx-blue-soft: #243c58;
+ --sx-emerald: #99dfbc; --sx-emerald-soft: #1d4137; --sx-gold: #f1cb80; --sx-gold-soft: #433b29;
+ --sx-red: #ffb3ac; --sx-red-soft: #4a3033;
+}
+
+[data-theme="light"] .breakdown { background: #fff; border-color: #ccd8e3; }
+[data-theme="light"] .breakdown h3,
+[data-theme="light"] .breakdown-item strong { color: #172d42; }
+[data-theme="light"] .breakdown-item { background: #edf3f8; }
+
+[data-theme="light"] .phone-content .safe-button { color: #176343; background: #e4f5ed; border-color: #9bcdb4; }
+[data-theme="light"] .phone-content .call-feedback.good strong { color: #176343; }
+[data-theme="light"] .phone-content .call-feedback.bad strong { color: #a82b2b; }

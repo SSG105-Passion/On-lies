@@ -401,3 +401,30 @@ test('inspector verdict needs no flags and exploratory flags never cause a citat
   engine.nextCase();
   assert.equal(engine.stamp(engine.getCurrentCase().isScam).result.isCorrect, true);
 });
+
+test('leaderboard distinguishes a successful empty cloud result from an offline fallback', async () => {
+  for (const failed of [false, true]) {
+    const client = { from() { return {
+      select() { return this; }, gt() { return this; }, order() { return this; },
+      limit: async () => ({ data: failed ? null : [], error: failed ? { message: 'offline' } : null }),
+    }; } };
+    const api = loader({ globals: { localStorage: storage() }, mocks: {
+      '@supabase/supabase-js': { createClient: () => client },
+    } })(path.join(root, 'supabase.ts'));
+    assert.equal((await api.fetchLeaderboard()).length, 0);
+    assert.equal(api.getLeaderboardSource(), failed ? 'local' : 'cloud');
+  }
+});
+
+test('real leaderboard players are not excluded because their name resembles demo data', async () => {
+  const client = { from() { return {
+    select() { return this; }, gt() { return this; }, order() { return this; },
+    limit: async () => ({ data: [{ user_id: 'real-player', username: 'Mai Anh', total_xp: 500 }], error: null }),
+  }; } };
+  const api = loader({ globals: { localStorage: storage() }, mocks: {
+    '@supabase/supabase-js': { createClient: () => client },
+  } })(path.join(root, 'supabase.ts'));
+  assert.equal((await api.fetchLeaderboard())[0].username, 'Mai Anh');
+  assert.equal(api.getLeaderboardSource(), 'cloud');
+  assert.doesNotMatch(api.scoreSaveMessage({ syncStatus: 'failed' }), /đang chờ/);
+});

@@ -14,6 +14,7 @@ import { escapeHtml } from './html';
 import { unlockAudio, playMascotSlideInSound, playMascotSlideOutSound, playMascotInteractionSound } from './audio';
 import './gameNavigation.css';
 import './overview.css';
+import './interfaceTheme.css';
 import {
   fetchLeaderboard,
   getCurrentProfile,
@@ -21,9 +22,8 @@ import {
   signIn,
   signUp,
   signOut,
-  subscribeToLeaderboard,
+  getLeaderboardSource, subscribeToLeaderboard,
   onAuthStateChange,
-  isSupabaseConfigured,
   scoreSaveMessage,
   type LeaderboardEntry,
   type UserProfile
@@ -339,9 +339,9 @@ async function renderLeaderboard() {
   try {
     const entries = await fetchLeaderboard();
     if (dbStatusSubtitle) {
-      dbStatusSubtitle.textContent = isSupabaseConfigured
+      dbStatusSubtitle.textContent = getLeaderboardSource() === 'cloud'
         ? 'Máy chủ Đám mây Supabase • Trực tuyến'
-        : 'Đang kết nối Supabase Cloud...';
+        : 'Dữ liệu trên thiết bị • Chưa kết nối đám mây';
     }
     if (entries.length === 0) {
       listContainer.innerHTML = `<div class="leaderboard-empty-state">
@@ -380,7 +380,10 @@ async function renderLeaderboard() {
   }
 }
 
+let authSubmitting = false;
+let authReturnFocus: HTMLElement | null = null;
 function openAuthModal() {
+  authReturnFocus = document.activeElement as HTMLElement | null;
   const authProfileView = $('authProfileView');
   const authForm = $('authForm');
   const authModalHeading = $('authModalHeading');
@@ -394,7 +397,7 @@ function openAuthModal() {
     if (authModalHeading) authModalHeading.textContent = 'Hồ sơ Đặc vụ';
     $('authCurrentUsername').textContent = currentUserProfile.username;
     $('authCurrentEmail').textContent = currentUserProfile.email || 'Tài khoản nội bộ';
-    $('authCurrentLevel').textContent = `${currentUserProfile.level}`;
+    $('authCurrentLevel').textContent = `${getLevelProgress(currentUserProfile.total_xp).level}`;
     $('authCurrentXP').textContent = `${currentUserProfile.total_xp} XP`;
     $('authCurrentRole').textContent = currentUserProfile.role_title;
   } else {
@@ -403,15 +406,21 @@ function openAuthModal() {
     if (authModalHeading) authModalHeading.textContent = isSignUpMode ? 'Đăng ký Đặc vụ' : 'Đăng nhập';
   }
 
+  authModal.setAttribute('role', 'dialog');
+  authModal.setAttribute('aria-modal', 'true');
   authModal.classList.remove('hidden');
+  (currentUserProfile?.is_authenticated ? $('closeAuthModalBtn') : $('authEmailInput'))?.focus();
 }
 
 function closeAuthModal() {
   authModal.classList.add('hidden');
+  authReturnFocus?.focus();
 }
 
 function setAuthMode(signUp: boolean) {
+  if (authSubmitting) return;
   isSignUpMode = signUp;
+  $('authPasswordInput').setAttribute('autocomplete', signUp ? 'new-password' : 'current-password');
   $('tabSignIn').classList.toggle('active', !signUp);
   $('tabSignUp').classList.toggle('active', signUp);
   const usernameGroup = $('usernameGroup');
@@ -423,6 +432,16 @@ function setAuthMode(signUp: boolean) {
   $('authErrorMsg').classList.add('hidden');
 }
 
+document.addEventListener('keydown', event => {
+  if (authModal.classList.contains('hidden')) return;
+  if (event.key === 'Escape') { event.preventDefault(); closeAuthModal(); }
+  if (event.key === 'Tab') {
+    const controls = Array.from(authModal.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), [tabindex="0"]')).filter(el => el.getClientRects().length > 0);
+    const first = controls[0], last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+  }
+});
 // Setup Auth form handlers
 $('tabSignIn')?.addEventListener('click', () => setAuthMode(false));
 $('tabSignUp')?.addEventListener('click', () => setAuthMode(true));
@@ -449,15 +468,22 @@ $('authForm')?.addEventListener('submit', async event => {
   const errorMsg = $('authErrorMsg');
   const submitBtn = $('authSubmitBtn') as HTMLButtonElement;
 
-  if (!email || !password) return;
+  if (!email || !password || authSubmitting) return;
+  authSubmitting = true;
+  const requestedSignUp = isSignUpMode;
 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Đang xử lý...';
   if (errorMsg) errorMsg.classList.add('hidden');
 
-  const result = isSignUpMode
-    ? await signUp(email, password, username)
-    : await signIn(email, password);
+  let result;
+  try {
+    result = requestedSignUp ? await signUp(email, password, username) : await signIn(email, password);
+  } catch {
+    result = { success: false, error: 'Không thể kết nối. Vui lòng thử lại.' };
+  } finally {
+    authSubmitting = false;
+  }
 
   submitBtn.disabled = false;
   submitBtn.textContent = isSignUpMode ? 'Tạo tài khoản & Lưu điểm' : 'Đăng nhập ngay';
@@ -1004,3 +1030,16 @@ window.setInterval(updateClock, 30_000);
 document.addEventListener('pointerdown', () => void unlockAudio(), { once: true });
 
 initWebAnalytics();
+
+itemList.addEventListener('input', event => {
+  const input = event.target as HTMLInputElement;
+  if (!input.matches('[data-sms-search]')) return;
+  const query = input.value.trim().toLocaleLowerCase('vi');
+  let visible = 0;
+  itemList.querySelectorAll<HTMLElement>('.conversation-row').forEach(row => {
+    row.hidden = !(row.dataset.searchText || '').toLocaleLowerCase('vi').includes(query);
+    if (!row.hidden) visible++;
+  });
+  const empty = itemList.querySelector<HTMLElement>('[data-sms-empty]');
+  if (empty) empty.hidden = visible > 0;
+});

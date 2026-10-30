@@ -1,3 +1,4 @@
+import { escapeHtml } from './html';
 import type { GameMode, ScenarioItem, UserAnswer } from './types';
 
 const state = (answer?: UserAnswer) => answer?.smsAction?.outcome === 'cautious'
@@ -12,12 +13,12 @@ export function renderChannelList(_mode: GameMode, items: ScenarioItem[], answer
       </div>
       <div class="sms-app-badge">💬</div>
     </header>
-    <div class="chat-search">🔍 Tìm kiếm trong tin nhắn...</div>
+    <input class="chat-search" data-sms-search type="search" aria-label="Tìm kiếm tin nhắn trong vòng" placeholder="Tìm người gửi hoặc nội dung…" />
     <div class="conversation-list">
       ${items.map(item => {
         const answer = answers.find(a => a.item.id === item.id);
         const initial = item.sender.trim().slice(0, 1).toUpperCase();
-        return `<button class="conversation-row ${answer ? 'evaluated' : ''}" data-item-id="${item.id}">
+        return `<button class="conversation-row ${answer ? 'evaluated' : ''}" data-item-id="${item.id}" data-search-text="${escapeHtml(item.sender + ' ' + item.body)}">
           <span class="chat-avatar avatar-${item.id % 4}">${initial}</span>
           <div class="conversation-body">
             <div class="conversation-topline">
@@ -30,6 +31,7 @@ export function renderChannelList(_mode: GameMode, items: ScenarioItem[], answer
         </button>`;
       }).join('')}
     </div>
+    <p data-sms-empty hidden role="status">Không tìm thấy tin nhắn phù hợp trong vòng này.</p>
     <div class="conversation-bottom">💬 Chạm vào tin nhắn để mở chi tiết và phân tích độ an toàn</div>
   </div>`;
 }

@@ -46,8 +46,6 @@ export const getLeaderboardSource = () => leaderboardSource;
 const LOCAL_STORAGE_PROFILE_KEY = 'on-lies-user-profile';
 const LOCAL_STORAGE_LEADERBOARD_KEY = 'on-lies-local-leaderboard';
 
-const MOCK_NAMES_SET = new Set(['Hoàng Long', 'Mai Anh', 'Tuấn Kiệt', 'Bảo Trâm', 'Minh Đức']);
-
 function getLocalLeaderboard(): LeaderboardEntry[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_LEADERBOARD_KEY);
@@ -59,8 +57,7 @@ function getLocalLeaderboard(): LeaderboardEntry[] {
             e &&
             typeof e.total_xp === 'number' &&
             e.total_xp > 0 &&
-            !String(e.user_id || '').startsWith('agent-') &&
-            !MOCK_NAMES_SET.has(e.username)
+            !String(e.user_id || '').startsWith('agent-')
         );
         localStorage.setItem(LOCAL_STORAGE_LEADERBOARD_KEY, JSON.stringify(cleaned));
         return cleaned;
@@ -124,7 +121,7 @@ export function saveLocalProfile(profile: UserProfile) {
  * Otherwise, uses localized mock store.
  */
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
-  leaderboardSource = isSupabaseConfigured ? 'cloud' : 'local';
+  leaderboardSource = 'local';
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -134,13 +131,14 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
         .order('total_xp', { ascending: false })
         .limit(20);
 
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
+        leaderboardSource = 'cloud';
+        if (data.length === 0) return [];
         const real = (data as LeaderboardEntry[]).filter(
           entry =>
             entry &&
             entry.total_xp > 0 &&
-            !String(entry.user_id || '').startsWith('agent-') &&
-            !MOCK_NAMES_SET.has(entry.username)
+            !String(entry.user_id || '').startsWith('agent-')
         );
         if (real.length > 0) {
           leaderboardSource = 'cloud';
@@ -159,13 +157,14 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
         .order('total_xp', { ascending: false })
         .limit(20);
 
-      if (!pError && profiles && profiles.length > 0) {
+      if (!pError && profiles) {
+        leaderboardSource = 'cloud';
+        if (profiles.length === 0) return [];
         const real = profiles.filter(
           (p: any) =>
             p &&
             (p.total_xp || 0) > 0 &&
-            !String(p.id || '').startsWith('agent-') &&
-            !MOCK_NAMES_SET.has(p.username)
+            !String(p.id || '').startsWith('agent-')
         );
         if (real.length > 0) {
           leaderboardSource = 'cloud';
@@ -186,6 +185,7 @@ export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
     }
   }
 
+  leaderboardSource = 'local';
   // Local/Offline Fallback with current user integrated ONLY if total_xp > 0
   const localList = getLocalLeaderboard();
   const currentProfile = getLocalProfile();
@@ -274,7 +274,7 @@ export interface ScoreSaveResult {
 
 export function scoreSaveMessage(result: ScoreSaveResult): string {
   if (result.syncStatus === 'synced') return 'Đã đồng bộ lên cơ sở dữ liệu Supabase Cloud.';
-  if (result.syncStatus === 'failed') return 'Điểm phiên chơi đã ghi nhận; đang chờ đồng bộ lên Supabase Cloud.';
+  if (result.syncStatus === 'failed') return 'Điểm đã lưu trên thiết bị này, nhưng đồng bộ lên Supabase Cloud thất bại.';
   return 'Điểm đã ghi nhận cho phiên chơi hiện tại.';
 }
 
