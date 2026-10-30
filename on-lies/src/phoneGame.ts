@@ -71,10 +71,10 @@ export const CALLS: CallCase[] = [
       'Em chuyển khoản tạm vào số tài khoản thủ quỹ đối tác này giúp thầy, 4h chiều họp xong thầy về trường gửi trả lại em ngay nhé!'
     ],
     lookupData: {
-      carrier: 'Mạng di động - Thuê bao kích hoạt 12 ngày trước',
-      networkActivity: 'Lịch sử: 18 cuộc gọi ngắn dưới 45 giây trong sáng nay',
-      registeredOwner: 'NGUYEN VAN LONG (Không trùng tên thầy An)',
-      audioForensics: 'Phổ âm thanh: Xuất hiện méo hài bậc cao ở dải 2.4kHz - 3.2kHz, đặc trưng của công nghệ sao chép giọng nói Deepfake AI.'
+      carrier: 'Thuê bao di động trả trước Viettel',
+      networkActivity: 'Kích hoạt: 12 ngày trước • 18 cuộc gọi đi trong 2 giờ qua',
+      registeredOwner: 'NGUYEN VAN LONG',
+      audioForensics: 'Chỉ số THD: 18.5% • Dải tần cao 2.4 - 3.2 kHz có hiện tượng nén méo phi tuyến tính'
     },
     trapQuestions: [
       {
@@ -121,10 +121,10 @@ export const CALLS: CallCase[] = [
       'Xin lưu ý: Ngân hàng tuyệt đối KHÔNG bao giờ yêu cầu quý khách đọc mã OTP, mật khẩu hay chuyển tiền vào bất kỳ tài khoản nào.'
     ],
     lookupData: {
-      carrier: 'Tổng đài Brandname Viễn thông cấp phép chính quy',
-      networkActivity: 'Lịch sử: Đầu số chăm sóc khách hàng hoạt động 8 năm',
-      registeredOwner: 'NGAN HANG TMCP QUOC TE (Chính chủ pháp nhân)',
-      audioForensics: 'Tạp âm nền: Không gian tổng đài thực tế, giọng nói tự nhiên, không ghi nhận can thiệp âm thanh nhân tạo.'
+      carrier: 'Tổng đài định danh Brandname VNPT',
+      networkActivity: 'Kích hoạt: 8 năm • Lưu lượng: 1.200 cuộc/ngày',
+      registeredOwner: 'NGAN HANG TMCP QUOC TE',
+      audioForensics: 'Chỉ số THD: 1.2% • Tạp âm nền văn phòng làm việc đồng nhất'
     },
     trapQuestions: [
       {
@@ -170,10 +170,10 @@ export const CALLS: CallCase[] = [
       'Yêu cầu anh kết bạn Zalo nhận lệnh bắt, sau đó chuyển 20 triệu tiền thanh tra vào tài khoản phong tỏa của Kho bạc để chứng minh trong sạch!'
     ],
     lookupData: {
-      carrier: 'Giao thức mạng ảo VoIP SIP Trunk quốc tế',
-      networkActivity: 'Đầu số hiển thị giả mạo công nghệ Caller ID Spoofing',
-      registeredOwner: 'Không xác định (Máy chủ đặt tại cụm Phnom Penh / Sihanoukville)',
-      audioForensics: 'Tạp âm nền: Xuất hiện tiếng còi hú công an và tiếng bộ đàm giả lập được phát lặp lại theo vòng tua 12 giây.'
+      carrier: 'Đầu số cố định ảo qua giao thức VoIP',
+      networkActivity: 'Đầu số định tuyến qua dải IP máy chủ nước ngoài (AS133xx)',
+      registeredOwner: 'THUE BAO DOANH NGHIEP CHUA DINH DANH',
+      audioForensics: 'Chỉ số THD: 4.8% • Băng tần thấp xuất hiện tạp âm tuần hoàn lặp lại mỗi 12 giây'
     },
     trapQuestions: [
       {
@@ -220,10 +220,10 @@ export const CALLS: CallCase[] = [
       'Nếu anh bận thì em gửi bác tổ trưởng cạnh nhà rồi anh chuyển khoản vào mã QR chính thức dán trên app bưu cục sau cũng được ạ.'
     ],
     lookupData: {
-      carrier: 'Mạng Viettel di động cá nhân',
-      networkActivity: 'Thuê bao hoạt động 4 năm, tần suất gọi phù hợp mô hình shipper',
-      registeredOwner: 'TRAN DINH TRUNG (Xác thực thông tin viễn thông chuẩn)',
-      audioForensics: 'Tạp âm nền: Tiếng nổ xe máy, tiếng còi xe đường phố thực tế, không có hiện tượng chỉnh sửa hay lọc âm.'
+      carrier: 'Mạng di động Viettel cá nhân',
+      networkActivity: 'Kích hoạt: 4 năm • Lưu lượng: 65 cuộc gọi/ngày',
+      registeredOwner: 'TRAN DINH TRUNG',
+      audioForensics: 'Chỉ số THD: 2.1% • Tạp âm môi trường: Tiếng gió và phương tiện giao thông'
     },
     trapQuestions: [
       {
@@ -269,10 +269,10 @@ export const CALLS: CallCase[] = [
       'Cài xong bạn nhớ bấm Cấp quyền Trợ năng (Accessibility) để hệ thống tự động quét khuôn mặt và đồng bộ dữ liệu vào tài khoản nhé!'
     ],
     lookupData: {
-      carrier: 'MobiFone di động - Kích hoạt 48 giờ trước',
-      networkActivity: 'Tần suất: 52 cuộc gọi liên tục trong sáng nay',
-      registeredOwner: 'NGUYEN THI THAO (SIM rác bán lẻ)',
-      audioForensics: 'Phát hiện tiếng gõ phím giả lập văn phòng, cuộc gọi thực hiện qua tai nghe giá rẻ.'
+      carrier: 'Mạng di động MobiFone trả trước',
+      networkActivity: 'Kích hoạt: 48 giờ trước • 52 cuộc gọi đi liên tục trong sáng nay',
+      registeredOwner: 'NGUYEN THI THAO',
+      audioForensics: 'Chỉ số THD: 5.6% • Tạp âm nền: Chuỗi tiếng gõ lặp lại ở tần số 400Hz - 800Hz'
     },
     trapQuestions: [
       {
@@ -318,10 +318,10 @@ export const CALLS: CallCase[] = [
       'Bệnh viện yêu cầu chuyển khoản gấp 40 triệu tạm ứng viện phí vào số tài khoản cá nhân của bác sĩ mổ này để ký giấy lên bàn mổ ngay!'
     ],
     lookupData: {
-      carrier: 'Vinaphone di động cá nhân',
-      networkActivity: 'Lịch sử: 4 cuộc gọi nhắm vào phụ huynh/sinh viên',
-      registeredOwner: 'Số điện thoại qua trạm trung chuyển',
-      audioForensics: 'Phát hiện âm thanh còi hú cấp cứu 115 được bật lặp lại từ một thiết bị thứ hai bên cạnh micro.'
+      carrier: 'Mạng di động VinaPhone',
+      networkActivity: 'Kích hoạt: 25 ngày • 4 cuộc gọi đi trong 1 giờ qua',
+      registeredOwner: 'LE DUC MANH',
+      audioForensics: 'Chỉ số THD: 8.2% • Âm thanh nền có nguồn phát còi còi lặp lại từ thiết bị phụ'
     },
     trapQuestions: [
       {
@@ -368,10 +368,10 @@ export const CALLS: CallCase[] = [
       'Công an phường làm việc trực tiếp tại trụ sở, không yêu cầu làm việc qua mạng, không gửi link và không thu bất kỳ khoản phí nào.'
     ],
     lookupData: {
-      carrier: 'Mạng điện thoại cố định VNPT Hà Nội',
-      networkActivity: 'Đầu số máy bàn công khai niêm yết trên cổng thông tin điện tử Quận',
-      registeredOwner: 'CONG AN PHUONG DICH VONG HAU (Chính quy nhà nước)',
-      audioForensics: 'Tạp âm nền: Tiếng bước chân, tiếng đóng dấu hồ sơ hành chính tự nhiên, phát âm chuẩn mực người thi hành công vụ.'
+      carrier: 'Mạng điện thoại cố định PSTN VNPT Hà Nội',
+      networkActivity: 'Kích hoạt: 12 năm • Cố định tại trạm viễn thông Cầu Giấy',
+      registeredOwner: 'CONG AN PHUONG DICH VONG HAU',
+      audioForensics: 'Chỉ số THD: 0.9% • Tín hiệu thoại tương tự thuần túy không qua xử lý số'
     },
     trapQuestions: [
       {
@@ -417,10 +417,10 @@ export const CALLS: CallCase[] = [
       'Để hệ thống kích hoạt từ xa, tổng đài vừa gửi 1 mã xác thực qua tin nhắn, anh đọc giúp em mã số đó để em hoàn tất chuyển đổi nhé!'
     ],
     lookupData: {
-      carrier: 'Gmobile đầu số 059 di động',
-      networkActivity: 'Tần suất: 45 cuộc/giờ nhắm vào mục tiêu chiếm quyền SIM',
-      registeredOwner: 'Thuê bao trả trước chưa chuẩn hóa thông tin',
-      audioForensics: 'Phát hiện giọng đọc theo kịch bản mẫu telesale lừa đảo chiếm đoạt tài khoản viễn thông.'
+      carrier: 'Mạng di động Gmobile (Đầu số 059)',
+      networkActivity: 'Kích hoạt: 18 ngày • Tần suất: 45 cuộc gọi đi/giờ',
+      registeredOwner: 'BUI VAN QUY',
+      audioForensics: 'Chỉ số THD: 6.4% • Mẫu ngữ điệu đồng dạng với các cuộc gọi tổng đài tự động'
     },
     trapQuestions: [
       {
@@ -467,10 +467,10 @@ export const CALLS: CallCase[] = [
       'Chương trình này thuộc đề án y tế cơ sở của phường, được hỗ trợ miễn phí 100% không thu tiền gì đâu ạ.'
     ],
     lookupData: {
-      carrier: 'Mạng điện thoại cố định khu vực TP.HCM',
-      networkActivity: 'Đầu số đăng ký cơ sở y tế công lập địa phương',
-      registeredOwner: 'TRAM Y TE PHUONG (Hồ sơ dịch vụ công chính quy)',
-      audioForensics: 'Tạp âm nền: Tiếng loa thông báo y tế, tiếng trao đổi chuyên môn khám chữa bệnh tự nhiên.'
+      carrier: 'Mạng điện thoại cố định Viettel TP.HCM',
+      networkActivity: 'Kích hoạt: 9 năm • Cố định tại trạm viễn thông Tân Bình',
+      registeredOwner: 'TRAM Y TE PHUONG',
+      audioForensics: 'Chỉ số THD: 1.1% • Tạp âm nền: Không gian cơ sở y tế địa phương'
     },
     trapQuestions: [
       {
@@ -516,10 +516,10 @@ export const CALLS: CallCase[] = [
       'Để hủy lệnh trừ tiền khẩn cấp, em gửi anh đường link Cổng đối soát tài chính, anh nhập 16 số thẻ và 3 số bí mật CVV mặt sau để hệ thống hủy trừ tiền ngay nhé!'
     ],
     lookupData: {
-      carrier: 'Đầu số cố định ảo VoIP GigaFone',
-      networkActivity: 'Tần suất: 110 cuộc gọi tự động mỗi ngày',
-      registeredOwner: 'Công ty TNHH Dịch vụ Truyền thông trung gian',
-      audioForensics: 'Giọng điệu dồn dập, tạo áp lực sắp bị trừ tiền nhằm kích thích tâm lý muốn lấy lại tiền ngay.'
+      carrier: 'Đầu số cố định ảo 024 7779xxxx',
+      networkActivity: 'Kích hoạt: 3 tháng • Lưu lượng: 110 cuộc gọi tự động/ngày',
+      registeredOwner: 'CTY TNHH TRUYEN THONG ASIA',
+      audioForensics: 'Chỉ số THD: 7.1% • Tín hiệu thoại nén codec G.729 qua máy chủ đám mây'
     },
     trapQuestions: [
       {
@@ -565,10 +565,10 @@ export const CALLS: CallCase[] = [
       'Đơn đầu tiên chỉ 200.000đ, làm thử có tiền rút về tài khoản ngân hàng ngay trong 3 phút, làm càng nhiều đơn lớn tiền hoa hồng càng cao!'
     ],
     lookupData: {
-      carrier: 'Vietnamobile đầu số 079',
-      networkActivity: 'Tần suất: 180 cuộc gọi tự động mỗi ngày (Robocall phát tán lời mời)',
-      registeredOwner: 'Số rác không định danh',
-      audioForensics: 'Đoạn đầu là giọng ghi âm tự động (Auto-dialer), sau đó tự động chuyển hướng sang nhân viên chốt đơn.'
+      carrier: 'Mạng di động Vietnamobile (079)',
+      networkActivity: 'Kích hoạt: 14 ngày • Quay số tự động 180 cuộc gọi đi/ngày',
+      registeredOwner: 'HOANG VAN TU',
+      audioForensics: 'Chỉ số THD: 9.3% • 15 giây đầu phát từ tệp âm thanh ghi âm sẵn'
     },
     trapQuestions: [
       {
@@ -614,10 +614,10 @@ export const CALLS: CallCase[] = [
       'Để xe được vận chuyển bàn giao về tận nhà trong 48 giờ tới, anh chỉ cần thanh toán trước 10% thuế trước bạ và phí đăng kiểm là 8.500.000đ vào tài khoản Ban tổ chức!'
     ],
     lookupData: {
-      carrier: 'Viettel di động trả trước',
-      networkActivity: 'Thuê bao kích hoạt 24 giờ trước, chỉ phát cuộc gọi một chiều',
-      registeredOwner: 'HOANG TRONG NGHIA (Tài khoản ngân hàng thuê mượn)',
-      audioForensics: 'Phát hiện âm thanh vỗ tay và nhạc chúc mừng giả lập phát từ loa ngoài.'
+      carrier: 'Mạng di động Viettel trả trước',
+      networkActivity: 'Kích hoạt: 24 giờ trước • Chỉ phát sinh cuộc gọi đi một chiều',
+      registeredOwner: 'HOANG TRONG NGHIA',
+      audioForensics: 'Chỉ số THD: 7.8% • Băng tần xuất hiện tệp âm thanh vỗ tay phát lặp lại'
     },
     trapQuestions: [
       {
@@ -658,7 +658,7 @@ let lives = 3;
 let finished = false;
 let currentPhase: 'ringing' | 'in-call' | 'feedback' | 'summary' = 'ringing';
 let selectedVerdict: 'hangup' | 'delay' | 'cooperate' | null = null;
-let currentIntelTab: 'lookup' | 'trap' | 'tip' = 'lookup';
+let currentIntelTab: 'live' | 'lookup' | 'trap' | 'tip' = 'live';
 let askedQuestions: Set<number> = new Set();
 let lastAskedIdx: number | null = null;
 let callTimer = 0;
@@ -720,7 +720,7 @@ function startCall(index: number) {
   callIdx = index;
   currentPhase = 'ringing';
   selectedVerdict = null;
-  currentIntelTab = 'lookup';
+  currentIntelTab = 'live';
   askedQuestions.clear();
   lastAskedIdx = null;
   callTimer = 0;
@@ -946,6 +946,10 @@ function render() {
 
               <!-- Tactical Tools Bar -->
               <div class="phone-tactical-tools">
+                <button class="phone-tool-btn ${currentIntelTab === 'live' ? 'is-active' : ''}" data-phone="tab-live">
+                  <span class="tool-icon">📡</span>
+                  <span>Giám sát</span>
+                </button>
                 <button class="phone-tool-btn ${currentIntelTab === 'lookup' ? 'is-active' : ''}" data-phone="tab-lookup">
                   <span class="tool-icon">🔍</span>
                   <span>Tra cứu sóng</span>
@@ -953,10 +957,6 @@ function render() {
                 <button class="phone-tool-btn ${currentIntelTab === 'trap' ? 'is-active' : ''} ${askedQuestions.size > 0 ? 'is-confronted' : ''}" data-phone="tab-trap">
                   <span class="tool-icon">🎙️</span>
                   <span>Tra vấn bẫy (${askedQuestions.size}/2)</span>
-                </button>
-                <button class="phone-tool-btn ${currentIntelTab === 'tip' ? 'is-active' : ''}" data-phone="tab-tip">
-                  <span class="tool-icon">💡</span>
-                  <span>Khuyến cáo</span>
                 </button>
               </div>
 
@@ -995,7 +995,22 @@ function render() {
             <p style="margin-top:4px;">${escapeHtml(call.story)}</p>
           </div>
 
-          ${currentIntelTab === 'lookup' ? `
+          ${currentIntelTab === 'live' ? `
+            <div class="intel-box" style="border-left:3px solid #10b981;">
+              <strong style="color:#059669;">📡 Kênh Giám sát Đàm thoại Trực tiếp:</strong>
+              <p style="margin:8px 0;font-size:12.5px;color:var(--home-secondary);line-height:1.6;">
+                Đang kết nối đàm thoại trực tiếp với thuê bao. Hãy lắng nghe kỹ từng câu nói của đối phương ở màn hình điện thoại bên trái.
+              </p>
+              <div style="background:rgba(15,23,42,0.04);padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.7;color:var(--home-ink);margin-top:8px;">
+                💡 <b>Thao tác nghiệp vụ:</b>
+                <ul style="margin:6px 0 0;padding-left:18px;">
+                  <li>Bấm <b>"Tra cứu sóng"</b> để yêu cầu hệ thống truy xuất dữ liệu kỹ thuật từ nhà mạng & trạm BTS.</li>
+                  <li>Bấm <b>"Tra vấn bẫy"</b> để chọn các câu hỏi nghiệp vụ thử phản ứng của người gọi.</li>
+                  <li>Đưa ra 1 trong 3 phán quyết: <b>Cúp máy &amp; Khóa số</b>, <b>Hoãn để xác minh</b>, hoặc <b>Tiếp nhận</b>.</li>
+                </ul>
+              </div>
+            </div>
+          ` : currentIntelTab === 'lookup' ? `
             <div class="intel-box" style="border-left:3px solid #3b82f6;">
               <strong style="color:#2563eb;">Dữ liệu Viễn thông &amp; Trạm phát sóng:</strong>
               <table class="intel-data-table">
@@ -1075,6 +1090,11 @@ document.addEventListener('click', event => {
       break;
     case 'decline':
       declineCallEarly();
+      break;
+    case 'tab-live':
+      currentIntelTab = 'live';
+      playActionBeep();
+      render();
       break;
     case 'tab-lookup':
       currentIntelTab = 'lookup';

@@ -61,7 +61,7 @@ const SCENES: Scene[] = [
     title: 'Mẹ đang đứng ở quầy ngân hàng rút sổ tiết kiệm 300 triệu',
     relative: 'Mẹ',
     relationship: 'Mẹ ruột • 58 tuổi',
-    crisisContext: 'Kẻ giả danh Viện kiểm sát gọi dọa bắt giam mẹ suốt 2 tiếng và ép mẹ đeo tai nghe ra ngân hàng rút toàn bộ sổ tiết kiệm 300 triệu chuyển "tài khoản tạm giữ". Mẹ đang lén nhắn tin cho bạn từ quầy!',
+    crisisContext: 'Mẹ nhận được cuộc gọi từ số lạ tự xưng cơ quan kiểm sát, bị yêu cầu giữ máy liên tục suốt 2 tiếng và đang đứng ở quầy ngân hàng chuẩn bị rút sổ tiết kiệm 300 triệu chuyển vào tài khoản thanh tra. Mẹ đang lén nhắn tin cho bạn từ quầy!',
     location: 'Quầy giao dịch Ngân hàng (Đang cầm bút chuẩn bị ký giấy rút tiền)',
     start: 'start',
     nodes: {
@@ -208,7 +208,7 @@ const SCENES: Scene[] = [
     title: 'Bố đang ở tiệm vàng & công ty tài chính định thế chấp sổ đỏ vay nóng',
     relative: 'Bố',
     relationship: 'Bố • 62 tuổi',
-    crisisContext: 'Bố tham gia "Hội nhóm Đầu tư Vàng Quốc tế Dubai" được hứa hẹn lãi suất 30%/tháng. Bố giấu mẹ mang sổ đỏ căn nhà ra tiệm vàng kiêm tín dụng đen định thế chấp vay nóng 500 triệu để nộp vào sàn!',
+    crisisContext: 'Bố tham gia hội nhóm đầu tư vàng quốc tế được hứa hẹn lợi nhuận cao. Bố giấu cả nhà mang sổ đỏ căn nhà ra tiệm vàng kiêm dịch vụ tài chính làm thủ tục thế chấp vay 500 triệu để nộp vào quỹ đầu tư!',
     location: 'Tiệm vàng & Văn phòng Cho vay Tư nhân',
     start: 'start',
     nodes: {
@@ -348,7 +348,7 @@ const SCENES: Scene[] = [
     title: 'Em gái sinh viên năm nhất bị "bắt cóc online" tại phòng khách sạn',
     relative: 'Em gái',
     relationship: 'Em gái út • 19 tuổi (Sinh viên năm nhất xa nhà)',
-    crisisContext: 'Kẻ giả danh công an dọa em gái dính vào vụ án rửa tiền, ép em thuê phòng khách sạn tự nhốt mình, tắt toàn bộ liên lạc người thân và quay video giả bị bắt cóc để tống tiền gia đình 100 triệu!',
+    crisisContext: 'Em gái nhận cuộc gọi từ số lạ xưng cơ quan an ninh thông báo tài khoản dính líu vụ án lớn, bị yêu cầu thuê phòng khách sạn một mình để phối hợp điều tra bí mật và đang rất hoảng sợ!',
     location: 'Phòng khách sạn ngoại thành (Khóa trái cửa một mình)',
     start: 'start',
     nodes: {
@@ -453,7 +453,7 @@ const SCENES: Scene[] = [
     title: 'Bà nội chuẩn bị mua gói "Thần dược trị bách bệnh" 60 triệu',
     relative: 'Bà nội',
     relationship: 'Bà nội • 76 tuổi',
-    crisisContext: 'Nhóm "Thần y Viện Y học Cổ truyền giả mạo" mang máy đo điện tử giả đến nhà khám bệnh miễn phí, phán bà bị "ung thư tế bào gốc giai đoạn 3" và ép bà mua gói cao đan hoàn tán 60 triệu để chữa dứt điểm!',
+    crisisContext: 'Có hai người mặc áo blouse tự xưng đoàn bác sĩ viện y học đến tận nhà khám bệnh miễn phí cho bà, dùng máy đo điện tử thông báo bà mắc bệnh nan y nguy hiểm và thuyết phục bà mua liệu trình thuốc 60 triệu!',
     location: 'Phòng khách nhà riêng (Đang có 2 đối tượng mặc áo blouse ngồi thuyết phục)',
     start: 'start',
     nodes: {
@@ -558,7 +558,7 @@ const SCENES: Scene[] = [
     title: 'Anh trai chuẩn bị chuyển cọc 120 triệu xuất khẩu lao động "chui"',
     relative: 'Anh trai',
     relationship: 'Anh trai • 27 tuổi',
-    crisisContext: 'Anh trai đang ngồi tại quán cà phê gần sân bay với đường dây "cò mồi" hứa hẹn visa lao động VIP sang Hàn Quốc lương 80 triệu/tháng, không cần thi tiếng, bắt chuyển cọc 120 triệu tiền mặt để bay ngay tuần sau!',
+    crisisContext: 'Anh trai đang ngồi tại quán cà phê gần sân bay với đối tác hứa hẹn thủ tục visa lao động sang Hàn Quốc lương cao không cần thi chứng chỉ tiếng, yêu cầu anh nộp cọc 120 triệu tiền mặt để làm thủ tục bay ngay tuần sau!',
     location: 'Quán cà phê gần Cảng hàng không (Đang chuẩn bị rút cọc chuyển khoản)',
     start: 'start',
     nodes: {
