@@ -342,3 +342,73 @@ export function playActionBeep(): void {
     o.stop(now + 0.05);
   } catch {}
 }
+
+/**
+ * Play a tense double-thump heartbeat for high emergency situations
+ */
+export function playEmergencyHeartbeat(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    [0, 0.14].forEach((offset, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      const freq = idx === 0 ? 70 : 55;
+      o.frequency.setValueAtTime(freq, now + offset);
+      o.frequency.exponentialRampToValueAtTime(35, now + offset + 0.1);
+      g.gain.setValueAtTime(0.18, now + offset);
+      g.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.12);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(now + offset);
+      o.stop(now + offset + 0.13);
+    });
+  } catch {}
+}
+
+/**
+ * High-tech sonar scan blip for telecom lookup
+ */
+export function playScannerBlip(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(1800, now);
+    o.frequency.exponentialRampToValueAtTime(2400, now + 0.08);
+    g.gain.setValueAtTime(0.09, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.1);
+  } catch {}
+}
+
+/**
+ * Uplifting resolve chord when crisis is averted
+ */
+export function playTacticalSuccess(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(freq, now + idx * 0.07);
+      g.gain.setValueAtTime(0.12, now + idx * 0.07);
+      g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.35);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(now + idx * 0.07);
+      o.stop(now + idx * 0.07 + 0.36);
+    });
+  } catch {}
+}

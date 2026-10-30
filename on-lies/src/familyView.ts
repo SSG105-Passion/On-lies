@@ -199,7 +199,7 @@ export function renderFamilyScene(state: FamilySceneView): string {
   </div>`;
 }
 
-export function renderFamilyIntro(total: number): string {
+export function renderFamilyIntro(total = 5): string {
   return `<div class="family-intro">
     <div class="family-intro-copy">
       <h1>Điểm tựa Vững chắc<br>khi Gia đình gặp Nguy biến.</h1>

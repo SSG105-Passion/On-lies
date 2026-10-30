@@ -139,7 +139,7 @@ function updateProgress() {
     const modeTotals: Record<string, { max: number; unit: string }> = {
       mail: { max: 13, unit: 'hồ sơ' },
       messages: { max: 9, unit: 'tin nhắn' },
-      phone: { max: 6, unit: 'cuộc gọi' },
+      phone: { max: 12, unit: 'cuộc gọi' },
       family: { max: 5, unit: 'tình huống' },
     };
     const meta = modeTotals[modeKey];
