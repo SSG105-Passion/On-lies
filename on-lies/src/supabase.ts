@@ -390,11 +390,28 @@ async function saveGameScore(gameMode: string, score: number, maxScore: number, 
 /**
  * Sign in using Supabase Auth or mock local account
  */
+function formatAuthError(msg?: string): string {
+  if (!msg) return 'Thao tác không thành công. Vui lòng thử lại.';
+  if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('fetch')) {
+    return 'Không thể kết nối máy chủ Supabase (Failed to fetch). Dự án Supabase có thể đang bị Tạm ngưng (Paused) trên Dashboard do không hoạt động, hoặc mạng/trình duyệt của bạn đang chặn kết nối.';
+  }
+  if (msg.includes('User already registered') || msg.includes('already exists')) {
+    return 'Email này đã được đăng ký tài khoản. Bạn vui lòng chuyển sang tab Đăng nhập.';
+  }
+  if (msg.includes('Password should be at least')) {
+    return 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.';
+  }
+  if (msg.includes('Invalid login credentials')) {
+    return 'Email hoặc mật khẩu không chính xác.';
+  }
+  return msg;
+}
+
 export async function signIn(email: string, password: string): Promise<{ success: boolean; error?: string }> {
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { success: false, error: error.message };
+      if (error) return { success: false, error: formatAuthError(error.message) };
 
       if (data.user) {
         const profile = await getCurrentProfile();
@@ -403,7 +420,7 @@ export async function signIn(email: string, password: string): Promise<{ success
       }
       return { success: false, error: 'Không đăng nhập được. Vui lòng thử lại.' };
     } catch (e: any) {
-      return { success: false, error: e?.message || 'Lỗi đăng nhập' };
+      return { success: false, error: formatAuthError(e?.message) };
     }
   }
 
@@ -427,7 +444,7 @@ export async function signUp(email: string, password: string, username: string):
         },
       });
 
-      if (error) return { success: false, error: error.message };
+      if (error) return { success: false, error: formatAuthError(error.message) };
       if (data.user && !data.session) return { success: true, message: 'Hãy kiểm tra email để xác nhận tài khoản, sau đó đăng nhập.' };
       if (data.user) {
         const profile = await getCurrentProfile();
@@ -436,7 +453,7 @@ export async function signUp(email: string, password: string, username: string):
       }
       return { success: false, error: 'Chưa tạo được tài khoản. Vui lòng thử lại.' };
     } catch (e: any) {
-      return { success: false, error: e?.message || 'Lỗi đăng ký' };
+      return { success: false, error: formatAuthError(e?.message) };
     }
   }
 
