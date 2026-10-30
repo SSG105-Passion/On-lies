@@ -250,7 +250,7 @@ export function renderFamilySummary(
     </header>
 
     <div class="family-summary-metrics">
-      <div><span>Ca can thiệp an toàn</span><strong>${score}<small> / ${history.length}</small></strong></div>
+      <div><span>Ca can thiệp an toàn</span><strong>${score}<small> / ${total}</small></strong></div>
       <div><span>Trái tim còn lại</span><strong>${lives}<small> / 3</small></strong></div>
       <div><span>Tích lũy XP</span><strong>+${score * 150}<small> XP</small></strong></div>
     </div>

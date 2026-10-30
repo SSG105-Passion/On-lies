@@ -45,6 +45,7 @@ interface Node {
 }
 
 interface Scene {
+  id?: number;
   title: string;
   relative: string;
   relationship: string;

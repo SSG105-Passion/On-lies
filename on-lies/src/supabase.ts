@@ -393,10 +393,10 @@ async function saveGameScore(gameMode: string, score: number, maxScore: number, 
 function formatAuthError(msg?: string): string {
   if (!msg) return 'Thao tác không thành công. Vui lòng thử lại.';
   if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('fetch')) {
-    return 'Không thể kết nối máy chủ Supabase (Failed to fetch). Dự án Supabase có thể đang bị Tạm ngưng (Paused) trên Dashboard do không hoạt động, hoặc mạng/trình duyệt của bạn đang chặn kết nối.';
+    return 'Không thể kết nối máy chủ Supabase. Vui lòng thử lại sau.';
   }
   if (msg.includes('User already registered') || msg.includes('already exists')) {
-    return 'Email này đã được đăng ký tài khoản. Bạn vui lòng chuyển sang tab Đăng nhập.';
+    return 'Email này đã được đăng ký tài khoản.';
   }
   if (msg.includes('Password should be at least')) {
     return 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.';
@@ -424,7 +424,7 @@ export async function signIn(email: string, password: string): Promise<{ success
     }
   }
 
-  return { success: false, error: 'Chưa thể kết nối tới máy chủ đám mây Supabase. Vui lòng thử lại.' };
+  return { success: false, error: 'Không thể kết nối máy chủ Supabase. Vui lòng thử lại sau.' };
 }
 
 /**
@@ -457,7 +457,7 @@ export async function signUp(email: string, password: string, username: string):
     }
   }
 
-  return { success: false, error: 'Chưa thể kết nối tới máy chủ đám mây Supabase. Vui lòng thử lại.' };
+  return { success: false, error: 'Không thể kết nối máy chủ Supabase. Vui lòng thử lại sau.' };
 }
 
 /**
