@@ -173,3 +173,172 @@ export function playMascotInteractionSound(): void {
     setTimeout(() => beep('A5', '8n'), 80);
   } catch {}
 }
+
+
+let ringtoneInterval: number | null = null;
+
+/**
+ * Play repeating realistic phone ringtone
+ */
+export function playPhoneRingtone(): void {
+  stopPhoneRingtone();
+  const playOnce = () => {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [440, 480].forEach(freq => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, now);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.08, now + 0.04);
+        g.gain.setValueAtTime(0.08, now + 0.8);
+        g.gain.linearRampToValueAtTime(0.001, now + 0.85);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(now);
+        o.stop(now + 0.86);
+      });
+      [440, 480].forEach(freq => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, now + 1.1);
+        g.gain.setValueAtTime(0, now + 1.1);
+        g.gain.linearRampToValueAtTime(0.08, now + 1.14);
+        g.gain.setValueAtTime(0.08, now + 1.9);
+        g.gain.linearRampToValueAtTime(0.001, now + 1.95);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(now + 1.1);
+        o.stop(now + 1.96);
+      });
+    } catch {}
+  };
+
+  playOnce();
+  ringtoneInterval = window.setInterval(playOnce, 3200);
+}
+
+/**
+ * Stop repeating phone ringtone
+ */
+export function stopPhoneRingtone(): void {
+  if (ringtoneInterval !== null) {
+    window.clearInterval(ringtoneInterval);
+    ringtoneInterval = null;
+  }
+}
+
+/**
+ * Play phone pickup / connect sound
+ */
+export function playPhonePickup(): void {
+  stopPhoneRingtone();
+  const ctx = getAudioContext();
+  if (ctx) {
+    try {
+      const now = ctx.currentTime;
+      [580, 880].forEach((freq, idx) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, now + idx * 0.08);
+        g.gain.setValueAtTime(0, now + idx * 0.08);
+        g.gain.linearRampToValueAtTime(0.12, now + idx * 0.08 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.12);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(now + idx * 0.08);
+        o.stop(now + idx * 0.08 + 0.14);
+      });
+      return;
+    } catch {}
+  }
+  try {
+    beep('C5', '16n');
+  } catch {}
+}
+
+/**
+ * Play phone hangup sound (three descending tones)
+ */
+export function playPhoneHangup(): void {
+  stopPhoneRingtone();
+  const ctx = getAudioContext();
+  if (ctx) {
+    try {
+      const now = ctx.currentTime;
+      [480, 420, 360].forEach((freq, idx) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(freq, now + idx * 0.12);
+        g.gain.setValueAtTime(0.12, now + idx * 0.12);
+        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.09);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(now + idx * 0.12);
+        o.stop(now + idx * 0.12 + 0.1);
+      });
+      return;
+    } catch {}
+  }
+  try {
+    beep('G3', '16n');
+  } catch {}
+}
+
+/**
+ * Play static / deepfake glitch burst
+ */
+export function playPhoneStatic(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const bufferSize = Math.floor(ctx.sampleRate * 0.2);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1200;
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.2);
+  } catch {}
+}
+
+/**
+ * Play subtle micro-click for UI buttons
+ */
+export function playActionBeep(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(1200, now);
+    o.frequency.exponentialRampToValueAtTime(800, now + 0.04);
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.05);
+  } catch {}
+}
