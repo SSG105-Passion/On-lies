@@ -672,15 +672,13 @@ let history: { title: string; won: boolean; lesson: string }[] = [];
 let sessionId = '';
 
 function content(): HTMLElement {
-  const el = document.getElementById('familyAppContent');
-  if (!el) throw new Error('#familyAppContent not found');
+  const el = document.getElementById('familyContent') || document.getElementById('familyAppContent');
+  if (!el) throw new Error('#familyContent not found');
   return el;
 }
 
-function stats(): HTMLElement {
-  const el = document.getElementById('familyStats');
-  if (!el) throw new Error('#familyStats not found');
-  return el;
+function stats(): HTMLElement | null {
+  return document.getElementById('familyStats');
 }
 
 export function openFamilyGame(): void {
@@ -690,7 +688,7 @@ export function openFamilyGame(): void {
   lives = 3;
   finished = false;
   history = [];
-  stats().classList.remove('hidden');
+  stats()?.classList.remove('hidden');
   content().innerHTML = renderFamilyIntro();
 }
 
@@ -765,7 +763,7 @@ function finish(): void {
     }));
   }
 
-  stats().classList.add('hidden');
+  stats()?.classList.add('hidden');
   content().innerHTML = renderFamilySummary(history, score, lives, SCENES.length);
 }
 

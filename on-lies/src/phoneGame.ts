@@ -667,15 +667,13 @@ let sessionId = '';
 const history: { call: CallCase; correct: boolean; verdictChoice: string }[] = [];
 
 function container(): HTMLElement {
-  const el = document.getElementById('phoneAppContent');
-  if (!el) throw new Error('#phoneAppContent not found');
+  const el = document.getElementById('phoneContent') || document.getElementById('phoneAppContent');
+  if (!el) throw new Error('#phoneContent not found');
   return el;
 }
 
-function stats(): HTMLElement {
-  const el = document.getElementById('phoneStats');
-  if (!el) throw new Error('#phoneStats not found');
-  return el;
+function stats(): HTMLElement | null {
+  return document.getElementById('phoneStats');
 }
 
 export function openPhoneGame(): void {
@@ -685,7 +683,7 @@ export function openPhoneGame(): void {
   lives = 3;
   finished = false;
   history.length = 0;
-  stats().classList.remove('hidden');
+  stats()?.classList.remove('hidden');
   renderIntro();
 }
 
@@ -826,7 +824,7 @@ function finish() {
     }));
   }
 
-  stats().classList.add('hidden');
+  stats()?.classList.add('hidden');
   render();
 }
 
