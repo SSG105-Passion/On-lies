@@ -11,7 +11,7 @@ import type { ScenarioItem, GameMode } from './types';
 import { createSessionId } from './session';
 import { getLevelProgress, readCompletedGames, TRACKED_GAMES } from './playerProgress';
 import { escapeHtml } from './html';
-import { unlockAudio } from './audio';
+import { unlockAudio, playMascotSlideInSound, playMascotSlideOutSound, playMascotInteractionSound } from './audio';
 import './gameNavigation.css';
 import './overview.css';
 import {
@@ -225,6 +225,7 @@ function showDesktop(restoreFocus = true) {
 }
 
 function openGame(app: PlayableGame) {
+  toggleContactWidget(false);
   if (app === 'sms') {
     openMode('messages');
     return;
@@ -824,7 +825,175 @@ async function finishGame() {
   }
 }
 
+// ==============================================================================
+// MASCOT CONTACT GUI CONTROLLER
+// ==============================================================================
+const contactWidget = $('contactMascotWidget') as HTMLElement | null;
+const toggleContactBtn = $('toggleContactBtn') as HTMLButtonElement | null;
+const mascotTrigger = $('mascotInteractiveTrigger') as HTMLElement | null;
+const mascotSpeechText = $('mascotSpeechText') as HTMLElement | null;
+const quickContactForm = $('quickContactForm') as HTMLFormElement | null;
+const quickContactInput = $('quickContactInput') as HTMLInputElement | null;
+const quickContactNotice = $('quickContactNotice') as HTMLElement | null;
+
+const mascotTips = [
+  'Chào bạn! Mình là Đặc vụ Miu. Cần trợ giúp an toàn số cứ nhắn mình nhé! 🐾',
+  'Mẹo số 1: Luôn dừng lại 60 giây trước khi chuyển tiền theo yêu cầu gấp! ⏳',
+  'Mẹo số 2: Ngân hàng và cơ quan công an không bao giờ đòi mã OTP qua điện thoại! 🛡️',
+  'Mẹo số 3: Hãy đối chiếu kỹ đuôi tên miền email trước khi tải file đính kèm! ✉️',
+  'Mẹo số 4: Nghi ngờ link bưu phẩm lạ? Mở ứng dụng gốc để kiểm tra nhé! 📦',
+  'Meo meo! Bạn thật chăm chỉ rèn luyện an toàn thông tin! Thưởng 10 điểm tuyệt vời! ⭐'
+];
+let tipIndex = 0;
+
+function toggleContactWidget(force?: boolean): void {
+  if (!contactWidget || !toggleContactBtn) return;
+  const isOpen = contactWidget.classList.contains('is-open');
+  const shouldOpen = force !== undefined ? force : !isOpen;
+
+  if (shouldOpen) {
+    contactWidget.classList.add('is-open');
+    contactWidget.setAttribute('aria-hidden', 'false');
+    toggleContactBtn.setAttribute('aria-expanded', 'true');
+    toggleContactBtn.classList.add('home-nav-active');
+    playMascotSlideInSound();
+
+    const mascotBox = contactWidget.querySelector('.mascot-svg-box');
+    if (mascotBox) {
+      mascotBox.classList.remove('wobble');
+      void (mascotBox as HTMLElement).offsetWidth;
+      mascotBox.classList.add('wobble');
+    }
+  } else if (isOpen) {
+    contactWidget.classList.remove('is-open');
+    contactWidget.setAttribute('aria-hidden', 'true');
+    toggleContactBtn.setAttribute('aria-expanded', 'false');
+    toggleContactBtn.classList.remove('home-nav-active');
+    playMascotSlideOutSound();
+  }
+}
+
+function initContactWidget(): void {
+  if (!toggleContactBtn || !contactWidget) return;
+
+  // Toggle button on top bar
+  toggleContactBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleContactWidget();
+  });
+
+  // Close button on card
+  $('closeContactBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleContactWidget(false);
+  });
+
+  // Click mascot to interact & wobble
+  mascotTrigger?.addEventListener('click', () => {
+    playMascotInteractionSound();
+    const svgBox = mascotTrigger.querySelector('.mascot-svg-box');
+    if (svgBox) {
+      svgBox.classList.remove('wobble');
+      void (svgBox as HTMLElement).offsetWidth;
+      svgBox.classList.add('wobble');
+    }
+    tipIndex = (tipIndex + 1) % mascotTips.length;
+    if (mascotSpeechText) {
+      mascotSpeechText.textContent = mascotTips[tipIndex];
+    }
+  });
+
+  // Keyboard accessibility for mascot
+  mascotTrigger?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      mascotTrigger.click();
+    }
+  });
+
+  // Copy buttons
+  contactWidget.querySelectorAll<HTMLButtonElement>('.contact-copy-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const targetId = btn.dataset.copyTarget;
+      if (!targetId) return;
+      const targetEl = document.getElementById(targetId);
+      const textToCopy = targetEl?.textContent?.trim() || '';
+      if (!textToCopy) return;
+
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+      } catch {
+        const temp = document.createElement('textarea');
+        temp.value = textToCopy;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+      }
+
+      playMascotInteractionSound();
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>✓ Đã chép!</span>';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('copied');
+      }, 1600);
+    });
+  });
+
+  // Quick message form submission
+  quickContactForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = quickContactInput?.value.trim();
+    if (!text) {
+      quickContactInput?.focus();
+      return;
+    }
+
+    if (quickContactInput) quickContactInput.value = '';
+    playMascotInteractionSound();
+
+    if (mascotSpeechText) {
+      mascotSpeechText.textContent = 'Cảm ơn bạn! Đặc vụ Miu đã nhận lời nhắn và gửi tới đội ngũ On-Lies rồi nhé! 🚀🐾';
+    }
+
+    const svgBox = mascotTrigger?.querySelector('.mascot-svg-box');
+    if (svgBox) {
+      svgBox.classList.remove('wobble');
+      void (svgBox as HTMLElement).offsetWidth;
+      svgBox.classList.add('wobble');
+    }
+
+    if (quickContactNotice) {
+      quickContactNotice.textContent = '✓ Lời nhắn đã được ghi nhận!';
+      quickContactNotice.classList.remove('hidden');
+      setTimeout(() => {
+        quickContactNotice.classList.add('hidden');
+      }, 3500);
+    }
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!contactWidget.classList.contains('is-open')) return;
+    const target = e.target as Node;
+    if (!contactWidget.contains(target) && !toggleContactBtn.contains(target)) {
+      toggleContactWidget(false);
+    }
+  });
+
+  // Close with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && contactWidget.classList.contains('is-open')) {
+      toggleContactWidget(false);
+    }
+  });
+}
+
 // Initializations
+initContactWidget();
 initTheme();
 updateClock();
 updateProgress();

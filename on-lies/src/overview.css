@@ -1891,3 +1891,518 @@
   background: var(--home-paper);
   border-color: var(--home-line);
 }
+
+
+/* ==========================================================================
+   MASCOT & CONTACT GUI WIDGET (#contactMascotWidget)
+   ========================================================================== */
+.device-shell:has(.overview-home:not(.hidden)) .home-nav .home-nav-active {
+  color: #1D4ED8;
+  border-color: #1D4ED8;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .device-shell:has(.overview-home:not(.hidden)) .home-nav button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .device-shell:has(.overview-home:not(.hidden)) .home-nav button:hover,
+[data-theme="dark"] .device-shell:has(.overview-home:not(.hidden)) .home-nav .home-nav-current,
+[data-theme="dark"] .device-shell:has(.overview-home:not(.hidden)) .home-nav .home-nav-active {
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.contact-mascot-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  z-index: 1000;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(100% + 80px)) scale(0.9);
+  transform-origin: bottom right;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.25), opacity 0.35s ease, visibility 0.5s;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-mascot-widget.is-open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Mascot Head / Peek Element */
+.mascot-badge-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: -10px;
+  padding-left: 14px;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.mascot-svg-box {
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.16));
+  animation: mascotFloat 3.6s ease-in-out infinite;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mascot-svg-box:hover {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.mascot-svg-box.wobble {
+  animation: mascotWobble 0.65s ease-in-out;
+}
+
+.mascot-speech-bubble {
+  position: relative;
+  background: var(--home-paper);
+  border: 1px solid var(--home-line-strong);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--home-ink);
+  max-width: 240px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+
+.mascot-speech-bubble:hover {
+  transform: translateY(-2px);
+  border-color: var(--home-blue);
+}
+
+.mascot-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 20px;
+  width: 10px;
+  height: 10px;
+  background: var(--home-paper);
+  border-right: 1px solid var(--home-line-strong);
+  border-bottom: 1px solid var(--home-line-strong);
+  transform: rotate(45deg);
+}
+
+.speech-sparkle {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.mascot-speech-bubble p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Contact Card Container */
+.contact-card {
+  background: var(--home-paper);
+  border: 1px solid var(--home-line-strong);
+  border-radius: 20px;
+  box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--home-line);
+  background: var(--home-subtle);
+}
+
+.contact-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-online-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #16a34a;
+  letter-spacing: 0.02em;
+}
+
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+  animation: greenPulse 2s infinite;
+}
+
+.contact-card-header h3 {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--home-ink);
+  margin: 0;
+}
+
+.contact-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--home-paper);
+  border: 1px solid var(--home-line);
+  color: var(--home-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.contact-close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: rotate(90deg);
+}
+
+.contact-body {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-subtext {
+  font-size: 11.5px;
+  color: var(--home-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  background: var(--home-subtle);
+  border: 1px solid var(--home-line);
+  border-radius: 12px;
+  transition: all 0.18s ease;
+}
+
+.contact-item:hover {
+  border-color: #93c5fd;
+  background: var(--home-blue-soft);
+  transform: translateX(2px);
+}
+
+.contact-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.contact-item-icon.phone-icon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.contact-item-icon.email-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.contact-item-icon.loc-icon {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.contact-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-item-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--home-muted);
+  margin-bottom: 2px;
+}
+
+.contact-item-val {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--home-ink);
+  font-family: var(--home-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-item-text {
+  display: block;
+  font-size: 11px;
+  color: var(--home-secondary);
+  line-height: 1.35;
+}
+
+.contact-copy-btn {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--home-paper);
+  border: 1px solid var(--home-line-strong);
+  color: var(--home-blue);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.contact-copy-btn:hover {
+  background: var(--home-blue);
+  color: #ffffff;
+  border-color: var(--home-blue);
+}
+
+.contact-copy-btn.copied {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  border-color: #22c55e !important;
+}
+
+/* Social Channels */
+.contact-channels {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.channels-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--home-muted);
+}
+
+.channel-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.channel-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid var(--home-line);
+  background: var(--home-subtle);
+  color: var(--home-ink);
+  transition: all 0.18s ease;
+}
+
+.channel-pill:hover {
+  transform: translateY(-1px);
+  border-color: var(--home-blue);
+  color: var(--home-blue);
+}
+
+/* Quick Message Box */
+.contact-quick-msg {
+  background: var(--home-subtle);
+  border: 1px solid var(--home-line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.quick-msg-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--home-secondary);
+}
+
+.quick-msg-form {
+  display: flex;
+  gap: 6px;
+}
+
+#quickContactInput {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--home-line-strong);
+  background: var(--home-paper);
+  font-size: 11.5px;
+  color: var(--home-ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#quickContactInput:focus {
+  border-color: var(--home-blue);
+  box-shadow: 0 0 0 2px var(--home-blue-soft);
+}
+
+.quick-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--home-blue);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.quick-send-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.quick-send-btn:active {
+  transform: translateY(0);
+}
+
+.quick-msg-notice {
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  animation: fadeIn 0.25s ease;
+}
+
+/* Animations */
+@keyframes mascotFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.2deg);
+  }
+}
+
+@keyframes mascotWobble {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.15) rotate(-6deg); }
+  50% { transform: scale(1.15) rotate(6deg); }
+  75% { transform: scale(1.08) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes greenPulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+  70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Dark Theme Overrides for Contact Mascot */
+[data-theme="dark"] .contact-mascot-widget .contact-card {
+  box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .contact-item-icon.phone-icon {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .contact-item-icon.email-icon {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .contact-item-icon.loc-icon {
+  background: rgba(167, 139, 250, 0.2);
+  color: #c4b5fd;
+}
+
+[data-theme="dark"] .contact-online-badge {
+  color: #4ade80;
+}
+
+[data-theme="dark"] .online-dot {
+  background: #4ade80;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
+}
+
+[data-theme="dark"] .quick-msg-notice {
+  color: #4ade80;
+}
+
+@media (max-width: 480px) {
+  .contact-mascot-widget {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+  .mascot-speech-bubble {
+    max-width: 190px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-mascot-widget {
+    transition: opacity 0.2s ease, visibility 0.2s;
+    transform: none !important;
+  }
+  .mascot-svg-box {
+    animation: none !important;
+  }
+}
