@@ -36,7 +36,7 @@ export const isSupabaseConfigured = Boolean(
   !supabaseUrl.includes('your-project-id')
 );
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
+export const supabase: SupabaseClient | null = isSupabaseConfigured && typeof createClient === 'function'
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 

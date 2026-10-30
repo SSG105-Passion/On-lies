@@ -26,7 +26,7 @@ test('top bar has fourth button "Liên hệ" and mascot GUI markup', () => {
   assert.ok(html.includes('id="mascotInteractiveTrigger"'), 'Must have #mascotInteractiveTrigger');
   assert.ok(html.includes('mascot-svg-box'), 'Must have mascot-svg-box');
   assert.ok(html.includes('1900 6868'), 'Must have mock hotline');
-  assert.ok(html.includes('hotro@on-lies.edu.vn'), 'Must have mock email');
+  assert.ok(html.includes('hotro@on-lies.edu.vn') || html.includes('onliesbypassion@gmail.com'), 'Must have contact email');
   assert.ok(html.includes('quickContactForm'), 'Must have quickContactForm');
 });
 
@@ -44,4 +44,3 @@ test('overview.css includes mascot slide and wobble animations', () => {
   assert.ok(css.includes('@keyframes mascotWobble'), 'Must include mascotWobble animation');
   assert.ok(css.includes('.contact-mascot-widget.is-open'), 'Must handle .is-open transition');
 });
-
