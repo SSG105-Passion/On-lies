@@ -4,6 +4,8 @@ services:
     env: node
     plan: free
     region: oregon
+    branch: main
+    autoDeploy: true
     buildCommand: cd on-lies && npm install --include=dev && npm run build
     startCommand: cd on-lies && node server/index.js
     envVars:
