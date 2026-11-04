@@ -2406,3 +2406,457 @@
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   GLOBAL DARK MODE POLISH & THEMING (LOBBY, MODALS, CARDS, DIALOGS)
+   ========================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] * {
+  scrollbar-color: #334155 #0b0f19;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Lobby at night surfaces */
+[data-theme="dark"] .overview-home {
+  --home-ground: #0b0f19;
+  --home-paper: #121826;
+  --home-subtle: #172033;
+  --home-ink: #f8fafc;
+  --home-secondary: #cbd5e1;
+  --home-muted: #94a3b8;
+  --home-line: rgba(255, 255, 255, 0.08);
+  --home-line-strong: rgba(255, 255, 255, 0.16);
+  --home-blue: #38bdf8;
+  --home-blue-soft: rgba(56, 189, 248, 0.15);
+  --home-emerald: #34d399;
+  --home-emerald-soft: rgba(52, 211, 153, 0.15);
+}
+
+[data-theme="dark"] .home-game,
+[data-theme="dark"] .home-profile,
+[data-theme="dark"] .home-leaderboard {
+  background: var(--home-paper);
+  border-color: var(--home-line);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .home-game:hover {
+  border-color: var(--home-blue);
+  box-shadow: 0 8px 30px rgba(56, 189, 248, 0.15);
+}
+
+[data-theme="dark"] .home-brand > strong,
+[data-theme="dark"] .home-brand > svg {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .home-account:hover {
+  background: var(--home-subtle);
+  border-color: var(--home-blue);
+}
+
+/* CA 01 - Inspector Mail Art */
+[data-theme="dark"] .home-game.inspector .home-game-art {
+  background: linear-gradient(145deg, #251e15 0%, #1a150e 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .overview-home .mini-folder {
+  background: #3d301c;
+  border-color: #5c4728;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+[data-theme="dark"] .overview-home .mini-paper {
+  background: #252019;
+  border-color: #4d3d29;
+  color: #e2d7c0;
+}
+[data-theme="dark"] .overview-home .mini-paper-highlight {
+  background: #3b311e;
+  color: #eccb78;
+}
+[data-theme="dark"] .overview-home .mini-stamp {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+  border-color: #f87171;
+}
+
+/* CA 02 - SMS Shield Art */
+[data-theme="dark"] .home-game.sms .home-game-art {
+  background: linear-gradient(145deg, #182635 0%, #101a24 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .overview-home .mini-messenger {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+[data-theme="dark"] .overview-home .mini-contact {
+  color: #f1f5f9;
+  border-bottom-color: #334155;
+}
+[data-theme="dark"] .overview-home .mini-contact small {
+  color: #94a3b8;
+}
+[data-theme="dark"] .overview-home .mini-avatar {
+  background: #2563eb;
+  color: #ffffff;
+}
+[data-theme="dark"] .overview-home .mini-bubble {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  color: #e2e8f0;
+}
+[data-theme="dark"] .overview-home .mini-source {
+  color: #38bdf8;
+}
+
+/* CA 03 - Phone Hotline Art */
+[data-theme="dark"] .home-game.phone .home-game-art {
+  background: linear-gradient(145deg, #1a1e2c 0%, #121520 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .overview-home .mini-caller {
+  background: #151926;
+  border-color: #2e364a;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  color: #f1f5f9;
+}
+
+/* CA 04 - Family Rescue Art */
+[data-theme="dark"] .home-game.family .home-game-art {
+  background: linear-gradient(145deg, #162a22 0%, #0e1c16 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .overview-home .mini-family .mini-contact {
+  color: #e2f0e8;
+  border-bottom-color: #244336;
+}
+[data-theme="dark"] .overview-home .mini-family .mini-contact small {
+  color: #86b29b;
+}
+[data-theme="dark"] .overview-home .mini-family .mini-avatar {
+  background: #059669;
+  color: #ffffff;
+}
+[data-theme="dark"] .overview-home .mini-family .mini-bubble {
+  background: #13271f;
+  border: 1px solid #234839;
+  color: #e2f0e8;
+}
+[data-theme="dark"] .overview-home .mini-family .outgoing {
+  background: #1b4332;
+  border-color: #2d6a4f;
+  color: #d8f3dc;
+}
+
+/* Daily Tip in Dark Mode (High contrast amber, crisp text) */
+[data-theme="dark"] .home-tip {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  color: #fde68a;
+}
+[data-theme="dark"] .home-tip-icon {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+}
+[data-theme="dark"] .home-tip-body {
+  color: #fde68a;
+}
+[data-theme="dark"] .home-tip-body strong {
+  color: #fef08a;
+}
+[data-theme="dark"] #closeTipBtn {
+  color: #fde68a;
+  background: transparent;
+  border: 0;
+  opacity: 0.75;
+  cursor: pointer;
+}
+[data-theme="dark"] #closeTipBtn:hover {
+  opacity: 1;
+  color: #ffffff;
+}
+
+/* Game Card Controls & Rewards */
+[data-theme="dark"] .home-xp-reward {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .home-game-progress {
+  background: var(--home-subtle);
+  border-color: var(--home-line);
+}
+
+[data-theme="dark"] .home-game-skill {
+  color: var(--home-muted);
+}
+
+[data-theme="dark"] .home-game-count {
+  color: var(--home-ink);
+}
+
+[data-theme="dark"] .home-game-progress-bar,
+[data-theme="dark"] .home-profile progress {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .home-game-progress-bar span {
+  background: #38bdf8;
+}
+
+[data-theme="dark"] .home-game-action {
+  background: var(--home-subtle);
+  border-color: var(--home-line);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .home-game-action:hover {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+/* Leaderboard Ranking Items */
+[data-theme="dark"] .home-rank-list .rank-1 {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+[data-theme="dark"] .home-rank-list .rank-current {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+[data-theme="dark"] .home-rank-list .rank-num {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--home-secondary);
+}
+
+/* Journey Badges */
+[data-theme="dark"] .home-badge {
+  background: var(--home-subtle);
+  border-color: var(--home-line);
+  color: var(--home-secondary);
+}
+
+[data-theme="dark"] .home-badge.unlocked {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #34d399;
+}
+
+[data-theme="dark"] .home-journey .progress-track {
+  background: #1e293b;
+}
+
+/* ==========================================================================
+   AUTH & ACCOUNT MODAL DARK THEME (#authModal)
+   ========================================================================== */
+[data-theme="dark"] #authModal.modal-backdrop {
+  background: rgba(5, 8, 15, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] #authModal .auth-card {
+  background: #121826;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .auth-card-header {
+  background: #172033;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] #authModal .auth-card-icon {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] #authModal .auth-card-title h3 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .auth-card-title small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .close-modal-x {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .close-modal-x:hover {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] #authModal .auth-tabs {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #authModal .auth-tab {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .auth-tab:hover {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .auth-tab.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+}
+
+[data-theme="dark"] #authModal .form-group label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] #authModal .form-group input {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .form-group input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] #authModal .form-group input:focus {
+  background: #1b253b;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  outline: none;
+}
+
+[data-theme="dark"] #authModal .auth-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] #authModal .primary-button {
+  background: #0284c7;
+  border: 1px solid #38bdf8;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+[data-theme="dark"] #authModal .primary-button:hover {
+  background: #0369a1;
+}
+
+[data-theme="dark"] #authModal .auth-disclaimer {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .auth-avatar-big {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] #authModal .auth-profile-view h4 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .auth-email-text {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .auth-stats-row div {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #authModal .auth-stats-row small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] #authModal .auth-stats-row strong {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] #authModal .secondary-button {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] #authModal .secondary-button:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+/* ==========================================================================
+   HELP & SAFETY DIALOGS DARK THEME (.home-dialog)
+   ========================================================================== */
+[data-theme="dark"] .home-dialog {
+  background: #121826;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="dark"] .home-dialog::backdrop {
+  background: rgba(5, 8, 15, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .home-dialog-close {
+  background: #172033;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .home-dialog-close:hover {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] .home-dialog h2,
+[data-theme="dark"] .home-dialog strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .home-dialog p,
+[data-theme="dark"] .home-dialog li {
+  color: #cbd5e1;
+}
+
+/* Mascot Contact Widget hover polish */
+[data-theme="dark"] .contact-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
