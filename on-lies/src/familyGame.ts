@@ -1,6 +1,23 @@
 import { createSessionId } from './session';
-import { beep, playEmergencyHeartbeat, playActionBeep, playTacticalSuccess } from './audio';
-import { renderFamilyIntro, renderFamilyScene, renderFamilySummary } from './familyView';
+import {
+  beep,
+  playActionBeep,
+  playTacticalSuccess,
+  playSirenAlert,
+  playTickTock,
+  playSystemHalt,
+  playEmergencyHeartbeat
+} from './audio';
+import {
+  renderIncidentIntro,
+  renderIncidentDashboard,
+  renderIncidentSummary
+} from './familyView';
+import type {
+  IncidentViewState,
+  IncidentHistoryItem,
+  TacticalAction
+} from './familyView';
 
 export interface FamilyGameResult {
   score: number;
@@ -15,661 +32,384 @@ declare global {
   }
 }
 
-type Who = 'family' | 'scammer' | 'me';
-
-interface ChatLine {
-  who: Who;
-  text: string;
-  attachment?: {
-    type: 'doc' | 'image' | 'warning';
-    badge: string;
-    title: string;
-    desc: string;
-  };
-}
-
-interface Choice {
-  text: string;
-  tacticLabel: string;
-  fear: number;
-  trust: number;
-  next: string;
-}
-
-interface Node {
-  lines: ChatLine[];
-  choices?: Choice[];
-  ending?: 'win' | 'lose';
-  lesson?: string;
-  locationStatus?: string;
-}
-
-interface Scene {
-  id?: number;
+export interface IncidentCase {
+  id: number;
+  code: string;
   title: string;
-  relative: string;
-  relationship: string;
-  crisisContext: string;
-  location: string;
-  start: string;
-  nodes: Record<string, Node>;
+  victimName: string;
+  victimDevice: string;
+  threatLevel: 'CRITICAL' | 'EXTREME' | 'HIGH';
+  targetAsset: string;
+  initialTime: number;
+  story: string;
+  initialPhoneStatus: string;
+  actions: TacticalAction[];
+  requiredSequence: string[];
+  forensicLesson: string;
 }
 
-const SCENES: Scene[] = [
+const INCIDENTS: IncidentCase[] = [
   {
     id: 1,
-    title: 'Mẹ đang đứng ở quầy ngân hàng rút sổ tiết kiệm 300 triệu',
-    relative: 'Mẹ',
-    relationship: 'Mẹ ruột • 58 tuổi',
-    crisisContext: 'Mẹ nhận được cuộc gọi từ số lạ tự xưng cơ quan kiểm sát, bị yêu cầu giữ máy liên tục suốt 2 tiếng và đang đứng ở quầy ngân hàng chuẩn bị rút sổ tiết kiệm 300 triệu chuyển vào tài khoản thanh tra. Mẹ đang lén nhắn tin cho bạn từ quầy!',
-    location: 'Quầy giao dịch Ngân hàng (Đang cầm bút chuẩn bị ký giấy rút tiền)',
-    start: 'start',
-    nodes: {
-      start: {
-        locationStatus: 'Mẹ đang xếp hàng trước quầy rút tiền, tai vẫn đeo tai nghe bị đe dọa liên tục',
-        lines: [
-          {
-            who: 'family',
-            text: 'Con ơi, có cán bộ Viện Kiểm sát đang nghe máy mẹ suốt từ sáng. Họ bảo số CMND cũ của mẹ liên quan tài khoản ma túy 15 tỷ ở Đà Nẵng, bắt mẹ ra rút hết sổ tiết kiệm 300 triệu dưỡng già nộp vào tài khoản thanh tra. Họ dặn nếu nhân viên ngân hàng hỏi thì bảo rút cho con mua đất, cấm nói vụ án kẻo bị còng tay ngay tại quầy... Mẹ run bần bật, sắp đến số thứ tự rồi con ơi!'
-          },
-          {
-            who: 'scammer',
-            text: 'Bà Nguyễn Thị Lan, chú ý camera an ninh! Đến lượt vào quầy thì làm theo đúng kịch bản, tuyệt đối không tháo tai nghe!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Trấn an & Kế hoãn binh tại chỗ',
-            text: 'Mẹ hít thở sâu, con đang ở cạnh mẹ đây! Mẹ giả vờ ho nhiều hoặc cần đi vệ sinh gấp để nhường lượt cho người sau, lùi lại 5 phút ra ghế chờ nhé mẹ.',
-            fear: -2,
-            trust: -2,
-            next: 'stall_bank'
-          },
-          {
-            tacticLabel: 'Giao thức: Trực diện đối đầu & Chỉ trích',
-            text: 'Mẹ bị ngốc à? Công an nào làm việc qua điện thoại! Mẹ cúp máy ngay đi, không con mặc kệ mẹ đấy!',
-            fear: 3,
-            trust: 2,
-            next: 'lose_panic'
-          },
-          {
-            tacticLabel: 'Giao thức: Thỏa hiệp chuyển thử một phần',
-            text: 'Họ dọa ghê thế thì mẹ cứ rút chuyển trước 30 triệu cho yên chuyện kẻo bị bắt thật.',
-            fear: 1,
-            trust: 3,
-            next: 'lose_transfer'
-          }
-        ]
+    code: 'INCIDENT #01',
+    title: 'Mã Độc Chiếm Quyền Trợ Năng (Accessibility Trojan)',
+    victimName: 'Chị Ngọc Mai (31 tuổi • Kế toán viên)',
+    victimDevice: 'Samsung Galaxy A54 • Android 14',
+    threatLevel: 'CRITICAL',
+    targetAsset: '85.000.000 VNĐ (Tài khoản thanh toán lương)',
+    initialTime: 60,
+    initialPhoneStatus: 'Mã độc đang gửi lệnh chuyển tiền ngầm qua cổng 443...',
+    story: 'Nạn nhân vừa bấm vào đường link cài file "DichVuCong_CapNhat.apk". Màn hình điện thoại đột nhiên bị đen mờ, các nút cảm ứng bị vô hiệu hóa. Kẻ gian từ xa đang tự động mở app ngân hàng, tạo lệnh chuyển 80.000.000 VNĐ sang tài khoản lạ và đếm ngược chờ hoàn tất!',
+    actions: [
+      {
+        id: 'act_airplane',
+        icon: '✈️',
+        title: 'Bật Chế độ máy bay / Ngắt Wifi & 4G',
+        desc: 'Cắt đứt ngay lập tức đường truyền Internet kết nối máy chủ điều khiển C2 của hacker.',
+        successLog: 'ĐÃ CẮT KẾT NỐI MẠNG: Tín hiệu C2 của hacker bị ngắt hoàn toàn! Lệnh chuyển tiền bị kẹt.',
+        threatMitigation: 'Hacker mất quyền điều khiển từ xa. Form chuyển tiền báo lỗi Network Connection.'
       },
-      stall_bank: {
-        locationStatus: 'Mẹ đã lùi ra ghế chờ, kẻ gian liên tục quát tháo trong tai nghe',
-        lines: [
-          {
-            who: 'family',
-            text: 'Mẹ lùi ra ghế ngồi rồi... Nhưng trong tai nghe họ quát mẹ ghê quá, họ bảo xe cảnh sát đang đỗ ngoài cổng ngân hàng chờ còng tay mẹ rồi con ơi! Mẹ sợ lắm, hay mẹ cứ rút đại cho xong?'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Can thiệp Ngoại tuyến & Bảo vệ quầy',
-            text: 'Mẹ giữ nguyên tai nghe đừng nói gì cả! Mẹ đứng dậy bước ngay tới bàn chú bảo vệ và cô giao dịch viên, đưa dòng tin nhắn này của con cho cô ấy đọc: "Tôi đang bị kẻ lạ dọa qua điện thoại ép rút tiền, xin giữ tôi lại!".',
-            fear: -3,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Kiểm tra Thực địa & Vạch trần',
-            text: 'Mẹ nhìn qua cửa kính xem có xe cảnh sát nào không? Không hề có chiếc nào! Viện kiểm sát chỉ gửi giấy mời qua bưu chính, không bao giờ giám sát qua tai nghe điện thoại đâu mẹ.',
-            fear: -1,
-            trust: -2,
-            next: 'verify_paper'
-          },
-          {
-            tacticLabel: 'Giao thức: Ép người thân tự đôi co',
-            text: 'Mẹ hét vào tai nghe bảo con trai mẹ làm luật sư xem họ dám bắt mẹ không!',
-            fear: 2,
-            trust: 2,
-            next: 'lose_panic'
-          }
-        ]
+      {
+        id: 'act_revoke_accessibility',
+        icon: '🛑',
+        title: 'Thu hồi quyền Trợ năng (Accessibility) & Buộc dừng App',
+        desc: 'Tước đoạt quyền tự đọc màn hình và tự điều khiển cảm ứng của tệp APK độc.',
+        successLog: 'ĐÃ THU HỒI TRỢ NĂNG: Lớp phủ đen biến mất, tệp APK độc bị đình chỉ quyền hệ thống.',
+        threatMitigation: 'Màn hình cảm ứng sáng rõ trở lại, nạn nhân lấy lại quyền làm chủ máy.'
       },
-      verify_paper: {
-        locationStatus: 'Kẻ gian gửi Lệnh bắt giam qua Zalo để khủng bố tinh thần',
-        lines: [
-          {
-            who: 'scammer',
-            text: 'Văn bản Tống đạt: Quyết định Phê chuẩn Lệnh Bắt Tạm Giam số 812/VKSTC. Bị can: Nguyễn Thị Lan. Tội danh: Rửa tiền xuyên quốc gia.',
-            attachment: {
-              type: 'doc',
-              badge: 'TÀI LIỆU NHẬN QUA ZALO',
-              title: 'Lệnh Bắt Giữ & Phong Tỏa Tài Sản',
-              desc: 'Con dấu đỏ Viện Kiểm sát Tối cao, tiêu đề đỏ chót ghi rõ họ tên và số CCCD của mẹ.'
-            }
-          },
-          {
-            who: 'family',
-            text: 'Họ vừa gửi lệnh bắt có con dấu đỏ chót tên mẹ qua Zalo đây con ơi! Nhìn y như thật thế này sao giả được hả con?'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Bàn giao Giao dịch viên xử lý',
-            text: 'Con dấu scan giả mạo 100%! Cơ quan pháp luật tuyệt đối không gửi lệnh bắt qua Zalo. Mẹ bước ngay tới quầy đưa máy cho cô giao dịch viên giúp con!',
-            fear: -3,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Yêu cầu chuyển khoản tiền cọc',
-            text: 'Nếu có con dấu thật thì mẹ cứ chuyển trước 50 triệu coi như tiền bảo lãnh tại ngoại.',
-            fear: 2,
-            trust: 3,
-            next: 'lose_transfer'
-          }
-        ]
+      {
+        id: 'act_lock_card_secondary',
+        icon: '🔒',
+        title: 'Dùng thiết bị phụ (Laptop) đăng nhập khóa khẩn cấp thẻ & tài khoản',
+        desc: 'Đóng băng dòng tiền ngân hàng từ một kênh độc lập an toàn chưa bị nhiễm mã độc.',
+        successLog: 'ĐÃ KHÓA TÀI SẢN: Tài khoản ngân hàng và thẻ được đặt hạn mức 0 VNĐ.',
+        threatMitigation: 'Mọi giao dịch phát sinh đều bị hệ thống ngân hàng từ chối.'
       },
-      win: {
-        locationStatus: 'Bảo vệ và giao dịch viên ngân hàng đã can thiệp, mẹ an toàn 100%',
-        lines: [
-          {
-            who: 'family',
-            text: 'Con ơi, cô giao dịch viên với chú bảo vệ đọc tin nhắn của con xong liền giữ mẹ lại phòng riêng, bảo mẹ cúp máy ngay! Cô ấy bảo tuần này có 3 bác lớn tuổi cũng bị bầy lừa đảo dọa y hệt như mẹ. Sổ tiết kiệm 300 triệu của mẹ vẫn nguyên vẹn, mẹ cảm ơn con nhiều lắm!'
-          }
-        ],
-        ending: 'win',
-        lesson: 'Kẻ giả danh công an/viện kiểm sát thường ép nạn nhân đeo tai nghe và dặn nói dối nhân viên ngân hàng để ngăn cản sự phát hiện. Hướng dẫn người thân ra hiệu cho giao dịch viên hoặc bảo vệ quầy là cách giải cứu hữu hiệu nhất.'
+      {
+        id: 'act_safe_mode_clean',
+        icon: '🧹',
+        title: 'Khởi động vào Safe Mode & Gỡ bỏ tận gốc tệp .APK độc',
+        desc: 'Quét sạch mã độc khỏi hệ điều hành mà không cho mã độc tự kích hoạt lại.',
+        successLog: 'ĐÃ LÀM SẠCH: Gỡ bỏ hoàn toàn DichVuCong_CapNhat.apk khỏi bộ nhớ máy.',
+        threatMitigation: 'Thiết bị hoàn toàn sạch bóng mã độc, hệ thống an toàn 100%.'
       },
-      lose_panic: {
-        locationStatus: 'Mẹ quá hoảng loạn, cúp máy với bạn và làm theo lệnh kẻ gian',
-        lines: [
-          {
-            who: 'family',
-            text: 'Con gắt gỏng với mẹ quá làm mẹ rối trí chẳng biết tin ai... Mẹ sợ bị còng tay trước mặt bao nhiêu người nên đã làm theo lời họ rút hết tiền chuyển đi rồi... Giờ họ khóa máy mẹ mới biết bị lừa, mất trắng 300 triệu rồi con ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Khi người thân đang bị thao túng tâm lý sợ hãi, việc chỉ trích gay gắt sẽ làm nạn nhân rối loạn và đẩy họ vào vòng xoáy nghe lời kẻ gian. Cần bình tĩnh trấn an và hướng dẫn hành động cụ thể tại chỗ.'
+      {
+        id: 'act_fatal_enter_pwd',
+        icon: '🔑',
+        title: 'Mở trực tiếp App ngân hàng trên máy đổi mật khẩu ngay',
+        desc: 'Đổi mật khẩu mới ngay trên màn hình điện thoại đang bị nhiễm mã độc.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM CHẾT NGƯỜI: Mã độc đang chạy ngầm và ghi lại toàn bộ thao tác phím (Keylogger) & quay video màn hình. Bạn nhập mật khẩu mới vào chính là dâng mật khẩu mới cho hacker! 80 triệu bị rút sạch ngay lập tức!',
+        successLog: '',
+        threatMitigation: ''
       },
-      lose_transfer: {
-        locationStatus: 'Mẹ đã chuyển tiền vào tài khoản rửa tiền của kẻ lừa đảo',
-        lines: [
-          {
-            who: 'family',
-            text: 'Mẹ vừa chuyển tiền xong thì đầu dây bên kia cười phá lên rồi chặn Zalo mẹ luôn... Mất hết tiền dưỡng già rồi con ơi, mẹ biết sống sao đây!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Tuyệt đối không bao giờ có khái niệm "chuyển tạm tiền thanh tra" hay "tiền bảo lãnh vào tài khoản cá nhân". Một khi đã chuyển tiền thì gần như không thể thu hồi.'
+      {
+        id: 'act_fatal_call_scammer',
+        icon: '📞',
+        title: 'Gọi điện thoại cho số lạ chửi bới yêu cầu dừng lại',
+        desc: 'Cố gắng tranh luận bằng điện thoại để đe dọa kẻ gian.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM TAI HẠI: Kẻ lừa đảo biết nạn nhân đã phát hiện, lập tức kích hoạt lệnh rút tiền khẩn cấp từ xa. Tiền bị tẩu tán trong chớp mắt!',
+        successLog: '',
+        threatMitigation: ''
       }
-    }
+    ],
+    requiredSequence: ['act_airplane', 'act_revoke_accessibility', 'act_lock_card_secondary', 'act_safe_mode_clean'],
+    forensicLesson: 'Quy tắc vàng khi bị mã độc Trợ năng (Accessibility Trojan): BƯỚC 1 PHẢI LÀ NGẮT MẠNG (Chế độ máy bay) để cắt quyền điều khiển từ xa của hacker. Tuyệt đối không nhập bất kỳ mật khẩu nào trên máy đang nhiễm.'
   },
   {
     id: 2,
-    title: 'Bố đang ở tiệm vàng & công ty tài chính định thế chấp sổ đỏ vay nóng',
-    relative: 'Bố',
-    relationship: 'Bố • 62 tuổi',
-    crisisContext: 'Bố tham gia hội nhóm đầu tư vàng quốc tế được hứa hẹn lợi nhuận cao. Bố giấu cả nhà mang sổ đỏ căn nhà ra tiệm vàng kiêm dịch vụ tài chính làm thủ tục thế chấp vay 500 triệu để nộp vào quỹ đầu tư!',
-    location: 'Tiệm vàng & Văn phòng Cho vay Tư nhân',
-    start: 'start',
-    nodes: {
-      start: {
-        locationStatus: 'Bố đang ngồi trong phòng tiếp khách tiệm vàng, tập hồ sơ thế chấp đã mở sẵn trên bàn',
-        lines: [
-          {
-            who: 'family',
-            text: 'Con à, bố đang ở chỗ người quen làm thủ tục vay vốn. Thầy trưởng nhóm đầu tư sàn vàng Dubai bảo hôm nay là hạn chót nâng cấp gói VIP lợi nhuận 30%/tháng. Bố thế chấp sổ đỏ vay 500 triệu nộp vào, tháng sau rút lãi mua cho con chiếc ô tô. Họ đang in hợp đồng, bố nhắn để con mừng!'
-          },
-          {
-            who: 'scammer',
-            text: 'Bác Ba cứ yên tâm ký hợp đồng vay thế chấp, chuyển tiền vào ví sàn trước 11h30 là tài khoản tự động nhảy lãi suất 30% ngay trong ngày!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Trì hoãn Pháp lý & Chuyên gia đối soát',
-            text: 'Bố ơi chuyện lớn thế này bố dừng bút lại 30 phút! Bố chụp hợp đồng thế chấp gửi con, con nhờ anh bạn thân làm phòng công chứng nhà nước kiểm tra điều khoản lãi suất giúp bố.',
-            fear: -2,
-            trust: -2,
-            next: 'stall_legal'
-          },
-          {
-            tacticLabel: 'Giao thức: Gọi mẹ làm ầm ĩ tại chỗ',
-            text: 'Bố điên rồi à? Bố dám mang sổ đỏ nhà đi cắm! Con gọi ngay cho mẹ ra tiệm vàng lôi bố về!',
-            fear: 3,
-            trust: 2,
-            next: 'lose_stubborn'
-          },
-          {
-            tacticLabel: 'Giao thức: Động viên bố vay thêm',
-            text: 'Nếu lãi 30%/tháng thật thì bố hỏi vay hẳn 1 tỷ cho bõ công!',
-            fear: 1,
-            trust: 4,
-            next: 'lose_ruined'
-          }
-        ]
+    code: 'INCIDENT #02',
+    title: 'Chiếm Đoạt Quyền SIM & Hack Phiên Đăng Nhập (SIM Swap)',
+    victimName: 'Anh Tuấn (36 tuổi • Chủ shop thời trang)',
+    victimDevice: 'iPhone 15 Pro • iOS 18',
+    threatLevel: 'EXTREME',
+    targetAsset: 'Ví MoMo 40.000.000 VNĐ & Danh bạ 500 khách hàng',
+    initialTime: 60,
+    initialPhoneStatus: 'SIM báo Không có Dịch vụ • Hacker đang yêu cầu mã xác thực...',
+    story: 'SIM điện thoại đột ngột mất sóng ("Không có dịch vụ"). Thông báo Telegram/Email trên máy tính cảnh báo có phiên đăng nhập mới từ IP Campuchia. Kẻ gian vừa cướp số SIM và đang chuẩn bị đổi tài khoản ví điện tử liên kết số điện thoại!',
+    actions: [
+      {
+        id: 'act_revoke_sessions',
+        icon: '💻',
+        title: 'Dùng máy tính bấm "Đăng xuất khỏi tất cả phiên làm việc khác"',
+        desc: 'Đá văng ngay lập tức kết nối của hacker khỏi tài khoản Telegram/Zalo/Email.',
+        successLog: 'ĐÃ ĐĂNG XUẤT: Phiên đăng nhập trái phép tại Campuchia bị cắt đứt tức thì.',
+        threatMitigation: 'Hacker bị mất phiên truy cập vào hòm thư và ứng dụng nhắn tin.'
       },
-      stall_legal: {
-        locationStatus: 'Bố tạm hoãn ký, nhóm tư vấn tiệm vàng bắt đầu hối thúc giục giã',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bố bảo họ chờ tí thì mấy cậu chuyên gia này khó chịu, bảo chậm 15 phút là sàn đóng cổng VIP mất cơ hội đổi đời. Bố thấy sốt ruột quá, hay cứ ký tạm?'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Kích hoạt Thử thách Rút thử Vốn',
-            text: 'Bố ơi, quy tắc vàng đầu tư tài chính: Bố bảo họ cho bố rút thử 5 triệu tiền lãi từ tài khoản sàn hiện tại về thẻ ngân hàng trước mặt bố xem có về tài khoản không. Không rút được là lừa đảo 100%!',
-            fear: -3,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Cung cấp Văn bản Cảnh báo Ngân hàng Nhà nước',
-            text: 'Ngân hàng Nhà nước Việt Nam nghiêm cấm mọi sàn giao dịch vàng và ngoại hối forex tư nhân. Ai cam kết lãi 30%/tháng đều là mô hình Ponzi lừa đảo lấy tiền người sau trả người trước bố ơi.',
-            fear: -2,
-            trust: -2,
-            next: 'show_proof'
-          }
-        ]
+      {
+        id: 'act_lock_sim',
+        icon: '📞',
+        title: 'Dùng điện thoại bàn gọi tổng đài nhà mạng khóa khẩn cấp số SIM bị cướp',
+        desc: 'Yêu cầu nhà mạng vô hiệu hóa ngay phôi SIM rác mà kẻ gian vừa chiếm quyền.',
+        successLog: 'ĐÃ KHÓA SỐ SIM: Phôi SIM giả mạo bị cắt chiều nhận cuộc gọi và tin nhắn SMS OTP.',
+        threatMitigation: 'Kẻ gian không thể nhận thêm bất kỳ mã xác thực OTP nào.'
       },
-      show_proof: {
-        locationStatus: 'Kẻ gian bắt đầu đưa giấy tờ pháp lý giả mạo để phản bác',
-        lines: [
-          {
-            who: 'scammer',
-            text: 'Bác nhìn xem, đây là Giấy chứng nhận Đăng ký Doanh nghiệp Tài chính Đa quốc gia có con dấu chứng nhận của Ủy ban Tài chính Dubai!',
-            attachment: {
-              type: 'doc',
-              badge: 'HỒ SƠ TÀI CHÍNH QUỐC TẾ',
-              title: 'Chứng chỉ Quỹ Vàng Hoàng Gia',
-              desc: 'Văn bản tiếng Anh in lem nhem, hoàn toàn không có giá trị pháp lý tại Việt Nam.'
-            }
-          },
-          {
-            who: 'family',
-            text: 'Họ chìa giấy phép quốc tế có mộc vàng đây con, nhìn sang trọng lắm!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Lệnh can thiệp chốt chặn gia đình',
-            text: 'Bố cầm sổ đỏ bước ra khỏi tiệm vàng ngay lập tức! Con đang ở trước cổng với chú công an phường đây rồi, tuyệt đối không ký bất kỳ giấy tờ gì!',
-            fear: -4,
-            trust: -5,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Bỏ cuộc để bố tự quyết',
-            text: 'Tùy bố, sau này mất nhà thì bố đừng trách con không cảnh báo!',
-            fear: 2,
-            trust: 3,
-            next: 'lose_ruined'
-          }
-        ]
+      {
+        id: 'act_freeze_wallet',
+        icon: '🔒',
+        title: 'Đăng nhập ví điện tử & App ngân hàng trên máy tính đóng băng tài khoản',
+        desc: 'Tạm khóa tính năng liên kết ví và chuyển tiền từ website ngân hàng.',
+        successLog: 'ĐÃ ĐÓNG BĂNG VÍ: Mọi giao dịch chuyển tiền từ ví MoMo tạm thời bị khóa cứng.',
+        threatMitigation: 'Toàn bộ 40.000.000 VNĐ trong ví được bảo toàn an toàn.'
       },
-      win: {
-        locationStatus: 'Bố đã nhận ra bộ mặt sàn ảo, cất sổ đỏ ra về an toàn',
-        lines: [
-          {
-            who: 'family',
-            text: 'Con ơi, bố yêu cầu rút thử 5 triệu thì họ bắt bố phải nộp thêm 50 triệu tiền "phí bảo hiểm luồng tiền" mới cho rút! Đúng y như lời con nói, tiền vào thì dễ tiền ra thì không bao giờ có! Bố cầm sổ đỏ về nhà rồi, hú vía suýt nữa mất cả căn nhà gia đình!'
-          }
-        ],
-        ending: 'win',
-        lesson: 'Các sàn đầu tư vàng ảo, forex với cam kết lãi suất phi thực tế (20-30%/tháng) đều là bẫy lừa đảo Ponzi. Luôn thử tính năng rút tiền và kiểm tra giấy phép của Ngân hàng Nhà nước trước mọi giao dịch lớn.'
+      {
+        id: 'act_hardware_2fa',
+        icon: '🛡️',
+        title: 'Kích hoạt xác thực 2 yếu tố (2FA) qua ứng dụng Authenticator',
+        desc: 'Loại bỏ hoàn toàn cơ chế nhận OTP qua SMS dễ bị đánh cắp.',
+        successLog: 'ĐÃ NÂNG CẤP 2FA: Tài khoản được bảo vệ bằng mã bảo mật Authenticator.',
+        threatMitigation: 'Triệt tiêu hoàn toàn nguy cơ bị chiếm đoạt tài khoản trong tương lai.'
       },
-      lose_stubborn: {
-        locationStatus: 'Bố tự ái, khóa máy và ký hợp đồng thế chấp',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bố tự ái vì con coi thường bố nên đã ký vay nộp hết tiền vào sàn rồi... Giờ trang web sàn biến mất, tiệm vàng cho người đến xiết nhà đòi 500 triệu cả gốc lẫn lãi... Bố ân hận quá con ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Với người lớn tuổi, lòng tự trọng rất cao. Tránh dùng từ ngữ xúc phạm hoặc dọa mách người khác, hãy dùng lý lẽ chuyên môn và tình cảm để giải thích.'
+      {
+        id: 'act_fatal_sms_reset',
+        icon: '📩',
+        title: 'Bấm "Quên mật khẩu" nhận mã OTP về số SIM đang mất sóng',
+        desc: 'Cố gắng khôi phục tài khoản bằng cách nhận mã OTP về số điện thoại.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM NGHIÊM TRỌNG: SIM của bạn đã bị kẻ gian nhân bản cướp sóng! Bạn bấm gửi OTP là mã sẽ nhảy thẳng về máy của hacker, giúp chúng đổi mật khẩu ví nhanh hơn!',
+        successLog: '',
+        threatMitigation: ''
       },
-      lose_ruined: {
-        locationStatus: 'Căn nhà bị thế chấp, sàn vàng ảo sập hoàn toàn',
-        lines: [
-          {
-            who: 'family',
-            text: 'Sàn vàng sập rồi, nhóm Zalo bị xóa sạch, nợ nần chồng chất giờ bố mẹ biết dọn đi đâu đây con...'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Lòng tham trước các khoản lợi nhuận siêu thực tế luôn là mồi nhử chết người. Hãy luôn bảo vệ tài sản pháp lý gia đình trước mọi hình thức ủy thác tài chính không chính thống.'
+      {
+        id: 'act_fatal_wait_tomorrow',
+        icon: '⏳',
+        title: 'Chờ đến sáng mai ra quầy giao dịch nhà mạng làm lại SIM',
+        desc: 'Để qua đêm rồi sáng mai mới ra cửa hàng viễn thông.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM CHẬM TRỄ: Tội phạm SIM Swap chuyên hành động vào ban đêm! Trong lúc bạn ngủ, kẻ gian đã dùng SIM rút sạch 40 triệu và nhắn tin lừa tiền toàn bộ người thân trong danh bạ!',
+        successLog: '',
+        threatMitigation: ''
       }
-    }
+    ],
+    requiredSequence: ['act_revoke_sessions', 'act_lock_sim', 'act_freeze_wallet', 'act_hardware_2fa'],
+    forensicLesson: 'Khi SIM đột ngột mất sóng ("Không có dịch vụ") kèm cảnh báo đăng nhập lạ: 100% là bẫy SIM Swap. Hãy lập tức đăng xuất phiên làm việc từ máy tính, gọi hotline nhà mạng khóa SIM và chuyển sang dùng ứng dụng Authenticator thay cho SMS OTP.'
   },
   {
     id: 3,
-    title: 'Em gái sinh viên năm nhất bị "bắt cóc online" tại phòng khách sạn',
-    relative: 'Em gái',
-    relationship: 'Em gái út • 19 tuổi (Sinh viên năm nhất xa nhà)',
-    crisisContext: 'Em gái nhận cuộc gọi từ số lạ xưng cơ quan an ninh thông báo tài khoản dính líu vụ án lớn, bị yêu cầu thuê phòng khách sạn một mình để phối hợp điều tra bí mật và đang rất hoảng sợ!',
-    location: 'Phòng khách sạn ngoại thành (Khóa trái cửa một mình)',
-    start: 'start',
-    nodes: {
-      start: {
-        locationStatus: 'Em gái đang ngồi khóc trong góc phòng khách sạn, kẻ gian giám sát qua cuộc gọi video kín',
-        lines: [
-          {
-            who: 'family',
-            text: 'Anh ơi... cứu em với! Có hai chú công an gọi bảo số tài khoản ngân hàng của em nhận tiền của trùm buôn người. Họ bắt em phải ra thuê phòng khách sạn một mình để "cách ly bảo vệ nhân chứng", cấm không được gọi cho bố mẹ. Họ bảo nếu em không nộp 100 triệu tiền bảo lãnh thì họ tống đạt lệnh truy nã toàn quốc... Em sợ lắm em đang trốn trong phòng khách sạn!'
-          },
-          {
-            who: 'scammer',
-            text: 'Sinh viên Trần Mai Anh! Bật camera trước quay toàn bộ căn phòng, đặt điện thoại lên bàn và không được tắt cuộc gọi video!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Kích hoạt Mật mã An toàn Gia đình',
-            text: 'Mai Anh nghe anh nói: Chú cún cưng hồi nhỏ nhà mình tên là gì? Em trả lời đúng anh mới tin đây là em gái anh. Bình tĩnh, anh đang ở ngay bên em đây!',
-            fear: -3,
-            trust: -3,
-            next: 'safeword_pass'
-          },
-          {
-            tacticLabel: 'Giao thức: Quát tháo hoảng loạn',
-            text: 'Mày bị điên rồi à? Sao lại dại dột đi thuê khách sạn một mình như thế? Bố mẹ biết thì mày chết đòn!',
-            fear: 3,
-            trust: 2,
-            next: 'lose_panic'
-          },
-          {
-            tacticLabel: 'Giao thức: Bảo em cứ làm theo lời kẻ lạ',
-            text: 'Em cứ chuyển hết tiền trong tài khoản cho họ đi rồi xin về nhà.',
-            fear: 1,
-            trust: 4,
-            next: 'lose_kidnap'
-          }
-        ]
+    code: 'INCIDENT #03',
+    title: 'Phần Mềm Gián Điệp Tống Tiền (Spyware Blackmail)',
+    victimName: 'Em Hoàng (20 tuổi • Sinh viên đại học)',
+    victimDevice: 'Xiaomi 13 • Android 14',
+    threatLevel: 'HIGH',
+    targetAsset: '30.000.000 VNĐ tiền học phí & Album ảnh riêng tư',
+    initialTime: 60,
+    initialPhoneStatus: 'Camera trước đang bật ngầm • Tin nhắn tống tiền đếm ngược 60s...',
+    story: 'Sau khi tải một ứng dụng xem phim lậu, đèn camera trước tự động bật sáng liên tục. Kẻ gian gửi thông báo đe dọa lên màn hình: "Đã sao chép danh bạ và video riêng tư. Chuyển 30 triệu vào ví USDT sau 60s nếu không video sẽ được phát tán cho toàn trường!"',
+    actions: [
+      {
+        id: 'act_cover_cam_air',
+        icon: '✈️',
+        title: 'Bật Chế độ máy bay + Che vật lý camera trước & sau',
+        desc: 'Chặn ngay lập tức việc truyền dữ liệu ra máy chủ ngoài và ngắt luồng quay lén.',
+        successLog: 'ĐÃ CẮT LUỒNG TRUYỀN DỮ LIỆU: Hacker không thể trích xuất thêm bất kỳ tệp tin nào.',
+        threatMitigation: 'Luồng livestream của camera bị ngắt kết nối hoàn toàn.'
       },
-      safeword_pass: {
-        locationStatus: 'Em gái đã bình tĩnh lại, nhận ra có anh trai hỗ trợ',
-        lines: [
-          {
-            who: 'family',
-            text: 'Chú cún nhà mình tên là Bông Xù... Anh ơi, họ đang dọa là nếu em không tự trói tay và quay video van xin gửi cho họ thì công an sẽ đến bắn vỡ cửa phòng bắt em!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Tác chiến Hiện trường Lễ tân Khách sạn',
-            text: 'Nghe anh dặn từng bước: Em tắt ngay cuộc gọi video của chúng nó! Mở khóa cửa phòng bước thẳng xuống quầy lễ tân tầng 1, đưa điện thoại cho nhân viên khách sạn và nhờ họ gọi Công an phường sở tại đến bảo vệ em ngay!',
-            fear: -4,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Bảo em tự quay video',
-            text: 'Em cứ quay video giả vờ như lời họ xem họ đòi gì tiếp theo.',
-            fear: 2,
-            trust: 3,
-            next: 'lose_kidnap'
-          }
-        ]
+      {
+        id: 'act_reboot_safe',
+        icon: '🔄',
+        title: 'Khởi động thiết bị vào Chế độ An toàn (Safe Mode)',
+        desc: 'Ngăn chặn ứng dụng gián điệp tự khởi chạy cùng hệ điều hành.',
+        successLog: 'ĐÃ VÀO SAFE MODE: Toàn bộ tiến trình gián điệp chạy ngầm bị hệ thống đóng băng.',
+        threatMitigation: 'Đèn camera tắt hẳn, phần mềm độc hại mất quyền kiểm soát thiết bị.'
       },
-      win: {
-        locationStatus: 'Lễ tân và Công an phường đã tiếp cận phòng, em gái an toàn',
-        lines: [
-          {
-            who: 'family',
-            text: 'Anh ơi, em làm theo lời anh chạy xuống lễ tân! Các anh công an phường vừa đến khách sạn rồi, các anh ấy bảo đây là thủ đoạn "Bắt cóc ảo" (Virtual Kidnapping) chuyên nhắm vào sinh viên mới lên thành phố. Em an toàn rồi, cảm ơn anh trai của em nhiều lắm!'
-          }
-        ],
-        ending: 'win',
-        lesson: 'Chiêu thức "Bắt cóc online" thao túng nạn nhân tự cô lập trong khách sạn, sau đó dùng hình ảnh cắt ghép để tống tiền người nhà. Hãy luôn quy ước "Mật khẩu gia đình" và dặn con em chạy ngay ra nơi đông người (lễ tân, bảo vệ) để nhờ trợ giúp.'
+      {
+        id: 'act_remove_device_admin',
+        icon: '🛑',
+        title: 'Hủy quyền Quản trị viên thiết bị (Device Admin) & Gỡ bỏ App độc',
+        desc: 'Tước quyền cao nhất trong cài đặt bảo mật và xóa sổ ứng dụng theo dõi.',
+        successLog: 'ĐÃ XÓA TẬN GỐC: Ứng dụng gián điệp bị gỡ bỏ hoàn toàn khỏi hệ thống Android.',
+        threatMitigation: 'Mã độc bị tiêu diệt, không còn khả năng hoạt động trở lại.'
       },
-      lose_panic: {
-        locationStatus: 'Em gái bị khủng hoảng tâm lý cực độ, cúp máy làm liều',
-        lines: [
-          {
-            who: 'family',
-            text: 'Em sợ anh và bố mẹ mắng nên em đã tự quay video khóc lóc gửi cho họ... Chúng nó lấy video đó gửi cho mẹ đòi 100 triệu tiền chuộc làm mẹ ngất xỉu phải đi cấp cứu rồi anh ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Khi nạn nhân là người trẻ bị đe dọa, sự chì chiết của gia đình sẽ đẩy họ vào bước đường cùng. Luôn mở rộng vòng tay bảo vệ và hướng dẫn thoát hiểm.'
+      {
+        id: 'act_report_cyber',
+        icon: '🚨',
+        title: 'Sao lưu ảnh chụp chứng cứ tống tiền & Báo cơ quan An ninh mạng',
+        desc: 'Lưu lại số ví, tin nhắn đe dọa và trình báo cơ quan công an thụ lý.',
+        successLog: 'ĐÃ BÁO CÁO PHÁP LUẬT: Hồ sơ vụ tống tiền được chuyển giao cơ quan chức năng.',
+        threatMitigation: 'Nạn nhân được bảo vệ an toàn, bảo toàn 30 triệu tiền học phí.'
       },
-      lose_kidnap: {
-        locationStatus: 'Gia đình bị tống tiền 100 triệu đồng trong hoảng loạn',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bố mẹ tưởng em bị bắt cóc thật nên đã chuyển 100 triệu cho kẻ gian rồi... Em có lỗi với cả nhà quá!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Kẻ lừa đảo dùng video tự quay của nạn nhân để dàn cảnh bắt cóc thật. Cần liên lạc trực tiếp hoặc định vị vị trí trước khi nghĩ đến việc chuyển tiền.'
+      {
+        id: 'act_fatal_pay_ransom',
+        icon: '💸',
+        title: 'Chuyển khoản 30 triệu tiền chuộc cho kẻ gian để chúng xóa clip',
+        desc: 'Thỏa hiệp chuyển tiền với hy vọng kẻ gian giữ lời hứa xóa dữ liệu.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM CHÍ MẠNG: Tội phạm tống tiền KHÔNG BAO GIỜ xóa dữ liệu sau khi nhận tiền! Ngay khi bạn chuyển 30 triệu, chúng sẽ tiếp tục đòi 50 triệu, 100 triệu cho đến khi bạn kiệt quệ tài chính!',
+        successLog: '',
+        threatMitigation: ''
+      },
+      {
+        id: 'act_fatal_delete_all_photos',
+        icon: '🗑️',
+        title: 'Vội vã tự xóa toàn bộ ảnh trong máy điện thoại',
+        desc: 'Xóa album ảnh trên điện thoại với hy vọng kẻ gian không lấy được.',
+        isFatal: true,
+        fatalReason: 'VÔ TÁC DỤNG: Kẻ gian đã sao chép dữ liệu lên máy chủ của chúng từ trước! Bạn xóa ảnh trên máy chỉ làm mất tài liệu của mình mà không ngăn chặn được hành vi tống tiền!',
+        successLog: '',
+        threatMitigation: ''
       }
-    }
+    ],
+    requiredSequence: ['act_cover_cam_air', 'act_reboot_safe', 'act_remove_device_admin', 'act_report_cyber'],
+    forensicLesson: 'Tuyệt đối KHÔNG BAO GIỜ chuyển tiền chuộc cho kẻ tống tiền. Hành động ngay lập tức là ngắt mạng, vào Safe Mode gỡ bỏ quyền Quản trị viên của ứng dụng độc và liên hệ cơ quan công an an ninh mạng hỗ trợ.'
   },
   {
     id: 4,
-    title: 'Bà nội chuẩn bị mua gói "Thần dược trị bách bệnh" 60 triệu',
-    relative: 'Bà nội',
-    relationship: 'Bà nội • 76 tuổi',
-    crisisContext: 'Có hai người mặc áo blouse tự xưng đoàn bác sĩ viện y học đến tận nhà khám bệnh miễn phí cho bà, dùng máy đo điện tử thông báo bà mắc bệnh nan y nguy hiểm và thuyết phục bà mua liệu trình thuốc 60 triệu!',
-    location: 'Phòng khách nhà riêng (Đang có 2 đối tượng mặc áo blouse ngồi thuyết phục)',
-    start: 'start',
-    nodes: {
-      start: {
-        locationStatus: 'Hai đối tượng tự xưng giáo sư y khoa đang cầm máy đo pin giả áp vào tay bà',
-        lines: [
-          {
-            who: 'family',
-            text: 'Cháu ơi, có hai bác sĩ của Viện Đông y Trung ương về tận nhà đo máy cho bà. Máy của họ kêu tít tít báo bà bị ung thư tế bào gốc sắp di căn rồi cháu ơi! Họ bảo may mà phát hiện sớm, có hộp cao sâm hoàng cung gia truyền 60 triệu uống 1 tháng là khỏi hẳn. Bà định lấy tiền mừng tuổi với dưỡng già đưa họ lấy thuốc ngay đây!'
-          },
-          {
-            who: 'scammer',
-            text: 'Cụ cứ tin tưởng y đức của chúng tôi, thuốc này là dược liệu quý hiếm của triều đình, chậm 1 tuần là khối u vỡ không cứu được đâu!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Đòi Hóa đơn & Bác sĩ Trạm Y tế can thiệp',
-            text: 'Bà ơi dừng tay lại! Bà đưa điện thoại cho vị "bác sĩ" đó nghe máy giúp cháu, để cháu hỏi mã chứng chỉ hành nghề và địa chỉ bệnh viện công tác của họ nhé bà.',
-            fear: -2,
-            trust: -2,
-            next: 'confront_fake_doc'
-          },
-          {
-            tacticLabel: 'Giao thức: Chửi bới đuổi người',
-            text: 'Toàn bọn lừa đảo đấy bà đuổi cổ chúng nó ra khỏi nhà ngay đi!',
-            fear: 2,
-            trust: 2,
-            next: 'lose_argue'
-          },
-          {
-            tacticLabel: 'Giao thức: Đồng ý mua thuốc cho xong',
-            text: 'Nếu bà thấy đau thì cứ mua thử 1 hộp 20 triệu uống xem sao.',
-            fear: 1,
-            trust: 3,
-            next: 'lose_poison'
-          }
-        ]
+    code: 'INCIDENT #04',
+    title: 'Bẫy Quét Mã QR Rút Ruột Thẻ Tín Dụng (Quishing Drain)',
+    victimName: 'Chị Thanh Hương (42 tuổi • Doanh nhân)',
+    victimDevice: 'Samsung Galaxy Z Fold5',
+    threatLevel: 'CRITICAL',
+    targetAsset: 'Thẻ tín dụng Visa hạn mức 150.000.000 VNĐ (Đang chờ lệnh 65 triệu)',
+    initialTime: 60,
+    initialPhoneStatus: 'Lệnh thanh toán quốc tế 65.000.000đ đang chờ duyệt OTP...',
+    story: 'Nạn nhân vừa quét mã QR in trên giấy thông báo cước giả mạo dán trước cửa nhà. Ngay lập tức thẻ bị trừ 65.000.000 VNĐ qua cổng thanh toán quốc tế mua thẻ quà tặng điện tử. Tin nhắn mã OTP xác thực đang nhảy về thanh thông báo điện thoại!',
+    actions: [
+      {
+        id: 'act_lock_online_pay',
+        icon: '🔒',
+        title: 'Mở App ngân hàng khóa ngay tính năng "Thanh toán Trực tuyến / Quốc tế"',
+        desc: 'Tắt ngay luồng quẹt thẻ E-commerce qua các cổng thanh toán nước ngoài.',
+        successLog: 'ĐÃ KHÓA THANH TOÁN ONLINE: Tính năng thanh toán trực tuyến của thẻ bị vô hiệu.',
+        threatMitigation: 'Cổng thanh toán quốc tế không thể khớp lệnh trừ tiền.'
       },
-      confront_fake_doc: {
-        locationStatus: 'Hai đối tượng ấp úng khi nghe bạn đòi kiểm tra chứng chỉ y khoa',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bà đưa máy thì họ xua tay bảo không rảnh nói chuyện với trẻ con! Họ đang giục bà vào phòng trong lấy tiền mặt nhanh kẻo họ phải đi khám cho nhà khác...'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Báo Tổ trưởng & Trạm Y tế Phường sang can thiệp',
-            text: 'Bà nói với họ: "Tiền cháu tôi giữ trong két sắt, 15 phút nữa nó về mở két đưa tiền". Đồng thời cháu gọi bác Tổ trưởng dân phố và chú công an phường ngay cạnh nhà mình bước sang kiểm tra giấy tờ của họ ngay bây giờ!',
-            fear: -4,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Để bà tự thỏa thuận giá',
-            text: 'Bà thử mặc cả xuống 10 triệu xem họ có bán không.',
-            fear: 1,
-            trust: 3,
-            next: 'lose_poison'
-          }
-        ]
+      {
+        id: 'act_zero_limit',
+        icon: '🛑',
+        title: 'Hạ hạn mức giao dịch ngày của thẻ tín dụng về 0 VNĐ',
+        desc: 'Đóng băng hoàn toàn khả năng phát sinh thêm bất kỳ giao dịch quẹt tiền nào.',
+        successLog: 'ĐÃ HẠ HẠN MỨC: Hạn mức thẻ tín dụng giảm về 0 VNĐ.',
+        threatMitigation: 'Mọi giao dịch tiếp theo tự động bị ngân hàng từ chối.'
       },
-      win: {
-        locationStatus: 'Bác tổ trưởng và công an phường có mặt, nhóm lừa đảo bỏ chạy tháo thân',
-        lines: [
-          {
-            who: 'family',
-            text: 'Cháu ơi, bác Tổ trưởng với chú công an vừa sang đến cổng là hai người kia vơ vội túi đồ leo lên xe máy chạy mất dép! Chú công an bảo cái máy đo kia là đồ chơi điện tử mua trên mạng có mấy chục nghìn, còn hộp thuốc toàn bột đậu nành trộn phẩm màu. Bà cảm ơn cháu gái thông minh của bà đã giữ lại tiền dưỡng già!'
-          }
-        ],
-        ending: 'win',
-        lesson: 'Nhóm lừa đảo người cao tuổi thường dùng máy móc giả tạo và đe dọa bệnh nan y để bán thực phẩm chức năng giá cắt cổ. Tuyệt đối không mua thuốc từ người lạ đến tận nhà; mọi chẩn đoán bệnh đều phải đến cơ sở y tế chính quy.'
+      {
+        id: 'act_dispute_bank',
+        icon: '🚨',
+        title: 'Gọi hotline ngân hàng báo cáo giao dịch gian lận (Dispute Fraud)',
+        desc: 'Yêu cầu phòng chống gian lận ngân hàng treo lệnh đối soát và hủy thanh toán.',
+        successLog: 'ĐÃ BÁO CÁO FRAUD: Ngân hàng ghi nhận tranh chấp và giữ lại 65 triệu đồng.',
+        threatMitigation: 'Tiền không bị chuyển ra khỏi hệ thống thanh toán liên ngân hàng.'
       },
-      lose_argue: {
-        locationStatus: 'Bà nội không tin lời bạn, giấu tiền mua thuốc',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bà thấy cháu nói năng cộc lốc quá nên bà tự lấy tiền mua rồi... Uống vào bà bị ngộ độc tiêu chảy phải đi viện cấp cứu đây này cháu ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Người già rất dễ tổn thương trước nỗi sợ bệnh tật. Cần phối hợp với các lực lượng uy tín như y tế phường, tổ trưởng dân phố để thuyết phục hiệu quả.'
+      {
+        id: 'act_reissue_card',
+        icon: '💳',
+        title: 'Yêu cầu ngân hàng hủy thẻ cũ & Phát hành thẻ mới với số CVV mới',
+        desc: 'Triệt tiêu hoàn toàn nguy cơ bị lộ thông tin thẻ và mã CVV mặt sau.',
+        successLog: 'ĐÃ HỦY THẺ LỘ THÔNG TIN: Thẻ cũ bị khóa vĩnh viễn, phát hành thẻ mới an toàn.',
+        threatMitigation: 'Kẻ gian hoàn toàn không còn dữ liệu thẻ để lạm dụng.'
       },
-      lose_poison: {
-        locationStatus: 'Bà đã uống phải thuốc giả chứa hóa chất độc hại',
-        lines: [
-          {
-            who: 'family',
-            text: 'Bà uống xong thuốc đó thì men gan tăng vọt, bác sĩ bảo thuốc có chứa kim loại nặng và corticoid độc hại... Mất 60 triệu mà bệnh còn nặng thêm!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Thuốc giả không rõ nguồn gốc vô cùng nguy hiểm cho tính mạng người già. Không bao giờ thỏa hiệp mua thử thuốc không có kiểm định của Bộ Y tế.'
+      {
+        id: 'act_fatal_provide_otp',
+        icon: '📲',
+        title: 'Đọc mã OTP gửi về máy cho người gọi để họ "hỗ trợ hủy lệnh"',
+        desc: 'Cung cấp mã xác thực cho đối tượng lạ tự xưng nhân viên hỗ trợ cước.',
+        isFatal: true,
+        fatalReason: 'MẮC BẪY NGHIÊM TRỌNG: Mã OTP đó CHÍNH LÀ mã xác nhận giao dịch trừ tiền 65 triệu! Bạn vừa đọc OTP xong là 65 triệu bốc hơi khỏi thẻ tín dụng ngay lập tức!',
+        successLog: '',
+        threatMitigation: ''
+      },
+      {
+        id: 'act_fatal_wait_see',
+        icon: '⏳',
+        title: 'Đợi xem thẻ có bị trừ tiền thật không rồi mới tính tiếp',
+        desc: 'Chờ đợi kết quả trừ tiền từ ngân hàng.',
+        isFatal: true,
+        fatalReason: 'SAI LẦM CHẬM TRỄ: Giao dịch thanh toán quốc tế diễn ra tự động trong vòng 60 giây. Chậm trễ đồng nghĩa với việc tiền chuyển sang cổng nước ngoài và cực kỳ khó đòi lại!',
+        successLog: '',
+        threatMitigation: ''
       }
-    }
+    ],
+    requiredSequence: ['act_lock_online_pay', 'act_zero_limit', 'act_dispute_bank', 'act_reissue_card'],
+    forensicLesson: 'Mã QR lạ có thể dẫn đến trang thanh toán ngầm. Khi phát hiện lệnh quẹt thẻ bất thường: khóa ngay tính năng thanh toán quốc tế trên app, hạ hạn mức về 0đ và gọi hotline ngân hàng tra soát (Dispute). TUYỆT ĐỐI KHÔNG đọc mã OTP cho bất kỳ ai.'
   },
   {
     id: 5,
-    title: 'Anh trai chuẩn bị chuyển cọc 120 triệu xuất khẩu lao động "chui"',
-    relative: 'Anh trai',
-    relationship: 'Anh trai • 27 tuổi',
-    crisisContext: 'Anh trai đang ngồi tại quán cà phê gần sân bay với đối tác hứa hẹn thủ tục visa lao động sang Hàn Quốc lương cao không cần thi chứng chỉ tiếng, yêu cầu anh nộp cọc 120 triệu tiền mặt để làm thủ tục bay ngay tuần sau!',
-    location: 'Quán cà phê gần Cảng hàng không (Đang chuẩn bị rút cọc chuyển khoản)',
-    start: 'start',
-    nodes: {
-      start: {
-        locationStatus: 'Anh trai đang ngồi cùng 2 người tự xưng là giám đốc phái cử lao động',
-        lines: [
-          {
-            who: 'family',
-            text: 'Em ơi, anh đang ngồi cà phê với hai anh bên Công ty Phái cử Quốc tế Sao Mai. Họ có suất ngoại giao đi làm nông nghiệp công nghệ cao bên Hàn Quốc lương 85 triệu/tháng, cam kết bao đỗ visa 100% không cần học tiếng. Họ bảo anh chuyển cọc 120 triệu tiền vé máy bay và hồ sơ ngay bây giờ để tuần sau xếp lịch bay luôn!'
-          },
-          {
-            who: 'scammer',
-            text: 'Em trai anh muốn đi thì ký hợp đồng cọc nhanh lên, bao nhiêu người đang xếp hàng xin suất này đấy!'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Tra cứu Mã số Doanh nghiệp Dolab Quốc gia',
-            text: 'Anh dừng tay lại! Anh bảo họ cho xem Giấy phép Hoạt động Dịch vụ Đưa người lao động đi làm việc ở nước ngoài do Bộ LĐ-TB&XH (Dolab) cấp. Em lên cổng dolab.gov.vn tra cứu mã số trong 1 phút!',
-            fear: -2,
-            trust: -3,
-            next: 'check_dolab'
-          },
-          {
-            tacticLabel: 'Giao thức: Giễu cợt năng lực anh trai',
-            text: 'Tiếng một chữ bẻ đôi không biết mà đòi lương 85 triệu? Anh mơ mộng hão huyền vừa thôi!',
-            fear: 2,
-            trust: 2,
-            next: 'lose_stubborn'
-          },
-          {
-            tacticLabel: 'Giao thức: Khuyên anh chuyển tiền cọc',
-            text: 'Cơ hội tốt thế thì anh cọc trước 60 triệu xem sao.',
-            fear: 1,
-            trust: 3,
-            next: 'lose_trafficking'
-          }
-        ]
+    code: 'INCIDENT #05',
+    title: 'Ransomware Khóa Màn Hình & Tống Tiền Dữ Liệu (Mobile Ransomware)',
+    victimName: 'Chú Bình (55 tuổi • Giám đốc xưởng sản xuất)',
+    victimDevice: 'Oppo Reno10 • ColorOS',
+    threatLevel: 'EXTREME',
+    targetAsset: '1.450 tệp hợp đồng công nợ & Hóa đơn điện tử công ty',
+    initialTime: 60,
+    initialPhoneStatus: 'Màn hình đỏ thẫm bị khóa cứng • Yêu cầu nộp tiền chuộc AES-256...',
+    story: 'Màn hình điện thoại bị khóa cứng bởi cảnh báo tống tiền: "Tất cả tài liệu và danh bạ đã bị khóa mã hóa AES-256. Nộp 10.000.000 VNĐ vào ví USDT sau 60s để nhận chìa khóa giải mã, quá thời gian khóa giải mã sẽ bị hủy vĩnh viễn!"',
+    actions: [
+      {
+        id: 'act_cut_cloud_sync',
+        icon: '✈️',
+        title: 'Bật Chế độ máy bay / Tắt Wifi ngăn lây lan sang Google Drive / Cloud',
+        desc: 'Cách ly hoàn toàn thiết bị để ngăn mã độc lây nhiễm tệp mã hóa lên kho lưu trữ đám mây.',
+        successLog: 'ĐÃ CÁCH LY THIẾT BỊ: Tiến trình đồng bộ đám mây bị ngắt, cứu dữ liệu lưu trữ trên Cloud.',
+        threatMitigation: 'Kho dữ liệu hợp đồng trên Google Drive của công ty được bảo vệ an toàn.'
       },
-      check_dolab: {
-        locationStatus: 'Công ty không có tên trên hệ thống cấp phép của Cục Quản lý Lao động Ngoài nước',
-        lines: [
-          {
-            who: 'family',
-            text: 'Em ơi, anh tra tên công ty họ trên trang dolab.gov.vn thì hoàn toàn không có giấy phép! Họ lại bảo đây là chương trình "đi theo diện visa du lịch thương mại rồi trốn ra ngoài làm việc", bên kia có người đón lo hết...'
-          }
-        ],
-        choices: [
-          {
-            tacticLabel: 'Giao thức: Vạch trần Rủi ro Cư trú Bất hợp pháp & Buôn người',
-            text: 'Đây là đường dây đưa người đi chui trái phép! Sang đó bị cảnh sát bắt trục xuất và phạt tù, hoặc bị bán vào các khu lao động cưỡng bức. Anh đứng dậy rời khỏi quán cà phê ngay lập tức!',
-            fear: -4,
-            trust: -4,
-            next: 'win'
-          },
-          {
-            tacticLabel: 'Giao thức: Để anh đánh cược số phận',
-            text: 'Đi chui thì hên xui, anh tự chịu trách nhiệm nếu bị bắt nhé.',
-            fear: 2,
-            trust: 3,
-            next: 'lose_trafficking'
-          }
-        ]
+      {
+        id: 'act_refuse_ransom',
+        icon: '🛑',
+        title: 'Tuyệt đối từ chối nộp tiền chuộc theo khuyến cáo Cục An toàn thông tin',
+        desc: 'Không thương lượng hay chuyển bất kỳ khoản tiền nào cho nhóm tin tặc.',
+        successLog: 'TỪ CHỐI TIỀN CHUỘC: Không tiếp tay cho tội phạm mạng phát triển phần mềm độc hại.',
+        threatMitigation: 'Bảo toàn 10.000.000 VNĐ quỹ tài chính công ty.'
       },
-      win: {
-        locationStatus: 'Anh trai đã rời khỏi quán, thoát khỏi cạm bẫy xuất khẩu lao động chui',
-        lines: [
-          {
-            who: 'family',
-            text: 'Cảm ơn em đã cảnh tỉnh anh kịp thời! Anh vừa đọc tin thấy tháng trước có nhóm cũng đóng cọc cho công ty ma này rồi bị bỏ rơi ở sân bay mất trắng tiền. Anh sẽ đăng ký học tiếng đàng hoàng theo chương trình EPS chính phủ cho an toàn!'
-          }
-        ],
-        ending: 'win',
-        lesson: 'Mọi hoạt động xuất khẩu lao động hợp pháp đều phải thông qua các doanh nghiệp được Cục Quản lý Lao động Ngoài nước cấp phép. Tuyệt đối không tin các lời hứa "không cần tiếng, lương khủng, đi bằng visa du lịch".'
+      {
+        id: 'act_recovery_clean',
+        icon: '🔄',
+        title: 'Khởi động máy vào Recovery Mode & Format phân vùng nhiễm mã độc',
+        desc: 'Xóa sạch phân vùng hệ thống bị chiếm đóng bởi mã độc tống tiền.',
+        successLog: 'ĐÃ XÓA MÃ ĐỘC: Phân vùng nhiễm tệp mã độc khóa màn hình bị xóa sạch.',
+        threatMitigation: 'Màn hình đỏ tống tiền biến mất, thiết bị trở về trạng thái sạch sẽ.'
       },
-      lose_stubborn: {
-        locationStatus: 'Anh trai tự ái, chuyển tiền và sập bẫy cò mồi',
-        lines: [
-          {
-            who: 'family',
-            text: 'Anh tự ái nên đã nộp tiền cọc rồi... Đến sân bay họ cầm tiền trốn mất tăm, gọi điện thì thuê bao... Mất 120 triệu tiền vay mượn rồi em ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Tránh mỉa mai lòng tự trọng của người thân khi họ khao khát cơ hội đổi đời. Hãy dùng bằng chứng pháp lý và số liệu thực tế từ cổng thông tin chính phủ.'
+      {
+        id: 'act_restore_clean_backup',
+        icon: '☁️',
+        title: 'Khôi phục lại toàn bộ hợp đồng từ bản sao lưu đám mây định kỳ',
+        desc: 'Đồng bộ lại tài liệu công việc từ bản backup an toàn của công ty.',
+        successLog: 'ĐÃ KHÔI PHỤC DỮ LIỆU: Toàn bộ 1.450 tệp hợp đồng được phục hồi 100%.',
+        threatMitigation: 'Doanh nghiệp hoạt động bình thường, không tổn thất một xu.'
       },
-      lose_trafficking: {
-        locationStatus: 'Anh trai bị đưa sang nước ngoài lao động cưỡng bức',
-        lines: [
-          {
-            who: 'family',
-            text: 'Họ lừa anh sang làm việc trong một casino lừa đảo ở biên giới, bị giam lỏng thu hộ chiếu... Giờ họ bắt gia đình chuộc 200 triệu mới cho về em ơi!'
-          }
-        ],
-        ending: 'lose',
-        lesson: 'Bẫy "việc nhẹ lương cao ở nước ngoài" là nguồn cung cho các đường dây buôn người và lao động cưỡng bức. Luôn tỉnh táo trước mọi lời mời xuất cảnh không chính thống.'
+      {
+        id: 'act_fatal_pay_ransom_usdt',
+        icon: '💸',
+        title: 'Chuyển 10 triệu nộp tiền chuộc mua mã mở khóa khẩn cấp',
+        desc: 'Chuyển tiền vào ví USDT của tin tặc để xin khóa giải mã.',
+        isFatal: true,
+        fatalReason: 'BỊ LỪA TRẮNG TAY: Khảo sát của cơ quan an ninh mạng cho thấy hơn 80% nạn nhân nộp tiền chuộc ransomware không bao giờ nhận được khóa giải mã! Tiền mất tật mang!',
+        successLog: '',
+        threatMitigation: ''
+      },
+      {
+        id: 'act_fatal_plug_usb_pc',
+        icon: '💻',
+        title: 'Cắm cáp USB vào máy tính văn phòng để copy dữ liệu ra',
+        desc: 'Kết nối máy điện thoại bị nhiễm với máy tính công ty qua cáp USB.',
+        isFatal: true,
+        fatalReason: 'LÂY NHIỄM NGUY HIỂM: Mã độc tự động lây lan qua giao thức MTP/USB sang máy tính văn phòng, làm tê liệt toàn bộ hệ thống máy tính công ty!',
+        successLog: '',
+        threatMitigation: ''
       }
-    }
+    ],
+    requiredSequence: ['act_cut_cloud_sync', 'act_refuse_ransom', 'act_recovery_clean', 'act_restore_clean_backup'],
+    forensicLesson: 'Đối phó Ransomware: Nguyên tắc số 1 là KHÔNG TRẢ TIỀN CHUỘC và CÁCH LY MẠNG ngay lập tức để bảo vệ dữ liệu đám mây. Luôn duy trì chiến lược sao lưu dự phòng định kỳ (3-2-1 Backup Rule).'
   }
 ];
 
-let sceneIdx = 0;
+let incidentIdx = 0;
 let score = 0;
 let lives = 3;
-let finished = false;
-let currentNodeId = 'start';
-let fear = 5;
-let trust = 5;
-let log: ChatLine[] = [];
-let history: { title: string; won: boolean; lesson: string }[] = [];
+let timeRemaining = 60;
+let timerInterval: number | null = null;
+let currentPhase: 'intro' | 'active' | 'result' | 'summary' = 'intro';
+
+// Incident State
+let networkOnline = true;
+let screenOverlayActive = true;
+let camActive = false;
+let phoneStatusLabel = '';
+let threatLogs: { time: string; text: string; type: 'threat' | 'success' | 'warn' }[] = [];
+let completedActions: Set<string> = new Set();
+let resultStatus: 'success' | 'fail' | undefined;
+let resultFeedback = '';
+let forensicLesson = '';
 let sessionId = '';
+const history: IncidentHistoryItem[] = [];
 
 function content(): HTMLElement {
   const el = document.getElementById('familyContent') || document.getElementById('familyAppContent');
@@ -683,137 +423,287 @@ function stats(): HTMLElement | null {
 
 export function openFamilyGame(): void {
   sessionId = createSessionId();
-  sceneIdx = 0;
+  incidentIdx = 0;
   score = 0;
   lives = 3;
-  finished = false;
-  history = [];
+  history.length = 0;
+  currentPhase = 'intro';
+  clearTimer();
   stats()?.classList.remove('hidden');
-  content().innerHTML = renderFamilyIntro();
-}
-
-function start(): void {
-  sceneIdx = 0;
-  score = 0;
-  lives = 3;
-  finished = false;
-  history = [];
-  loadScene(0);
-}
-
-function loadScene(index: number): void {
-  sceneIdx = index;
-  const s = SCENES[index];
-  currentNodeId = s.start;
-  fear = 5;
-  trust = 5;
-  const node = s.nodes[currentNodeId];
-  log = [...node.lines];
-  playEmergencyHeartbeat();
   render();
 }
 
-function choose(choiceIdx: number): void {
-  const s = SCENES[sceneIdx];
-  const node = s.nodes[currentNodeId];
-  if (!node.choices || !node.choices[choiceIdx]) return;
+function startAll(): void {
+  incidentIdx = 0;
+  score = 0;
+  lives = 3;
+  history.length = 0;
+  startIncident(0);
+}
 
-  const choice = node.choices[choiceIdx];
+function clearTimer(): void {
+  if (timerInterval !== null) {
+    window.clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function startIncident(index: number): void {
+  clearTimer();
+  incidentIdx = index;
+  const inc = INCIDENTS[index];
+  currentPhase = 'active';
+  timeRemaining = inc.initialTime;
+  networkOnline = true;
+  screenOverlayActive = true;
+  camActive = inc.id === 3; // camera active on spyware incident
+  phoneStatusLabel = inc.initialPhoneStatus;
+  completedActions.clear();
+  resultStatus = undefined;
+  resultFeedback = '';
+  forensicLesson = inc.forensicLesson;
+
+  threatLogs = [
+    { time: '00:00', text: `PHÁT HIỆN SỰ CỐ: ${inc.title}`, type: 'threat' },
+    { time: '00:01', text: `Tài sản gặp nguy biến: ${inc.targetAsset}`, type: 'warn' },
+    { time: '00:02', text: 'Kẻ gian đang điều khiển tiến trình hệ thống...', type: 'threat' }
+  ];
+
+  playSirenAlert();
+  render();
+
+  // Start Real-Time 60s Countdown Timer
+  timerInterval = window.setInterval(() => {
+    if (timeRemaining > 0) {
+      timeRemaining--;
+      const isUrgent = timeRemaining <= 15;
+      playTickTock(isUrgent);
+
+      if (timeRemaining === 15) {
+        playSirenAlert();
+        playEmergencyHeartbeat();
+      }
+
+      // Update timer DOM element directly for smooth 60fps countdown
+      const digitsEl = document.getElementById('iruTimerDigits');
+      if (digitsEl) {
+        const timeFormatted = `${String(Math.floor(timeRemaining / 60)).padStart(2, '0')}:${String(timeRemaining % 60).padStart(2, '0')}`;
+        digitsEl.textContent = timeFormatted;
+      }
+
+      if (timeRemaining === 0) {
+        handleTimeout();
+      }
+    }
+  }, 1000);
+}
+
+function handleTimeout(): void {
+  clearTimer();
+  lives--;
+  beep('G2', '8n');
+  const inc = INCIDENTS[incidentIdx];
+  resultStatus = 'fail';
+  resultFeedback = 'HẾT GIỜ (00:00)! Bạn không kịp thực hiện các biện pháp ngắt mạng & đóng băng dòng tiền trong 60 giây. Kẻ gian đã kịp rút sạch toàn bộ tài sản!';
+  threatLogs.push({ time: '00:60', text: 'THẤT BẠI: Lệnh chuyển tiền hoàn tất. Tài sản bị đánh cắp!', type: 'threat' });
+
+  history.push({
+    code: inc.code,
+    title: inc.title,
+    targetAsset: inc.targetAsset,
+    won: false,
+    timeElapsed: inc.initialTime,
+    lesson: inc.forensicLesson
+  });
+
+  render();
+}
+
+function executeAction(actionId: string): void {
+  if (currentPhase !== 'active' || resultStatus) return;
+  const inc = INCIDENTS[incidentIdx];
+  const action = inc.actions.find(a => a.id === actionId);
+  if (!action || completedActions.has(actionId)) return;
+
+  const timeFormatted = `${String(Math.floor((inc.initialTime - timeRemaining) / 60)).padStart(2, '0')}:${String((inc.initialTime - timeRemaining) % 60).padStart(2, '0')}`;
+
+  // Check Fatal Blunder
+  if (action.isFatal) {
+    clearTimer();
+    lives--;
+    beep('G2', '8n');
+    playEmergencyHeartbeat();
+    resultStatus = 'fail';
+    resultFeedback = action.fatalReason || 'Sai lầm chiến thuật nghiêm trọng!';
+    threatLogs.push({ time: timeFormatted, text: `LỖI TAI HẠI: ${action.title}`, type: 'threat' });
+
+    history.push({
+      code: inc.code,
+      title: inc.title,
+      targetAsset: inc.targetAsset,
+      won: false,
+      timeElapsed: inc.initialTime - timeRemaining,
+      lesson: inc.forensicLesson
+    });
+
+    render();
+    return;
+  }
+
+  // Check sequence order requirement
+  const currentStepIdx = completedActions.size;
+  const expectedActionId = inc.requiredSequence[currentStepIdx];
+
+  if (action.id !== expectedActionId) {
+    playActionBeep();
+    beep('F3', '16n');
+    threatLogs.push({
+      time: timeFormatted,
+      text: `CHƯA THỂ THỰC HIỆN: Cần tuân thủ quy trình SOP ưu tiên trước (${action.title} chưa phù hợp lúc này).`,
+      type: 'warn'
+    });
+    render();
+    return;
+  }
+
+  // Valid step in sequence executed!
+  completedActions.add(action.id);
   playActionBeep();
 
-  log.push({ who: 'me', text: choice.text });
-  fear = Math.max(0, Math.min(10, fear + choice.fear));
-  trust = Math.max(0, Math.min(10, trust + choice.trust));
+  // Specific state transitions
+  if (action.id === 'act_airplane' || action.id === 'act_cut_cloud_sync') {
+    networkOnline = false;
+    phoneStatusLabel = 'Đã ngắt toàn bộ Wifi/4G • Tín hiệu hacker bị cắt đứt';
+    playSystemHalt();
+  }
+  if (action.id === 'act_revoke_accessibility' || action.id === 'act_reboot_safe' || action.id === 'act_recovery_clean') {
+    screenOverlayActive = false;
+    camActive = false;
+    phoneStatusLabel = 'Đã tước quyền chiếm đoạt • Màn hình an toàn';
+    beep('C5', '8n');
+  }
 
-  currentNodeId = choice.next;
-  const nextNode = s.nodes[currentNodeId];
-  if (nextNode) {
-    log.push(...nextNode.lines);
-    if (nextNode.ending === 'win') {
-      score++;
-      playTacticalSuccess();
-      history.push({ title: s.title, won: true, lesson: nextNode.lesson || '' });
-    } else if (nextNode.ending === 'lose') {
-      lives--;
-      beep('G2', '8n');
-      history.push({ title: s.title, won: false, lesson: nextNode.lesson || '' });
-    } else if (fear >= 7 || trust >= 7) {
-      playEmergencyHeartbeat();
-    }
+  threatLogs.push({
+    time: timeFormatted,
+    text: action.successLog,
+    type: 'success'
+  });
+
+  // Check if all steps in sequence completed -> SUCCESS!
+  if (completedActions.size === inc.requiredSequence.length) {
+    clearTimer();
+    score++;
+    playTacticalSuccess();
+    resultStatus = 'success';
+    const elapsed = inc.initialTime - timeRemaining;
+    resultFeedback = `XUẤT SẮC! Bạn đã xử lý chuẩn xác 100% quy trình SOP chỉ trong ${elapsed} giây! Bảo toàn trọn vẹn ${inc.targetAsset}!`;
+
+    history.push({
+      code: inc.code,
+      title: inc.title,
+      targetAsset: inc.targetAsset,
+      won: true,
+      timeElapsed: elapsed,
+      lesson: inc.forensicLesson
+    });
   }
 
   render();
 }
 
-function nextScene(): void {
-  if (lives === 0 || sceneIdx === SCENES.length - 1) {
-    finish();
+function nextIncident(): void {
+  if (lives === 0 || incidentIdx === INCIDENTS.length - 1) {
+    finishGame();
   } else {
-    loadScene(sceneIdx + 1);
+    startIncident(incidentIdx + 1);
   }
 }
 
-function finish(): void {
-  if (finished) return;
-  finished = true;
+function finishGame(): void {
+  clearTimer();
+  currentPhase = 'summary';
 
-  if (lives > 0 && history.length === SCENES.length) {
+  if (lives > 0 && history.length === INCIDENTS.length) {
     document.dispatchEvent(new CustomEvent<FamilyGameResult>('family-completed', {
-      detail: { score, maxScore: SCENES.length, livesLeft: lives, sessionId },
+      detail: { score, maxScore: INCIDENTS.length, livesLeft: lives, sessionId },
     }));
   }
 
   stats()?.classList.add('hidden');
-  content().innerHTML = renderFamilySummary(history, score, lives, SCENES.length);
+  render();
 }
 
 function render(): void {
-  const s = SCENES[sceneIdx];
-  const node = s.nodes[currentNodeId];
+  const root = content();
+  if (!root) return;
 
-  content().innerHTML = renderFamilyScene({
-    title: s.title,
-    relative: s.relative,
-    relationship: s.relationship,
-    intro: s.crisisContext,
-    location: s.location,
-    locationStatus: node.locationStatus || s.location,
-    sceneIdx,
-    total: SCENES.length,
-    score,
+  if (currentPhase === 'intro') {
+    root.innerHTML = renderIncidentIntro(INCIDENTS.length);
+    return;
+  }
+
+  if (currentPhase === 'summary') {
+    root.innerHTML = renderIncidentSummary(history, score, lives, INCIDENTS.length);
+    return;
+  }
+
+  const inc = INCIDENTS[incidentIdx];
+
+  const viewState: IncidentViewState = {
+    incidentIdx,
+    total: INCIDENTS.length,
+    code: inc.code,
+    threatLevel: inc.threatLevel,
+    title: inc.title,
+    victimName: inc.victimName,
+    victimDevice: inc.victimDevice,
+    targetAsset: inc.targetAsset,
+    story: inc.story,
+    timeRemaining,
     lives,
-    fear,
-    trust,
-    log,
-    choices: node.choices ? node.choices.map(c => ({ text: c.text, tacticLabel: c.tacticLabel })) : [],
-    ending: node.ending,
-    lesson: node.lesson,
-  });
+    score,
+    networkOnline,
+    screenOverlayActive,
+    camActive,
+    phoneStatusLabel,
+    threatLogs,
+    completedActions,
+    availableActions: inc.actions,
+    stepCurrent: completedActions.size,
+    stepTotal: inc.requiredSequence.length,
+    resultStatus,
+    resultFeedback,
+    forensicLesson
+  };
 
-  const chat = content().querySelector('.family-chat');
-  if (chat) chat.scrollTop = chat.scrollHeight;
+  root.innerHTML = renderIncidentDashboard(viewState);
+
+  // Auto scroll threat feed on phone
+  const feedEl = document.getElementById('iruThreatFeed');
+  if (feedEl) feedEl.scrollTop = feedEl.scrollHeight;
 }
 
+// Global click event delegation for Incident Response Unit (IRU)
 document.addEventListener('click', event => {
   const target = event.target as HTMLElement;
-  const button = target.closest<HTMLButtonElement>('[data-family]');
+  const button = target.closest<HTMLButtonElement>('[data-iru]');
   if (!button || button.disabled) return;
 
-  const action = button.dataset.family;
+  const action = button.dataset.iru;
   switch (action) {
-    case 'start':
-      start();
+    case 'start-first':
+      startAll();
       break;
-    case 'choose': {
-      const idx = Number(button.dataset.choice);
-      if (!isNaN(idx)) choose(idx);
+    case 'execute-action': {
+      const actionId = button.dataset.actionId;
+      if (actionId) executeAction(actionId);
       break;
     }
-    case 'next':
-      nextScene();
+    case 'next-incident':
+      nextIncident();
       break;
-    case 'finish':
-      finish();
+    case 'restart-all':
+      startAll();
       break;
   }
 });

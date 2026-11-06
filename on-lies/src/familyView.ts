@@ -1,280 +1,294 @@
 import { escapeHtml } from './html';
 import './family.css';
 
-const icon = (path: string, className = '') =>
-  `<svg class="${className}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
-
-const shield = () =>
-  icon('<path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8.5 12 2.3 2.3 4.7-5"/>');
-
-const arrow = () =>
-  icon('<path d="m9 5 7 7-7 7"/>');
-
-const avatar = (relative: string, className = '') =>
-  `<span class="family-portrait ${className}" aria-hidden="true">${escapeHtml(
-    relative.split(/\s+/).map(word => word[0]).slice(0, 2).join('').toLocaleUpperCase('vi')
-  )}</span>`;
-
-const footer = () =>
-  '<footer class="family-disclaimer">Tình huống mô phỏng can thiệp khủng hoảng gia đình · Bảo vệ người thân trước bẫy lừa đảo thời gian thực</footer>';
-
-function livesMarkup(lives: number) {
-  return `<span class="family-lives" aria-label="${lives} mạng còn lại">${[0, 1, 2]
-    .map(i =>
-      icon(
-        '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
-        i < lives ? 'is-full' : ''
-      )
-    )
-    .join('')}</span>`;
-}
-
-function meter(label: string, value: number, kind: string) {
-  return `<div class="family-meter">
-    <span>${label}</span>
-    <div class="family-meter-track ${kind}" role="meter" aria-label="${label}" aria-valuenow="${value}" aria-valuemin="0" aria-valuemax="10">
-      <i style="width:${Math.min(100, Math.max(0, value * 10))}%"></i>
-    </div>
-    <strong>${value}<small>/10</small></strong>
-  </div>`;
-}
-
-export interface FamilySceneView {
+export interface TacticalAction {
+  id: string;
+  icon: string;
   title: string;
-  relative: string;
-  relationship: string;
-  intro: string;
-  location: string;
-  locationStatus: string;
-  sceneIdx: number;
-  total: number;
-  score: number;
-  lives: number;
-  fear: number;
-  trust: number;
-  log: {
-    who: 'family' | 'scammer' | 'me';
-    text: string;
-    attachment?: {
-      type: 'doc' | 'image' | 'warning';
-      badge: string;
-      title: string;
-      desc: string;
-    };
-  }[];
-  choices: {
-    text: string;
-    tacticLabel: string;
-  }[];
-  ending?: 'win' | 'lose';
-  lesson?: string;
+  desc: string;
+  isFatal?: boolean;
+  fatalReason?: string;
+  successLog: string;
+  threatMitigation: string;
 }
 
-export function renderFamilyScene(state: FamilySceneView): string {
-  const { relative, sceneIdx, total, ending } = state;
-  const compact = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 760px)').matches;
+export interface IncidentViewState {
+  incidentIdx: number;
+  total: number;
+  code: string;
+  threatLevel: 'CRITICAL' | 'EXTREME' | 'HIGH';
+  title: string;
+  victimName: string;
+  victimDevice: string;
+  targetAsset: string;
+  story: string;
+  timeRemaining: number;
+  lives: number;
+  score: number;
+  networkOnline: boolean;
+  screenOverlayActive: boolean;
+  camActive: boolean;
+  phoneStatusLabel: string;
+  threatLogs: { time: string; text: string; type: 'threat' | 'success' | 'warn' }[];
+  completedActions: Set<string>;
+  availableActions: TacticalAction[];
+  stepCurrent: number;
+  stepTotal: number;
+  resultStatus?: 'success' | 'fail';
+  resultFeedback?: string;
+  forensicLesson?: string;
+}
 
-  const chat = state.log
-    .map(line => {
-      const isScammer = line.who === 'scammer';
-      const isMe = line.who === 'me';
-      const label = isMe ? 'Bạn (Lời khuyên)' : isScammer ? 'Tin nhắn chuyển tiếp từ kẻ lạ' : escapeHtml(relative);
+export interface IncidentHistoryItem {
+  code: string;
+  title: string;
+  targetAsset: string;
+  won: boolean;
+  timeElapsed: number;
+  lesson: string;
+}
 
-      const attachmentHtml = line.attachment
-        ? `<div class="family-attachment-card">
-            <span class="attachment-badge">${escapeHtml(line.attachment.badge)}</span>
-            <strong>${escapeHtml(line.attachment.title)}</strong>
-            <p>${escapeHtml(line.attachment.desc)}</p>
-          </div>`
-        : '';
-
-      return `<div class="family-message is-${line.who}">
-        <div class="family-message-content">
-          ${isScammer ? `<span class="family-forwarded">${icon('<path d="m13 5 7 7-7 7M20 12H9a5 5 0 0 0-5 5"/>')}Lời đe dọa của kẻ lừa đảo</span>` : ''}
-          <div class="family-bubble">
-            ${escapeHtml(line.text)}
-            ${attachmentHtml}
-          </div>
-          <span class="family-message-label">${label}</span>
+export function renderIncidentIntro(total = 5): string {
+  return `
+    <div class="iru-stage">
+      <div class="iru-intro-card">
+        <div class="iru-hero-icon">🚨</div>
+        <h2>Trung tâm Ứng cứu Khẩn cấp 60 Giây</h2>
+        <p>
+          Một loạt điện thoại của người dùng đang bị <b>mã độc tấn công, bị chiếm quyền điều khiển từ xa hoặc bị cướp quyền SIM</b>.
+          Tiền trong tài khoản và dữ liệu cá nhân đang bị rút ruột từng giây!
+          <br><br>
+          ⚡ <b>Nhiệm vụ Điều tra viên:</b> Trong 60 giây, thực hiện chuỗi quy trình thao tác cấp cứu chuẩn (SOP Incident Response)
+          để cắt đứt đường truyền của hacker, đóng băng dòng tiền và giải cứu an toàn thiết bị!
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-bottom:28px;">
+          <span style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
+            5 Ca Sự cố Nghiêm trọng
+          </span>
+          <span style="background:rgba(6,182,212,0.15);color:#22d3ee;border:1px solid rgba(6,182,212,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
+            Đếm ngược 60 Giây / Ca
+          </span>
+          <span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
+            Chuỗi Quy trình SOP
+          </span>
         </div>
-      </div>`;
-    })
-    .join('');
-
-  const response = ending
-    ? `<div class="family-feedback ${ending === 'win' ? 'is-success' : 'is-warning'}" role="status">
-        <span class="family-feedback-icon">${ending === 'win' ? shield() : icon('<path d="M12 9v4m0 4h.01M10.3 4.8 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.8a2 2 0 0 0-3.4 0Z"/>')}</span>
-        <div>
-          <h2 tabindex="-1" data-family-feedback>${ending === 'win' ? 'Bảo vệ thành công người thân!' : 'Người thân đã bị thao túng sập bẫy'}</h2>
-          <p>${escapeHtml(state.lesson || '')}</p>
-          <button class="family-primary" data-family="next">
-            ${state.lives === 0 || sceneIdx === total - 1 ? 'Xem báo cáo tác chiến tổng kết' : 'Ca giải cứu tiếp theo'} ${arrow()}
-          </button>
-        </div>
-      </div>`
-    : `<h2>Hành động can thiệp tiếp theo của bạn:</h2>
-       <div class="family-choices">
-         ${state.choices
-           .map(
-             (choice, i) => `
-               <button class="family-choice" data-family="choose" data-choice="${i}">
-                 <span class="family-choice-key" aria-hidden="true">${String.fromCharCode(65 + i)}</span>
-                 <div class="family-choice-body">
-                   <span class="family-choice-tag">${escapeHtml(choice.tacticLabel)}</span>
-                   <span class="family-choice-text">${escapeHtml(choice.text)}</span>
-                 </div>
-                 ${arrow()}
-               </button>`
-           )
-           .join('')}
-       </div>
-       <p class="family-response-hint">Mỗi lời khuyên đều ảnh hưởng trực tiếp đến tâm lý và quyết định chuyển tiền của người thân.</p>`;
-
-  return `<div class="family-stage">
-    <header class="family-heading">
-      <div>
-        <h1 tabindex="-1">Phòng Tác chiến: Giải cứu ${escapeHtml(relative)}</h1>
-        <p>Địa điểm hiện tại: <b style="color:var(--family-coral);">${escapeHtml(state.locationStatus)}</b></p>
+        <button class="iru-next-btn" data-iru="start-first" style="font-size:15px;padding:14px 34px;">
+          ⚡ Tiếp nhận Ca trực Cứu hộ Ngay
+        </button>
       </div>
-      <div class="family-session">
-        <span class="family-step">Ca giải cứu <b>${sceneIdx + 1} / ${total}</b></span>
-        <span class="family-score">${state.score * 150} XP</span>
-        ${livesMarkup(state.lives)}
-      </div>
-    </header>
+    </div>
+  `;
+}
 
-    <div class="family-workspace">
-      <!-- LEFT / MAIN: LIVE CRISIS CHAT -->
-      <section class="family-conversation" aria-label="Cuộc trò chuyện với ${escapeHtml(relative)}">
-        <header class="family-contact">
-          ${avatar(relative)}
-          <div>
-            <h2>${escapeHtml(relative)} <small style="font-size:12px;color:var(--family-muted);font-weight:400;">(${escapeHtml(state.relationship)})</small></h2>
-            <p><span class="family-status-dot ${ending ? 'is-ended' : ''}"></span>${ending ? 'Đã kết thúc can thiệp' : 'Đang hoảng sợ · Cần bạn giúp đỡ gấp'}</p>
-          </div>
-          <span class="family-contact-icon">${icon('<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/>')}</span>
-        </header>
+export function renderIncidentDashboard(state: IncidentViewState): string {
+  const isUrgent = state.timeRemaining <= 15 && !state.resultStatus;
+  const timeFormatted = `${String(Math.floor(state.timeRemaining / 60)).padStart(2, '0')}:${String(state.timeRemaining % 60).padStart(2, '0')}`;
 
-        <div class="family-chat" id="familyChat" role="log" aria-label="Nội dung hội thoại">
-          <p class="family-chat-date">Kênh liên lạc gia đình khẩn cấp</p>
-          ${chat}
+  return `
+    <div class="iru-stage">
+      <!-- TOP STATUS BAR -->
+      <div class="iru-top-header">
+        <div class="iru-pill">
+          <span class="pulse-red"></span>
+          <span>TRỰC BAN PHẢN ỨNG NHANH · CA ${state.incidentIdx + 1} / ${state.total}</span>
         </div>
+        <div class="iru-session-metrics">
+          <span>Điểm tích lũy: <b style="color:var(--iru-cyan);">${state.score * 150} XP</b></span>
+          <span class="iru-lives">${'♥'.repeat(state.lives)}${'♡'.repeat(3 - state.lives)}</span>
+        </div>
+      </div>
 
-        <div class="family-response">${response}</div>
-      </section>
+      <!-- MAIN GRID: PHONE SIMULATOR vs TACTICAL CONSOLE -->
+      <div class="iru-grid">
+        <!-- LEFT: HACKED SMARTPHONE FRAME -->
+        <div class="iru-phone-frame">
+          <div class="iru-phone-notch">
+            <div class="iru-notch-cam ${state.camActive ? 'active-cam' : ''}" title="${state.camActive ? 'Camera đang bị truy cập lén' : 'Camera an toàn'}"></div>
+          </div>
 
-      <!-- RIGHT: CRISIS CONTROL PANEL -->
-      <aside class="family-brief" aria-label="Thông tin tình huống">
-        <h2 class="family-brief-label">TÌNH HUỐNG KHẨN CẤP</h2>
-        <h3 class="family-scenario-title">${escapeHtml(state.title)}</h3>
+          <div class="iru-phone-status-bar">
+            <span>${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+            <span class="iru-status-badge ${state.networkOnline ? 'online' : 'airplane'}">
+              ${state.networkOnline ? '📶 4G/Wifi: ĐANG NỐI MẠNG' : '✈️ CHẾ ĐỘ MÁY BAY: CẮT MẠNG'}
+            </span>
+          </div>
 
-        <details class="family-brief-details" ${compact ? '' : 'open'}>
-          <summary>Chi tiết bối cảnh nguy hiểm ${arrow()}</summary>
-          <p class="family-context">${escapeHtml(state.intro)}</p>
-          <div class="family-goal">
-            ${shield()}
-            <div>
-              <h3>Mục tiêu tác chiến</h3>
-              <p>Trấn an tâm lý, chặn việc chuyển tiền và phối hợp với bên thứ ba (giao dịch viên, công an phường, người quen) xác minh ngay lập tức.</p>
+          <!-- COUNTDOWN TIMER BANNER -->
+          <div class="iru-countdown-banner ${isUrgent ? 'is-urgent' : ''}">
+            <div class="iru-countdown-label">
+              ${state.resultStatus === 'success' ? 'ĐÃ NGĂN CHẶN THÀNH CÔNG' : state.resultStatus === 'fail' ? 'SỰ CỐ THẤT THOÁT' : 'THỜI GIAN VÀNG TRƯỚC KHI BỊ CHIẾM ĐOẠT'}
+            </div>
+            <div class="iru-countdown-digits" id="iruTimerDigits">${timeFormatted}</div>
+            <div style="font-size:10.5px;color:#cbd5e1;">
+              ${state.phoneStatusLabel}
             </div>
           </div>
-        </details>
 
-        <div class="family-brief-meters">
-          ${meter('Mức độ Hoảng loạn', state.fear, 'is-fear')}
-          ${meter('Bị Kẻ Gian Thao Túng', state.trust, 'is-trust')}
+          <!-- TARGET ASSET AT RISK -->
+          <div class="iru-asset-box">
+            <span style="color:#94a3b8;display:block;margin-bottom:2px;">Tài sản đang bị nhắm tới:</span>
+            <strong>${escapeHtml(state.targetAsset)}</strong>
+          </div>
+
+          <!-- PHONE SCREEN DISPLAY -->
+          <div class="iru-phone-screen">
+            ${state.screenOverlayActive ? `
+              <div class="iru-screen-overlay">
+                <span style="font-size:32px;">⚠️</span>
+                <span>MÀN HÌNH BỊ CHIẾM QUYỀN ĐIỀU KHIỂN (OVERLAY)</span>
+                <span style="font-size:11px;font-weight:400;color:#cbd5e1;">Mã độc đang chặn thao tác cảm ứng và tự động thao tác ngầm</span>
+              </div>
+            ` : ''}
+
+            <div class="iru-malware-dialog">
+              <div class="iru-malware-header">
+                <span>⚡</span>
+                <span>CẢNH BÁO TIẾN TRÌNH HỆ THỐNG</span>
+              </div>
+              <p style="color:#e2e8f0;font-size:11.5px;line-height:1.5;">
+                Thiết bị: <b>${escapeHtml(state.victimDevice)}</b><br>
+                Chủ máy: <b>${escapeHtml(state.victimName)}</b>
+              </p>
+            </div>
+
+            <div style="font-size:11px;font-weight:700;color:var(--iru-muted);margin-top:4px;">
+              NHẬT KÝ THIẾT BỊ THỜI GIAN THỰC:
+            </div>
+
+            <!-- LIVE THREAT FEED ON PHONE -->
+            <div class="iru-threat-log-feed" id="iruThreatFeed">
+              ${state.threatLogs.map(log => `
+                <div class="log-${log.type}">
+                  <b>[${escapeHtml(log.time)}]</b> ${escapeHtml(log.text)}
+                </div>
+              `).join('')}
+            </div>
+          </div>
         </div>
 
-        <div class="family-tactic-guide">
-          <strong>💡 Nguyên tắc Vàng khi Người thân Bị Lừa:</strong>
-          <ul>
-            <li><b>Không chỉ trích:</b> Mắng mỏ chỉ đẩy người nhà vào góc tối và bí mật chuyển tiền.</li>
-            <li><b>Câu giờ:</b> Bất kỳ sự trì hoãn nào cũng giúp não bộ thoát khỏi trạng thái "chiến hay biến".</li>
-            <li><b>Kích hoạt kênh độc lập:</b> Luôn xác minh qua người thứ ba tại chỗ.</li>
-          </ul>
+        <!-- RIGHT: TACTICAL ACTION CONSOLE -->
+        <div class="iru-console">
+          <!-- DOSSIER CARD -->
+          <div class="iru-case-dossier">
+            <div class="iru-case-meta">
+              <span class="iru-case-code">${escapeHtml(state.code)}</span>
+              <span class="iru-threat-pill ${state.threatLevel}">CẤP ĐỘ NGUY HIỂM: ${state.threatLevel}</span>
+            </div>
+            <h3 class="iru-case-title">${escapeHtml(state.title)}</h3>
+            <p class="iru-victim-info">
+              👤 Nạn nhân: <b>${escapeHtml(state.victimName)}</b> · Thiết bị: <b>${escapeHtml(state.victimDevice)}</b>
+            </p>
+            <div class="iru-case-story">
+              <b>Diễn biến sự cố:</b> ${escapeHtml(state.story)}
+            </div>
+          </div>
+
+          <!-- ACTION DECK -->
+          ${!state.resultStatus ? `
+            <div class="iru-action-deck-title">
+              <span>BÀN PHÍM TÁC CHIẾN CẤP CỨU KHẨN CẤP</span>
+              <span class="iru-step-counter">Tiến trình SOP: <b>${state.stepCurrent} / ${state.stepTotal} bước</b></span>
+            </div>
+
+            <div class="iru-action-grid">
+              ${state.availableActions.map(action => {
+                const isDone = state.completedActions.has(action.id);
+                return `
+                  <button class="iru-action-btn ${isDone ? 'is-completed' : ''}"
+                          data-iru="execute-action" data-action-id="${escapeHtml(action.id)}"
+                          ${isDone ? 'disabled' : ''}>
+                    <span class="iru-action-icon">${action.icon}</span>
+                    <div class="iru-action-body">
+                      <strong>${escapeHtml(action.title)}</strong>
+                      <p>${escapeHtml(action.desc)}</p>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          ` : `
+            <!-- RESULT CARD WHEN INCIDENT FINISHES -->
+            <div class="iru-result-card ${state.resultStatus}">
+              <div class="iru-result-badge">
+                ${state.resultStatus === 'success' ? '🛡️' : '💥'}
+              </div>
+              <h3 class="iru-result-title">
+                ${state.resultStatus === 'success' ? 'GIẢI CỨU THÀNH CÔNG! BẢO TOÀN TÀI SẢN!' : 'SỰ CỐ THẤT BẠI: NẠN NHÂN ĐÃ BỊ THIỆT HẠI!'}
+              </h3>
+              <p class="iru-result-desc">${escapeHtml(state.resultFeedback || '')}</p>
+
+              <div class="iru-forensic-box">
+                <strong>📋 Hồ sơ Nghiệp vụ &amp; Quy tắc Ứng cứu Chuẩn (SOP):</strong>
+                ${escapeHtml(state.forensicLesson || '')}
+              </div>
+
+              <button class="iru-next-btn" data-iru="next-incident">
+                ${state.lives === 0 || state.incidentIdx === state.total - 1 ? 'Xem Báo cáo Tổng kết Toàn bộ Ca trực →' : 'Tiếp nhận Ca Cứu hộ Tiếp theo →'}
+              </button>
+            </div>
+          `}
         </div>
-      </aside>
+      </div>
     </div>
-    ${footer()}
-  </div>`;
+  `;
 }
 
-export function renderFamilyIntro(total = 5): string {
-  return `<div class="family-intro">
-    <div class="family-intro-copy">
-      <h1>Điểm tựa Vững chắc<br>khi Gia đình gặp Nguy biến.</h1>
-      <p>Kẻ lừa đảo thời 4.0 dùng đe dọa án tù, video Deepfake con cháu và ép mua thuốc dỏm để thao túng người lớn tuổi. Một lời khuyên bình tĩnh và hành động quyết đoán của bạn có thể cứu trọn tiền tích góp cả đời của người thân!</p>
-      <div class="family-intro-meta">
-        <span>${total} Ca Khủng hoảng</span>
-        <span>3 Trái tim Bảo vệ</span>
-        <span>Tác chiến Đa kênh</span>
-      </div>
-      <button class="family-primary" data-family="start">Bước vào Phòng Tác chiến ${arrow()}</button>
-      <p class="family-intro-note">Bình tĩnh · Thấu cảm · Hành động chính xác</p>
-    </div>
-
-    <div class="family-intro-preview">
-      <div class="family-contact">
-        ${avatar('Mẹ')}
-        <div>
-          <h2>Mẹ ruột</h2>
-          <p><span class="family-status-dot"></span>Đang đứng tại quầy ngân hàng rút 300 triệu...</p>
-        </div>
-      </div>
-      <div class="family-message is-family">
-        <div class="family-bubble">Con ơi, Viện kiểm sát dọa bắt mẹ, bắt rút hết 300 triệu tiết kiệm chuyển ngay... Mẹ run quá!</div>
-      </div>
-      <div class="family-message is-me">
-        <div class="family-bubble">Mẹ hít thở sâu nhé, con ở đây rồi! Mẹ đưa máy cho cô giao dịch viên ngân hàng ngay giúp con!</div>
-      </div>
-      <div class="family-intro-goal">
-        ${shield()}
-        <p>Bảo vệ người thân · Chặn dòng tiền bẫy</p>
-      </div>
-    </div>
-  </div>
-  ${footer()}`;
-}
-
-export function renderFamilySummary(
-  history: { title: string; won: boolean; lesson: string }[],
+export function renderIncidentSummary(
+  history: IncidentHistoryItem[],
   score: number,
   lives: number,
   total: number
 ): string {
-  return `<div class="family-summary">
-    <header class="family-summary-heading">
-      <span class="family-summary-icon">${shield()}</span>
-      <h1>${lives === 0 ? 'Ca Tác chiến gặp Tổn thất' : 'Chiến dịch Giải cứu Gia đình Thành công!'}</h1>
-      <p>Tổng kết các bài học nghiệp vụ giúp bạn và gia đình luôn an toàn trước mọi cạm bẫy.</p>
-    </header>
+  const isWon = lives > 0;
+  return `
+    <div class="iru-stage">
+      <div class="iru-intro-card" style="max-width:800px;">
+        <div class="iru-hero-icon" style="background:${isWon ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #991b1b)'};">
+          ${isWon ? '🛡️' : '⚠️'}
+        </div>
+        <h2>${isWon ? 'Hoàn thành Xuất sắc Ca trực Cứu hộ Khẩn cấp!' : 'Ca trực Bị Tạm đình chỉ do Mắc Sai lầm Nghiêm trọng'}</h2>
+        <p>Tổng kết thành tích bảo vệ tài sản và thiết bị người dùng trước các đợt tấn công mạng thời gian thực.</p>
 
-    <div class="family-summary-metrics">
-      <div><span>Ca can thiệp an toàn</span><strong>${score}<small> / ${total}</small></strong></div>
-      <div><span>Trái tim còn lại</span><strong>${lives}<small> / 3</small></strong></div>
-      <div><span>Tích lũy XP</span><strong>+${score * 150}<small> XP</small></strong></div>
-    </div>
+        <div class="iru-summary-metrics">
+          <div class="iru-metric-item">
+            <span>Ca cứu hộ thành công</span>
+            <strong style="color:#34d399;">${score} / ${total}</strong>
+          </div>
+          <div class="iru-metric-item">
+            <span>Trái tim còn lại</span>
+            <strong style="color:#f87171;">${lives} / 3</strong>
+          </div>
+          <div class="iru-metric-item">
+            <span>Tổng XP thu được</span>
+            <strong style="color:#22d3ee;">+${score * 150} XP</strong>
+          </div>
+        </div>
 
-    <h2 class="family-review-title">Hồ sơ nghiệp vụ đã tích lũy</h2>
-    <div class="family-reviews">
-      ${history
-        .map(
-          h => `<details class="family-review ${h.won ? 'is-success' : 'is-warning'}">
-            <summary>
-              <span class="family-review-mark">${h.won ? icon('<path d="m5 12 4 4L19 6"/>') : icon('<path d="M12 8v5m0 4h.01"/><circle cx="12" cy="12" r="9"/>')}</span>
-              <span>${escapeHtml(h.title)}</span>
-              ${arrow()}
-            </summary>
-            <p>${escapeHtml(h.lesson)}</p>
-          </details>`
-        )
-        .join('')}
-    </div>
+        <div style="text-align:left;margin-bottom:24px;">
+          <h4 style="font-size:13px;font-weight:700;color:var(--iru-cyan);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">
+            Nhật ký Hồ sơ Sự cố đã xử lý:
+          </h4>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${history.map(item => `
+              <div style="background:rgba(15,23,42,0.8);border:1px solid ${item.won ? '#10b981' : '#ef4444'};border-radius:10px;padding:12px 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <span style="font-weight:700;color:#fff;font-size:13.5px;">${escapeHtml(item.code)}: ${escapeHtml(item.title)}</span>
+                  <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;background:${item.won ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};color:${item.won ? '#34d399' : '#f87171'};">
+                    ${item.won ? '✓ THÀNH CÔNG' : '✕ THẤT BẠI'}
+                  </span>
+                </div>
+                <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">Tài sản bảo vệ: <b style="color:#f87171;">${escapeHtml(item.targetAsset)}</b> · Thời gian xử lý: <b>${item.timeElapsed}s</b></div>
+                <p style="font-size:11.5px;color:#cbd5e1;line-height:1.5;">💡 <b>Bài học:</b> ${escapeHtml(item.lesson)}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
 
-    <div class="family-summary-actions">
-      <button class="family-primary" data-family="start">Chơi lại chiến dịch ${arrow()}</button>
-      <button class="family-secondary" data-action="familyExit">Về sảnh chính</button>
+        <div style="display:flex;gap:14px;justify-content:center;">
+          <button class="iru-next-btn" data-iru="restart-all">⚡ Trực ban Ca Cứu hộ Mới</button>
+          <button class="family-back" data-action="familyExit" style="font-size:13px;padding:12px 20px;">Về màn hình chính</button>
+        </div>
+      </div>
     </div>
-    ${footer()}
-  </div>`;
+  `;
 }

@@ -412,3 +412,70 @@ export function playTacticalSuccess(): void {
     });
   } catch {}
 }
+
+/**
+ * Emergency siren alarm pulse for incident response
+ */
+export function playSirenAlert(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(650, now);
+    o.frequency.linearRampToValueAtTime(950, now + 0.18);
+    o.frequency.linearRampToValueAtTime(650, now + 0.36);
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.4);
+  } catch {}
+}
+
+/**
+ * Crisp countdown tick sound for each elapsed second
+ */
+export function playTickTock(isUrgent = false): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(isUrgent ? 1400 : 900, now);
+    o.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+    g.gain.setValueAtTime(isUrgent ? 0.12 : 0.06, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.04);
+  } catch {}
+}
+
+/**
+ * Power-down / network disconnection sound effect
+ */
+export function playSystemHalt(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  try {
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(450, now);
+    o.frequency.exponentialRampToValueAtTime(60, now + 0.28);
+    g.gain.setValueAtTime(0.15, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.32);
+  } catch {}
+}
