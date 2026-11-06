@@ -63,7 +63,7 @@ export function renderIncidentIntro(total = 5): string {
         </p>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:28px;">
           <span style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
-            5 Ca Sự cố Nghiêm trọng
+            ${total} Ca Sự cố Nghiêm trọng
           </span>
           <span style="background:rgba(6,182,212,0.15);color:#22d3ee;border:1px solid rgba(6,182,212,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
             Đếm ngược 60 Giây / Ca
