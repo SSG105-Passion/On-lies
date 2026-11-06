@@ -649,6 +649,55 @@ export const CALLS: CallCase[] = [
     },
     lesson: 'Không có bữa trưa nào miễn phí. Nếu bạn không tham gia dự thưởng mà tự nhiên được báo trúng xe sang, 100% là bẫy lừa đảo đòi nộp phí trước.',
     tactic: 'Bẫy Lừa đảo Trúng thưởng & Đòi nộp Tiền phí Trước'
+  },
+  {
+    id: 13,
+    callerName: 'Tổng đài Chăm sóc Khách hàng Điện lực EVN',
+    callerNumber: '028 7779 88xx • Đầu số VoIP',
+    callerTag: 'Đầu số dịch vụ VoIP tự động',
+    avatar: '⚡',
+    story: 'Giọng đọc tự động thông báo căn hộ của bạn đang nợ hóa đơn tiền điện 2.850.000đ và lệnh cắt điện khẩn cấp sẽ được thi hành sau 2 giờ.',
+    dialogue: [
+      'Alo, Trung tâm Thu hồi nợ cước Tổng công ty Điện lực xin thông báo: Hợp đồng điện sinh hoạt tại địa chỉ của quý khách đang nợ tiền điện kỳ trước là 2.850.000đ.',
+      'Lệnh cắt điện tự động sẽ được thi hành sau đúng 2 giờ nữa nếu quý khách không hoàn tất nghĩa vụ thanh toán.',
+      'Để hủy lệnh cắt điện khẩn cấp, quý khách vui lòng bấm phím 1 chuyển tiếp gặp thanh tra viên hoặc chuyển khoản trực tiếp vào số tài khoản đối soát đặc biệt!'
+    ],
+    lookupData: {
+      carrier: 'Dịch vụ SIP Trunking VoIP đầu 028',
+      networkActivity: 'Phát tán: Hơn 160 cuộc gọi tự động ghi âm sẵn chỉ trong buổi sáng',
+      registeredOwner: 'DOANH NGHIEP TNHH DICH VU TRUYEN THONG A Chau',
+      audioForensics: 'Giọng máy TTS (Text-to-Speech) ghép âm thanh từ file kịch bản dựng sẵn'
+    },
+    trapQuestions: [
+      {
+        label: 'Hỏi Mã khách hàng sử dụng điện (Mã PE)',
+        question: 'Dạ cho em hỏi Mã khách hàng sử dụng điện (Mã PE) ghi trên công tơ nhà em là số mấy ạ?',
+        callerResponse: 'Hệ thống điện lực đang khóa do nợ cước nên tôi không xem chi tiết được! Anh/chị phải thanh toán ngay trước 2 tiếng rồi mang biên lai ra phòng giao dịch đối chiếu sau!',
+        revealedClue: 'LỘ BẢN CHẤT LỪA ĐẢO: Nhân viên Điện lực chính thống luôn tra cứu được chính xác Mã PE và tên chủ hợp đồng. Kẻ gian gọi tự động hàng loạt hoàn toàn không có dữ liệu thật!'
+      },
+      {
+        label: 'Đề nghị ra phòng giao dịch Điện lực nộp tiền mặt',
+        question: 'Dạ để em chạy ra quầy giao dịch Điện lực quận đóng tiền mặt trực tiếp cho an tâm được không ạ?',
+        callerResponse: 'Không kịp đâu anh/chị ơi! Chạy ra quầy làm thủ tục là bên kỹ thuật đã ngắt điện rồi! Phải chuyển khoản ngay vào số tài khoản đối soát này để giữ điện sinh hoạt!',
+        revealedClue: 'LỘ BẢN CHẤT LỪA ĐẢO: Điện lực EVN không bao giờ ép khách hàng chuyển khoản vào tài khoản cá nhân và luôn khuyến khích thanh toán qua App EVN chính thức.'
+      }
+    ],
+    verdicts: {
+      hangup: {
+        isCorrect: true,
+        feedback: 'Rất chính xác! EVN chỉ gửi thông báo qua SMS định danh (Brandname EVN) hoặc ứng dụng chính thức, không gọi điện dọa cắt điện đột ngột và KHÔNG BAO GIỜ yêu cầu chuyển tiền vào tài khoản cá nhân.'
+      },
+      delay: {
+        isCorrect: true,
+        feedback: 'Xử lý chuẩn xác! Bạn dừng cuộc gọi để mở App CSKH EVN hoặc gọi tổng đài 19001006 / 19006769 của Điện lực để tra cứu hóa đơn.'
+      },
+      cooperate: {
+        isCorrect: false,
+        feedback: 'Mắc bẫy lừa đảo! Kẻ gian lợi dụng tâm lý lo sợ bị cúp điện sinh hoạt để ép bạn chuyển tiền vào tài khoản của chúng.'
+      }
+    },
+    lesson: 'Ngành Điện lực không thu tiền qua số tài khoản cá nhân và không gọi điện dọa cắt điện trong vài giờ. Luôn tra cứu hóa đơn qua website hoặc ứng dụng CSKH EVN chính thức.',
+    tactic: 'Mạo danh Điện lực dọa cắt điện khẩn cấp để cưỡng ép chuyển tiền'
   }
 ];
 

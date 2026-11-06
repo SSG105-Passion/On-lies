@@ -3,7 +3,7 @@
    Trung tâm Ứng cứu Sự cố Khẩn cấp 60 Giây • On-Lies Cybersecurity
    ========================================================================== */
 
-#familyApp, [data-theme="light"] #familyApp {
+#familyApp, [data-theme="dark"] #familyApp {
   --iru-bg: #090d16;
   --iru-panel: #0f172a;
   --iru-card: #1e293b;
@@ -21,6 +21,23 @@
   font-size: 14px;
 }
 
+[data-theme="light"] #familyApp {
+  --iru-bg: #f8fafc;
+  --iru-panel: #ffffff;
+  --iru-card: #f1f5f9;
+  --iru-border: #cbd5e1;
+  --iru-text: #0f172a;
+  --iru-muted: #475569;
+  --iru-subtle: #64748b;
+  --iru-cyan: #0284c7;
+  --iru-green: #059669;
+  --iru-amber: #d97706;
+  --iru-red: #dc2626;
+  --iru-red-glow: rgba(220, 38, 38, 0.2);
+  background: var(--iru-bg);
+  color: var(--iru-text);
+}
+
 #familyApp h1, #familyApp h2, #familyApp h3, #familyApp h4, #familyApp p { margin: 0; }
 #familyApp button { font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
@@ -28,9 +45,9 @@
   width: 100%;
   min-height: 54px;
   padding: 0 28px;
-  background: #020617;
+  background: var(--iru-panel);
   border-bottom: 1px solid var(--iru-border);
-  color: #f8fafc;
+  color: var(--iru-text);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,13 +69,13 @@
   border: 1px solid var(--iru-border);
   border-radius: 8px;
   padding: 6px 14px;
-  background: #0f172a;
-  color: var(--iru-muted);
+  background: var(--iru-card);
+  color: var(--iru-text);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.15s ease;
 }
-.family-back:hover { background: #1e293b; color: #fff; border-color: var(--iru-cyan); }
+.family-back:hover { background: var(--iru-panel); color: var(--iru-cyan); border-color: var(--iru-cyan); }
 
 .family-content {
   flex: 1;
@@ -88,6 +105,7 @@
   border: 1px solid var(--iru-border);
   border-radius: 12px;
   padding: 14px 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .iru-pill {
@@ -97,7 +115,7 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #fff;
+  color: var(--iru-text);
 }
 .pulse-red {
   width: 10px;
@@ -147,6 +165,12 @@
   overflow: hidden;
 }
 
+[data-theme="light"] .iru-phone-frame {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
 .iru-phone-notch {
   width: 110px;
   height: 20px;
@@ -157,6 +181,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+[data-theme="light"] .iru-phone-notch {
+  background: #cbd5e1;
 }
 .iru-notch-cam { width: 8px; height: 8px; border-radius: 50%; background: #1e293b; }
 .iru-notch-cam.active-cam { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
@@ -170,6 +197,9 @@
   padding: 0 6px 8px;
   font-family: 'JetBrains Mono', monospace;
 }
+[data-theme="light"] .iru-phone-status-bar {
+  color: #475569;
+}
 .iru-status-badge {
   padding: 2px 6px;
   border-radius: 4px;
@@ -177,7 +207,9 @@
   font-weight: 700;
 }
 .iru-status-badge.online { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+[data-theme="light"] .iru-status-badge.online { color: #15803d; background: #dcfce7; }
 .iru-status-badge.airplane { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+[data-theme="light"] .iru-status-badge.airplane { color: #b45309; background: #fef3c7; border-color: #d97706; }
 
 .iru-countdown-banner {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35));
@@ -186,6 +218,10 @@
   padding: 12px;
   text-align: center;
   margin-bottom: 12px;
+}
+[data-theme="light"] .iru-countdown-banner {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border-color: #ef4444;
 }
 .iru-countdown-banner.is-urgent {
   animation: urgentBlink 0.8s infinite;
@@ -196,6 +232,7 @@
 }
 
 .iru-countdown-label { font-size: 11px; font-weight: 700; color: #fca5a5; letter-spacing: 0.05em; }
+[data-theme="light"] .iru-countdown-label { color: #991b1b; }
 .iru-countdown-digits {
   font-size: 34px;
   font-weight: 900;
@@ -203,6 +240,10 @@
   color: #ffffff;
   margin: 2px 0;
   text-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+}
+[data-theme="light"] .iru-countdown-digits {
+  color: #b91c1c;
+  text-shadow: none;
 }
 
 .iru-asset-box {
@@ -213,7 +254,13 @@
   font-size: 11.5px;
   margin-bottom: 12px;
 }
+[data-theme="light"] .iru-asset-box {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
 .iru-asset-box strong { color: #f87171; font-size: 13px; }
+[data-theme="light"] .iru-asset-box strong { color: #dc2626; }
 
 /* Phone Inner Screen Display */
 .iru-phone-screen {
@@ -228,6 +275,10 @@
   position: relative;
   min-height: 320px;
 }
+[data-theme="light"] .iru-phone-screen {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
 
 .iru-malware-dialog {
   background: rgba(15, 23, 42, 0.95);
@@ -237,6 +288,11 @@
   box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
   font-size: 12px;
 }
+[data-theme="light"] .iru-malware-dialog {
+  background: #fef2f2;
+  border-color: #f87171;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.15);
+}
 .iru-malware-header {
   display: flex;
   align-items: center;
@@ -244,6 +300,9 @@
   color: #f87171;
   font-weight: 700;
   margin-bottom: 6px;
+}
+[data-theme="light"] .iru-malware-header {
+  color: #b91c1c;
 }
 .iru-screen-overlay {
   position: absolute;
@@ -262,6 +321,10 @@
   backdrop-filter: blur(2px);
   z-index: 5;
 }
+[data-theme="light"] .iru-screen-overlay {
+  background: rgba(15, 23, 42, 0.85);
+  color: #fca5a5;
+}
 
 .iru-threat-log-feed {
   flex: 1;
@@ -278,9 +341,17 @@
   flex-direction: column;
   gap: 4px;
 }
+[data-theme="light"] .iru-threat-log-feed {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
 .iru-threat-log-feed .log-threat { color: #f87171; }
+[data-theme="light"] .iru-threat-log-feed .log-threat { color: #dc2626; font-weight: 600; }
 .iru-threat-log-feed .log-success { color: #4ade80; }
+[data-theme="light"] .iru-threat-log-feed .log-success { color: #16a34a; font-weight: 600; }
 .iru-threat-log-feed .log-warn { color: #fbbf24; }
+[data-theme="light"] .iru-threat-log-feed .log-warn { color: #d97706; font-weight: 600; }
 
 /* ==========================================================================
    TACTICAL CONSOLE (RIGHT COLUMN)
@@ -296,6 +367,7 @@
   border: 1px solid var(--iru-border);
   border-radius: 16px;
   padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .iru-case-meta {
   display: flex;
@@ -315,9 +387,13 @@
 .iru-threat-pill.EXTREME { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
 .iru-threat-pill.HIGH { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
 
-.iru-case-title { font-size: 19px; font-weight: 800; line-height: 1.4; color: #fff; margin-bottom: 8px !important; }
+[data-theme="light"] .iru-threat-pill.CRITICAL { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+[data-theme="light"] .iru-threat-pill.EXTREME { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+[data-theme="light"] .iru-threat-pill.HIGH { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+
+.iru-case-title { font-size: 19px; font-weight: 800; line-height: 1.4; color: var(--iru-text); margin-bottom: 8px !important; }
 .iru-victim-info { font-size: 12.5px; color: var(--iru-muted); margin-bottom: 12px !important; }
-.iru-case-story { font-size: 13px; line-height: 1.65; color: #cbd5e1; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 10px; border-left: 3px solid var(--iru-cyan); }
+.iru-case-story { font-size: 13px; line-height: 1.65; color: var(--iru-text); background: var(--iru-card); padding: 12px 14px; border-radius: 10px; border-left: 3px solid var(--iru-cyan); }
 
 .iru-action-deck-title {
   display: flex;
@@ -325,7 +401,7 @@
   justify-content: space-between;
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--iru-text);
 }
 .iru-step-counter { font-size: 12px; color: var(--iru-cyan); font-weight: 600; }
 
@@ -346,9 +422,10 @@
   color: var(--iru-text);
   transition: all 0.18s ease;
   min-height: 84px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .iru-action-btn:hover:not(:disabled) {
-  background: #1e293b;
+  background: var(--iru-card);
   border-color: var(--iru-cyan);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(6, 182, 212, 0.15);
@@ -371,7 +448,7 @@
   display: block;
   font-size: 10px;
   font-weight: 700;
-  color: #34d399;
+  color: #10b981;
   margin-top: 4px;
 }
 
@@ -381,12 +458,12 @@
   margin-top: 2px;
 }
 .iru-action-body { flex: 1; min-width: 0; }
-.iru-action-body strong { display: block; font-size: 13.5px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 4px; }
+.iru-action-body strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--iru-text); line-height: 1.4; margin-bottom: 4px; }
 .iru-action-body p { font-size: 11.5px; line-height: 1.5; color: var(--iru-muted); margin: 0; }
 
 /* Operation Live Log */
 .iru-live-ops-log {
-  background: #020617;
+  background: var(--iru-panel);
   border: 1px solid var(--iru-border);
   border-radius: 12px;
   padding: 12px 16px;
@@ -409,7 +486,7 @@
 }
 .ops-item { display: flex; gap: 8px; align-items: baseline; }
 .ops-time { color: var(--iru-cyan); font-weight: 700; }
-.ops-text { color: #e2e8f0; }
+.ops-text { color: var(--iru-text); }
 
 /* ==========================================================================
    RESULT & DEBRIEF MODAL / CARDS
@@ -421,7 +498,7 @@
   padding: 32px 28px;
   margin-top: 14px;
   text-align: center;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
 }
 .iru-result-card.success { border-color: #10b981; }
 .iru-result-card.fail { border-color: #ef4444; }
@@ -435,27 +512,27 @@
   font-size: 32px;
   margin: 0 auto 16px;
 }
-.iru-result-card.success .iru-result-badge { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.iru-result-card.fail .iru-result-badge { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.iru-result-card.success .iru-result-badge { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.iru-result-card.fail .iru-result-badge { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
-.iru-result-title { font-size: 22px; font-weight: 800; margin-bottom: 8px !important; }
+.iru-result-title { font-size: 22px; font-weight: 800; color: var(--iru-text); margin-bottom: 8px !important; }
 .iru-result-desc { font-size: 13.5px; color: var(--iru-muted); line-height: 1.6; max-width: 600px; margin: 0 auto 20px !important; }
 
 .iru-forensic-box {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--iru-card);
   border: 1px solid var(--iru-border);
   border-radius: 12px;
   padding: 16px 20px;
   text-align: left;
   font-size: 12.5px;
   line-height: 1.7;
-  color: #cbd5e1;
+  color: var(--iru-text);
   margin: 18px 0 24px;
 }
 .iru-forensic-box strong { color: var(--iru-cyan); font-size: 13px; display: block; margin-bottom: 6px; }
 
 .iru-next-btn {
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #fff;
   border: 0;
   border-radius: 10px;
@@ -466,10 +543,11 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 .iru-next-btn:hover {
-  background: linear-gradient(135deg, #0891b2, #0e7490);
-  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+  background: linear-gradient(135deg, #0369a1, #075985);
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.35);
   transform: translateY(-2px);
 }
 
@@ -482,6 +560,7 @@
   border-radius: 24px;
   padding: 38px 34px;
   text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
 }
 .iru-hero-icon {
   width: 84px;
@@ -501,7 +580,7 @@
   50% { transform: scale(1.05); }
 }
 
-.iru-intro-card h2 { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 12px !important; }
+.iru-intro-card h2 { font-size: 26px; font-weight: 800; color: var(--iru-text); margin-bottom: 12px !important; }
 .iru-intro-card p { font-size: 13.5px; line-height: 1.7; color: var(--iru-muted); margin-bottom: 24px !important; }
 
 .iru-summary-metrics {
@@ -511,14 +590,14 @@
   margin: 20px 0 28px;
 }
 .iru-metric-item {
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--iru-card);
   border: 1px solid var(--iru-border);
   border-radius: 12px;
   padding: 14px 10px;
   text-align: center;
 }
 .iru-metric-item span { font-size: 11px; color: var(--iru-muted); display: block; margin-bottom: 4px; }
-.iru-metric-item strong { font-size: 22px; font-weight: 800; color: #fff; }
+.iru-metric-item strong { font-size: 22px; font-weight: 800; color: var(--iru-text); }
 
 @media (max-width: 860px) {
   .iru-grid { grid-template-columns: 1fr; }

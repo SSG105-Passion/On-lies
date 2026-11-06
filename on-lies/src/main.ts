@@ -51,7 +51,7 @@ let isSignUpMode = false;
 type PlayableGame = 'mail' | 'sms' | 'phone' | 'family';
 let lastOpenedGame: PlayableGame = 'mail';
 const gameNames: Record<PlayableGame, string> = {
-  mail: 'Thanh tra Hộp thư', sms: 'Lá chắn SMS', phone: 'Cuộc gọi khẩn', family: 'Phản ứng 60s',
+  mail: 'Thanh tra Hộp thư', sms: 'Lá chắn SMS', phone: 'Cuộc gọi khẩn', family: 'Ứng cứu Khẩn cấp 60s',
 };
 
 function showGameNavigation(app: PlayableGame) {
@@ -139,8 +139,8 @@ function updateProgress() {
     const modeTotals: Record<string, { max: number; unit: string }> = {
       mail: { max: 13, unit: 'hồ sơ' },
       messages: { max: 9, unit: 'tin nhắn' },
-      phone: { max: 12, unit: 'cuộc gọi' },
-      family: { max: 5, unit: 'ca cứu hộ' },
+      phone: { max: 13, unit: 'cuộc gọi' },
+      family: { max: 13, unit: 'ca ứng cứu' },
     };
     const meta = modeTotals[modeKey];
     if (meta) {

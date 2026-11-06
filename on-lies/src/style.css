@@ -1417,6 +1417,11 @@ button:focus-visible {
   overflow: hidden;
 }
 
+[data-theme="light"] .app-window {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
 /* macOS Window Bar */
 .app-window-bar {
   height: 44px;
@@ -1428,6 +1433,16 @@ button:focus-visible {
   background: #1e293b;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   user-select: none;
+}
+
+[data-theme="light"] .app-window-bar {
+  background: #ffffff;
+  border-bottom-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .window-title {
+  color: #0f172a;
 }
 
 /* Traffic Lights */

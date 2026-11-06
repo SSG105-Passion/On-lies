@@ -48,18 +48,18 @@ export interface IncidentHistoryItem {
   lesson: string;
 }
 
-export function renderIncidentIntro(total = 5): string {
+export function renderIncidentIntro(total = 13): string {
   return `
     <div class="iru-stage">
       <div class="iru-intro-card">
         <div class="iru-hero-icon">🚨</div>
         <h2>Trung tâm Ứng cứu Khẩn cấp 60 Giây</h2>
         <p>
-          Một loạt điện thoại của người dùng đang bị <b>mã độc tấn công, bị chiếm quyền điều khiển từ xa hoặc bị cướp quyền SIM</b>.
+          Hệ thống ghi nhận hàng loạt người dùng đang bị <b>mã độc tấn công, bị chiếm đoạt quyền điều khiển thiết bị hoặc bị cướp quyền SIM</b>.
           Tiền trong tài khoản và dữ liệu cá nhân đang bị rút ruột từng giây!
           <br><br>
-          ⚡ <b>Nhiệm vụ Điều tra viên:</b> Trong 60 giây, thực hiện chuỗi quy trình thao tác cấp cứu chuẩn (SOP Incident Response)
-          để cắt đứt đường truyền của hacker, đóng băng dòng tiền và giải cứu an toàn thiết bị!
+          ⚡ <b>Nhiệm vụ Chuyên viên Ứng cứu:</b> Trong 60 giây, thực hiện các bước ứng phó khẩn cấp chính xác
+          để ngắt đứt đường truyền của kẻ gian, phong tỏa dòng tiền và bảo vệ an toàn thiết bị!
         </p>
         <div style="display:flex;gap:12px;justify-content:center;margin-bottom:28px;">
           <span style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
@@ -69,11 +69,11 @@ export function renderIncidentIntro(total = 5): string {
             Đếm ngược 60 Giây / Ca
           </span>
           <span style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
-            Chuỗi Quy trình SOP
+            Phản ứng Chuẩn xác
           </span>
         </div>
         <button class="iru-next-btn" data-iru="start-first" style="font-size:15px;padding:14px 34px;">
-          ⚡ Tiếp nhận Ca trực Cứu hộ Ngay
+          ⚡ Tiếp nhận Ca Trực Ngay
         </button>
       </div>
     </div>
@@ -186,8 +186,8 @@ export function renderIncidentDashboard(state: IncidentViewState): string {
           <!-- ACTION DECK -->
           ${!state.resultStatus ? `
             <div class="iru-action-deck-title">
-              <span>BÀN PHÍM TÁC CHIẾN CẤP CỨU KHẨN CẤP</span>
-              <span class="iru-step-counter">Tiến trình SOP: <b>${state.stepCurrent} / ${state.stepTotal} bước</b></span>
+              <span>BẢNG ĐIỀU KHIỂN THAO TÁC ỨNG CỨU</span>
+              <span class="iru-step-counter">Tiến độ xử lý: <b>${state.stepCurrent} / ${state.stepTotal} bước</b></span>
             </div>
 
             <div class="iru-action-grid">
@@ -218,12 +218,12 @@ export function renderIncidentDashboard(state: IncidentViewState): string {
               <p class="iru-result-desc">${escapeHtml(state.resultFeedback || '')}</p>
 
               <div class="iru-forensic-box">
-                <strong>📋 Hồ sơ Nghiệp vụ &amp; Quy tắc Ứng cứu Chuẩn (SOP):</strong>
+                <strong>📋 Hồ sơ Nghiệp vụ &amp; Quy tắc Ứng phó Chuẩn:</strong>
                 ${escapeHtml(state.forensicLesson || '')}
               </div>
 
               <button class="iru-next-btn" data-iru="next-incident">
-                ${state.lives === 0 || state.incidentIdx === state.total - 1 ? 'Xem Báo cáo Tổng kết Toàn bộ Ca trực →' : 'Tiếp nhận Ca Cứu hộ Tiếp theo →'}
+                ${state.lives === 0 || state.incidentIdx === state.total - 1 ? 'Xem Báo cáo Tổng kết Toàn bộ Ca trực →' : 'Tiếp nhận Ca Ứng cứu Tiếp theo →'}
               </button>
             </div>
           `}
@@ -285,7 +285,7 @@ export function renderIncidentSummary(
         </div>
 
         <div style="display:flex;gap:14px;justify-content:center;">
-          <button class="iru-next-btn" data-iru="restart-all">⚡ Trực ban Ca Cứu hộ Mới</button>
+          <button class="iru-next-btn" data-iru="restart-all">⚡ Nhận Ca Trực Mới</button>
           <button class="family-back" data-action="familyExit" style="font-size:13px;padding:12px 20px;">Về màn hình chính</button>
         </div>
       </div>

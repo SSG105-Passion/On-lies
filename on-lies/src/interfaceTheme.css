@@ -41,14 +41,13 @@
 [data-theme="light"] .chat-detail header,
 [data-theme="light"] .chat-incoming { background: #edf3f8; border-color: #ccd8e3; color: #243c51; }
 [data-theme="light"] .conversation-row:hover { background: #dfebf5; }
-[data-theme="dark"] #familyApp .family-choice-key { background: #3a5044; color: #f1e3bf; }
-[data-theme="dark"] #familyApp .family-brief,
-[data-theme="dark"] #familyApp .family-goal,
-[data-theme="dark"] #familyApp .family-brief-meters { border-color: var(--family-border); }
 
 [data-theme="light"] .result-screen { background: #edf3f8; }
 [data-theme="light"] .result-card h2 { color: #172d42; }
-[data-theme="light"] .result-metrics div { background: #fff; border-color: #ccd8e3; }
+[data-theme="light"] .result-subtitle { color: #475569; }
+[data-theme="light"] .result-metrics div { background: #fff; border-color: #ccd8e3; color: #172d42; }
+[data-theme="light"] .result-metrics div strong { color: #172d42; }
+[data-theme="light"] .result-metrics div small { color: #64748b; }
 [data-theme="dark"] #mailApp[data-mode="messages"] { background: #101c2a; color: #edf3fa; }
 [data-theme="dark"] #inspectModal.sms-investigation-active {
  --sx-bg: #101c2a; --sx-panel: #192838; --sx-subtle: #1e3042; --sx-raised: #263d53;
