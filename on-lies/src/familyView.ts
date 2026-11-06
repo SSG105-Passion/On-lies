@@ -270,15 +270,15 @@ export function renderIncidentSummary(
           </h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
             ${history.map(item => `
-              <div style="background:rgba(15,23,42,0.8);border:1px solid ${item.won ? '#10b981' : '#ef4444'};border-radius:10px;padding:12px 16px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <span style="font-weight:700;color:#fff;font-size:13.5px;">${escapeHtml(item.code)}: ${escapeHtml(item.title)}</span>
-                  <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;background:${item.won ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};color:${item.won ? '#34d399' : '#f87171'};">
+              <div class="iru-history-card ${item.won ? 'is-won' : 'is-lost'}">
+                <div class="iru-history-header">
+                  <span class="iru-history-title">${escapeHtml(item.code)}: ${escapeHtml(item.title)}</span>
+                  <span class="iru-history-tag ${item.won ? 'tag-won' : 'tag-lost'}">
                     ${item.won ? '✓ THÀNH CÔNG' : '✕ THẤT BẠI'}
                   </span>
                 </div>
-                <div style="font-size:12px;color:#94a3b8;margin-bottom:6px;">Tài sản bảo vệ: <b style="color:#f87171;">${escapeHtml(item.targetAsset)}</b> · Thời gian xử lý: <b>${item.timeElapsed}s</b></div>
-                <p style="font-size:11.5px;color:#cbd5e1;line-height:1.5;">💡 <b>Bài học:</b> ${escapeHtml(item.lesson)}</p>
+                <div class="iru-history-meta">Tài sản bảo vệ: <b class="iru-asset-highlight">${escapeHtml(item.targetAsset)}</b> · Thời gian xử lý: <b>${item.timeElapsed}s</b></div>
+                <p class="iru-history-lesson">💡 <b>Bài học:</b> ${escapeHtml(item.lesson)}</p>
               </div>
             `).join('')}
           </div>

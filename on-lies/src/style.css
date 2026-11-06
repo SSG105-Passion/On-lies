@@ -28,6 +28,18 @@
   --text-tertiary: #64748b;
   --text-muted: #475569;
 
+  /* Surfaces & Semantic Home Palette (Dark Default) */
+  --home-paper: #0f172a;
+  --home-line: #1e293b;
+  --home-ink: #f8fafc;
+  --home-secondary: #cbd5e1;
+  --home-muted: #94a3b8;
+  --home-subtle: #1e293b;
+  --home-blue: #38bdf8;
+  --home-blue-soft: rgba(56, 189, 248, 0.15);
+  --home-card-bg: #1e293b;
+  --home-card-border: #334155;
+
   /* Fonts */
   --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Be Vietnam Pro", system-ui, sans-serif;
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -47,6 +59,18 @@
   --text-secondary: #475569;
   --text-tertiary: #64748b;
   --text-muted: #94a3b8;
+
+  /* Surfaces & Semantic Home Palette (Light Mode) */
+  --home-paper: #ffffff;
+  --home-line: #cbd5e1;
+  --home-ink: #0f172a;
+  --home-secondary: #334155;
+  --home-muted: #64748b;
+  --home-subtle: #f8fafc;
+  --home-blue: #2563eb;
+  --home-blue-soft: #eff6ff;
+  --home-card-bg: #ffffff;
+  --home-card-border: #cbd5e1;
 }
 
 [data-theme="light"] body {

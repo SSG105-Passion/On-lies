@@ -691,14 +691,212 @@
 
 
 /* ==========================================================================
-   THEME STYLES: LIGHT & DARK MODE FOR PHONE APP
+   THEME STYLES: COMPREHENSIVE LIGHT & DARK MODE FOR PHONE APP
    ========================================================================== */
-#phoneApp {
+
+/* DARK MODE (DEFAULT / [data-theme="dark"]) */
+#phoneApp,
+[data-theme="dark"] #phoneApp {
   background: #090d16;
   color: #f8fafc;
   overflow-y: auto;
 }
 
+[data-theme="dark"] .phone-top-status,
+#phoneApp:not([data-theme="light"]) .phone-top-status {
+  background: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .phone-top-status .phone-pill,
+#phoneApp:not([data-theme="light"]) .phone-top-status .phone-pill {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .phone-session-info,
+#phoneApp:not([data-theme="light"]) .phone-session-info {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .phone-intro-card,
+#phoneApp:not([data-theme="light"]) .phone-intro-card {
+  background: #0f172a;
+  border-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .phone-intro-card h2,
+#phoneApp:not([data-theme="light"]) .phone-intro-card h2 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .phone-intro-card p,
+#phoneApp:not([data-theme="light"]) .phone-intro-card p {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .phone-feature-item,
+#phoneApp:not([data-theme="light"]) .phone-feature-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .phone-feature-item strong,
+#phoneApp:not([data-theme="light"]) .phone-feature-item strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .phone-feature-item small,
+#phoneApp:not([data-theme="light"]) .phone-feature-item small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .phone-intel-panel,
+#phoneApp:not([data-theme="light"]) .phone-intel-panel {
+  background: #0f172a;
+  border-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .intel-header,
+#phoneApp:not([data-theme="light"]) .intel-header {
+  border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .intel-header h3,
+#phoneApp:not([data-theme="light"]) .intel-header h3 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .intel-badge,
+#phoneApp:not([data-theme="light"]) .intel-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .intel-box,
+#phoneApp:not([data-theme="light"]) .intel-box {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .intel-box strong,
+#phoneApp:not([data-theme="light"]) .intel-box strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .intel-data-table td,
+#phoneApp:not([data-theme="light"]) .intel-data-table td {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .intel-data-table td:first-child,
+#phoneApp:not([data-theme="light"]) .intel-data-table td:first-child {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .intel-data-table td:last-child,
+#phoneApp:not([data-theme="light"]) .intel-data-table td:last-child {
+  color: #f8fafc;
+}
+
+/* Custom interactive boxes and trap question buttons in phone dossier */
+.phone-trap-btn {
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.phone-trap-btn:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.phone-trap-btn.is-asked,
+.phone-trap-btn:disabled {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: #1e293b;
+  color: #64748b;
+  cursor: default;
+  opacity: 0.7;
+}
+
+.intel-guide-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #cbd5e1;
+  margin-top: 8px;
+}
+
+.intel-forensic-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #7dd3fc;
+}
+
+.intel-trap-result {
+  margin-top: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.intel-title-green { color: #34d399; }
+.intel-title-blue { color: #38bdf8; }
+.intel-title-amber { color: #fbbf24; }
+
+[data-theme="dark"] .phone-summary-card,
+#phoneApp:not([data-theme="light"]) .phone-summary-card {
+  background: #0f172a;
+  border-color: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .review-item,
+#phoneApp:not([data-theme="light"]) .review-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .review-text strong,
+#phoneApp:not([data-theme="light"]) .review-text strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .review-text p,
+#phoneApp:not([data-theme="light"]) .review-text p {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES ([data-theme="light"])
+   ========================================================================== */
 [data-theme="light"] #phoneApp {
   background: #f1f5f9;
   color: #0f172a;
@@ -835,6 +1033,11 @@
   color: #0f172a;
 }
 
+[data-theme="light"] .intel-badge {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
 [data-theme="light"] .intel-box {
   background: #f8fafc;
   border-color: #cbd5e1;
@@ -856,6 +1059,47 @@
 [data-theme="light"] .intel-data-table td:last-child {
   color: #0f172a;
 }
+
+[data-theme="light"] .phone-trap-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .phone-trap-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+[data-theme="light"] .phone-trap-btn.is-asked,
+[data-theme="light"] .phone-trap-btn:disabled {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+[data-theme="light"] .intel-guide-box {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #334155;
+}
+
+[data-theme="light"] .intel-forensic-box {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #1e3a8a;
+}
+
+[data-theme="light"] .intel-trap-result {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #065f46;
+}
+
+[data-theme="light"] .intel-title-green { color: #059669; }
+[data-theme="light"] .intel-title-blue { color: #2563eb; }
+[data-theme="light"] .intel-title-amber { color: #d97706; }
 
 [data-theme="light"] .phone-summary-card {
   background: #ffffff;

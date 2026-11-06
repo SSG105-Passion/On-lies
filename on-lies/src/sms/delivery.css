@@ -11,7 +11,36 @@
   white-space: nowrap;
 }
 
-#inspectModal.sms-investigation-active {
+#inspectModal.sms-investigation-active,
+[data-theme="dark"] #inspectModal.sms-investigation-active {
+  --sx-bg: #090d16;
+  --sx-panel: #0f172a;
+  --sx-subtle: #1e293b;
+  --sx-raised: #1e293b;
+  --sx-border: #334155;
+  --sx-border-strong: #475569;
+  --sx-text: #f8fafc;
+  --sx-secondary: #cbd5e1;
+  --sx-muted: #94a3b8;
+  --sx-blue: #38bdf8;
+  --sx-blue-soft: rgba(56, 189, 248, 0.15);
+  --sx-emerald: #10b981;
+  --sx-emerald-soft: rgba(16, 185, 129, 0.15);
+  --sx-gold: #f59e0b;
+  --sx-gold-soft: rgba(245, 158, 11, 0.15);
+  --sx-red: #ef4444;
+  --sx-red-soft: rgba(239, 68, 68, 0.15);
+
+  display: block;
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  background: var(--sx-bg);
+  overflow: hidden;
+  z-index: 60;
+}
+
+[data-theme="light"] #inspectModal.sms-investigation-active {
   --sx-bg: #F3F5F8;
   --sx-panel: #FFFFFF;
   --sx-subtle: #F7F9FB;

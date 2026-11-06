@@ -190,6 +190,10 @@ function applyTheme(theme: string) {
   const text = $('themeText');
   if (icon) icon.textContent = theme === 'light' ? '☀️' : '🌙';
   if (text) text.textContent = theme === 'light' ? 'Sáng' : 'Tối';
+  const inGameIcon = $('inGameThemeIcon');
+  const inGameText = $('inGameThemeText');
+  if (inGameIcon) inGameIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+  if (inGameText) inGameText.textContent = theme === 'light' ? 'Sáng' : 'Tối';
   localStorage.setItem('on-lies-theme', theme);
 }
 
@@ -199,6 +203,7 @@ function toggleTheme() {
 }
 
 $('themeToggleBtn')?.addEventListener('click', toggleTheme);
+$('inGameThemeToggleBtn')?.addEventListener('click', toggleTheme);
 
 document.addEventListener('mail-completed', () => {
   recordCompletion('mail');
@@ -218,7 +223,7 @@ function showDesktop(restoreFocus = true) {
   desktop.classList.remove('hidden');
   resultScreen.classList.add('hidden');
   inspectModal.classList.add('hidden');
-  $('windowTitle').textContent = 'Mail Inspector';
+  $('windowTitle').textContent = 'Thanh tra Hộp thư';
   $('gameNavigation').classList.add('hidden');
   updateDockActive('desktop');
   if (restoreFocus) document.querySelector<HTMLButtonElement>(`[data-app="${lastOpenedGame}"]`)?.focus({ preventScroll: true });
